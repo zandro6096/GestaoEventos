@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "GestaoEventos",
+    "slug": "gestaoeventos-react",
+    "owner": "sandsen",
+  "version": "1.0.2",
+    "scheme": "gestaoeventos",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "manager.events.dev",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "versionCode": 25,
+      "package": "manager.eventsdev"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-local-authentication",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "appEnvironment": "development",
+      "router": {},
+      "eas": {
+        "projectId": "ae2bb30c-d448-4f58-88a1-f6506bf25f2f"
+      }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/ae2bb30c-d448-4f58-88a1-f6506bf25f2f"
+    }
+  }
+}
