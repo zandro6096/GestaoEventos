@@ -3,7 +3,7 @@
     "name": "GestaoEventos",
     "slug": "gestaoeventos-react",
     "owner": "sandsen",
-  "version": "1.0.2",
+    "version": "1.0.3",
     "scheme": "gestaoeventos",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -22,7 +22,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "versionCode": 25,
+      "versionCode": 31,
       "package": "manager.eventsdev"
     },
     "web": {
