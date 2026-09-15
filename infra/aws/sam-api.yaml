@@ -1,0 +1,257 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: GestaoEventos API - AWS Lambda (.NET 8) + API Gateway HTTP API
+
+Parameters:
+  StageName:
+    Type: String
+    Default: "$default"
+    Description: API Gateway stage name. Use $default to avoid stage in URL.
+
+  FunctionMemorySize:
+    Type: Number
+    Default: 512
+    MinValue: 128
+    MaxValue: 10240
+
+  FunctionTimeout:
+    Type: Number
+    Default: 30
+    MinValue: 1
+    MaxValue: 900
+
+  ReservedConcurrency:
+    Type: Number
+    Default: 20
+    MinValue: 1
+
+  ProvisionedConcurrency:
+    Type: Number
+    Default: 2
+    MinValue: 0
+
+  LogRetentionInDays:
+    Type: Number
+    Default: 14
+    AllowedValues:
+      - 1
+      - 3
+      - 5
+      - 7
+      - 14
+      - 30
+      - 60
+      - 90
+      - 120
+      - 180
+      - 365
+
+  AppUrl:
+    Type: String
+    Default: https://sistema-eventos.seven-projetos.com
+
+  MysqlConnectionString:
+    Type: String
+    NoEcho: true
+
+  JwtSigningKey:
+    Type: String
+    NoEcho: true
+    MinLength: 32
+    Description: Chave HMAC de assinatura do JWT. Sem default de proposito — a API nao sobe sem ela.
+
+  SesAccessKey:
+    Type: String
+    Default: ""
+    NoEcho: true
+
+  SesSecretKey:
+    Type: String
+    Default: ""
+    NoEcho: true
+
+  SesRegion:
+    Type: String
+    Default: us-east-1
+
+  SesFromEmail:
+    Type: String
+    Default: noreply@seven-projetos.com
+
+  SesFromName:
+    Type: String
+    Default: Gestao de Eventos
+
+  StripeSecretKey:
+    Type: String
+    Default: ""
+    NoEcho: true
+
+  StripePublishableKey:
+    Type: String
+    Default: ""
+
+  StripeWebhookSecret:
+    Type: String
+    Default: ""
+    NoEcho: true
+
+  JwtSigningKey:
+    Type: String
+    NoEcho: true
+
+  JwtIssuer:
+    Type: String
+    Default: gestao-eventos-api
+
+  JwtAudience:
+    Type: String
+    Default: gestao-eventos-app
+
+  SsoDefaultReturnUrl:
+    Type: String
+    Default: https://sistema-eventos.seven-projetos.com/auth/sso/callback
+
+  SsoStateSigningKey:
+    Type: String
+    NoEcho: true
+
+  SsoGoogleClientId:
+    Type: String
+    Default: ""
+
+  SsoGoogleClientSecret:
+    Type: String
+    Default: ""
+    NoEcho: true
+
+  SsoFacebookClientId:
+    Type: String
+    Default: ""
+
+  SsoFacebookClientSecret:
+    Type: String
+    Default: ""
+    NoEcho: true
+
+  SsoMicrosoftClientId:
+    Type: String
+    Default: ""
+
+  SsoMicrosoftClientSecret:
+    Type: String
+    Default: ""
+    NoEcho: true
+
+Conditions:
+  IsDefaultStage: !Equals [!Ref StageName, "$default"]
+
+Resources:
+  GestaoEventosHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref StageName
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AppUrl
+        AllowHeaders:
+          - Authorization
+          - Content-Type
+          - X-Requested-With
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        AllowCredentials: true
+        MaxAge: 86400
+
+  GestaoEventosApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-api"
+      CodeUri: ../../GestaoEventos.API/src/GestaoEventos.Web/
+      Runtime: dotnet8
+      Handler: GestaoEventos.API.Web
+      MemorySize: !Ref FunctionMemorySize
+      Timeout: !Ref FunctionTimeout
+      ReservedConcurrentExecutions: !Ref ReservedConcurrency
+      AutoPublishAlias: live
+      ProvisionedConcurrencyConfig:
+        ProvisionedConcurrentExecutions: !Ref ProvisionedConcurrency
+      Tracing: Active
+      Environment:
+        Variables:
+          ASPNETCORE_ENVIRONMENT: Production
+          ConnectionStrings__Mysql: !Ref MysqlConnectionString
+          Jwt__SigningKey: !Ref JwtSigningKey
+          Jwt__Issuer: gestao-eventos-api
+          Jwt__Audience: gestao-eventos-app
+          App__Url: !Ref AppUrl
+          Ses__AccessKey: !Ref SesAccessKey
+          Ses__SecretKey: !Ref SesSecretKey
+          Ses__Region: !Ref SesRegion
+          Ses__FromEmail: !Ref SesFromEmail
+          Ses__FromName: !Ref SesFromName
+          Stripe__SecretKey: !Ref StripeSecretKey
+          Stripe__PublishableKey: !Ref StripePublishableKey
+          Stripe__WebhookSecret: !Ref StripeWebhookSecret
+          Jwt__SigningKey: !Ref JwtSigningKey
+          Jwt__Issuer: !Ref JwtIssuer
+          Jwt__Audience: !Ref JwtAudience
+          Sso__DefaultReturnUrl: !Ref SsoDefaultReturnUrl
+          Sso__StateSigningKey: !Ref SsoStateSigningKey
+          Sso__Google__ClientId: !Ref SsoGoogleClientId
+          Sso__Google__ClientSecret: !Ref SsoGoogleClientSecret
+          Sso__Facebook__ClientId: !Ref SsoFacebookClientId
+          Sso__Facebook__ClientSecret: !Ref SsoFacebookClientSecret
+          Sso__Microsoft__ClientId: !Ref SsoMicrosoftClientId
+          Sso__Microsoft__ClientSecret: !Ref SsoMicrosoftClientSecret
+      Policies:
+        - AWSLambdaBasicExecutionRole
+      Events:
+        Root:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref GestaoEventosHttpApi
+            Path: /
+            Method: ANY
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref GestaoEventosHttpApi
+            Path: /{proxy+}
+            Method: ANY
+
+  GestaoEventosApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${GestaoEventosApiFunction}"
+      RetentionInDays: !Ref LogRetentionInDays
+
+Outputs:
+  HttpApiId:
+    Description: HTTP API identifier
+    Value: !Ref GestaoEventosHttpApi
+
+  HttpApiStageName:
+    Description: HTTP API stage name
+    Value: !Ref StageName
+
+  HttpApiInvokeUrl:
+    Description: API invoke URL (stage may be implicit for $default)
+    Value: !Sub "https://${GestaoEventosHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+
+  ApiOriginDomainName:
+    Description: Domain used by CloudFront API origin
+    Value: !Sub "${GestaoEventosHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+
+  ApiOriginPath:
+    Description: Origin path to use in CloudFront for stage routing
+    Value: !If [IsDefaultStage, "", !Sub "/${StageName}"]
+
+  LambdaFunctionName:
+    Description: Lambda function name
+    Value: !Ref GestaoEventosApiFunction

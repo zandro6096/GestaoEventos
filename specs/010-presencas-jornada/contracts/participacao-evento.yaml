@@ -1,0 +1,328 @@
+openapi: 3.0.3
+info:
+  title: GestaoEventos — Participações Evento (Existente)
+  version: 1.0.0
+  description: |
+    Endpoints existentes para registro de participação em eventos.
+    Documentado aqui como referência para a feature 010.
+
+servers:
+  - url: https://localhost:7200
+    description: Local HTTPS
+
+paths:
+  /api/participacoes-evento:
+    get:
+      summary: Lista participações em eventos
+      operationId: listParticipacaoEvento
+      parameters:
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: take
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: evento_id
+          in: query
+          schema:
+            type: integer
+        - name: usuario_id
+          in: query
+          schema:
+            type: integer
+        - name: ocorrencia_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lista paginada de participações
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageResultParticipacaoEvento"
+
+    post:
+      summary: Cria nova participação (auto check-in ou registro pelo responsável)
+      operationId: createParticipacaoEvento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateParticipacaoEventoRequest"
+            example:
+              evento_id: 42
+              usuario_id: 7
+              ocorrencia_id: 101
+              ocorrido_em: "2026-03-08T19:30:00Z"
+              status: "presente"
+              observacao: null
+      responses:
+        "200":
+          description: Participação criada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseParticipacaoEvento"
+        "400":
+          description: Validation error
+
+  /api/participacoes-evento/{id}:
+    put:
+      summary: Atualiza status de participação existente
+      operationId: updateParticipacaoEvento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateParticipacaoEventoRequest"
+      responses:
+        "200":
+          description: Participação atualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseParticipacaoEvento"
+        "400":
+          description: Validation error (inclui erro de janela 24h após finalização)
+
+  /api/participacoes:
+    get:
+      summary: Jornada pessoal — lista participações do usuário logado
+      operationId: listParticipacoes
+      parameters:
+        - name: usuario_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: estrutura_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: take
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Lista de participações do usuário
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParticipacaoListResponse"
+
+  /api/participacoes/frequencia:
+    get:
+      summary: Frequência do usuário (percentual de presença)
+      operationId: getFrequencia
+      description: |
+        **Mudança desta feature (010)**: adicionado query param `periodo_dias`.
+        Default: 30 dias. Valores válidos: 7, 30, 90, 365.
+      parameters:
+        - name: usuario_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: estrutura_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: periodo_dias
+          in: query
+          description: "NOVO nesta feature. Filtra participações dos últimos N dias. Default: 30."
+          schema:
+            type: integer
+            enum: [7, 30, 90, 365]
+            default: 30
+      responses:
+        "200":
+          description: Dados de frequência calculados
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FrequenciaResponse"
+
+components:
+  schemas:
+    CreateParticipacaoEventoRequest:
+      type: object
+      required: [evento_id, ocorrido_em, status]
+      properties:
+        evento_id:
+          type: integer
+        usuario_id:
+          type: integer
+          nullable: true
+        usuario_virtual_id:
+          type: integer
+          nullable: true
+        ocorrencia_id:
+          type: integer
+          nullable: true
+        ocorrido_em:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [presente, ausente, justificado]
+        observacao:
+          type: string
+          nullable: true
+
+    UpdateParticipacaoEventoRequest:
+      type: object
+      required: [id, evento_id, usuario_id, ocorrido_em, status]
+      properties:
+        id:
+          type: integer
+        evento_id:
+          type: integer
+        usuario_id:
+          type: integer
+        ocorrido_em:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [presente, ausente, justificado]
+        observacao:
+          type: string
+          nullable: true
+
+    ParticipacaoEventoRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        evento_id:
+          type: integer
+        usuario_id:
+          type: integer
+        ocorrido_em:
+          type: string
+          format: date-time
+        status:
+          type: string
+        observacao:
+          type: string
+          nullable: true
+        criado_em:
+          type: string
+          format: date-time
+        atualizado_em:
+          type: string
+          format: date-time
+
+    ResponseParticipacaoEvento:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/ParticipacaoEventoRecord"
+        success:
+          type: boolean
+        message:
+          type: string
+
+    PageResultParticipacaoEvento:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ParticipacaoEventoRecord"
+        page_info:
+          $ref: "#/components/schemas/PageInfo"
+
+    PageInfo:
+      type: object
+      properties:
+        page_number:
+          type: integer
+        page_size:
+          type: integer
+        total_count:
+          type: integer
+        total_pages:
+          type: integer
+
+    ParticipacaoRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        evento_id:
+          type: integer
+        evento_titulo:
+          type: string
+        usuario_id:
+          type: integer
+        usuario_nome:
+          type: string
+        ocorrido_em:
+          type: string
+          format: date-time
+        status:
+          type: string
+        observacao:
+          type: string
+          nullable: true
+        registrado_em:
+          type: string
+          format: date-time
+
+    ParticipacaoListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ParticipacaoRecord"
+        success:
+          type: boolean
+        message:
+          type: string
+
+    FrequenciaResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            percentual_frequencia:
+              type: number
+              format: decimal
+              description: Percentual de presença (0–100)
+            total_participacoes:
+              type: integer
+            total_presencas:
+              type: integer
+            total_ausencias:
+              type: integer
+            total_pendentes:
+              type: integer
+        success:
+          type: boolean
+        message:
+          type: string

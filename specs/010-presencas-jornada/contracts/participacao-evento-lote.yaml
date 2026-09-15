@@ -1,0 +1,188 @@
+openapi: 3.0.3
+info:
+  title: GestaoEventos — Registro de Presença em Lote (NOVO)
+  version: 1.0.0
+  description: |
+    Novo endpoint criado na feature 010-presencas-jornada.
+    Permite que o responsável registre presença de toda a lista de participantes
+    de uma ocorrência em uma única chamada atômica (transação única no banco).
+    
+    ## Idempotência
+    - Se já existir registro para `(usuario_id | usuario_virtual_id, ocorrencia_id)` → **update** (upsert)
+    - Não cria duplicatas em hipótese nenhuma
+    
+    ## Permissões
+    - Requer `VALIDAR_PRESENCA_GRUPO` ou `context.isOwner = true`
+    - Participante sem permissão recebe 403
+    
+    ## Policy de Correção
+    - Evento finalizado: permitido por até 24h
+    - Após 24h: apenas admin (retorna 400 com mensagem explicativa)
+
+servers:
+  - url: https://localhost:7200
+    description: Local HTTPS
+
+paths:
+  /api/participacoes-evento/lote:
+    post:
+      summary: Registra presença em lote para uma ocorrência
+      operationId: bulkCreateParticipacaoEvento
+      tags:
+        - Participações
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BulkCreateParticipacaoEventoRequest"
+            example:
+              ocorrencia_id: 101
+              evento_id: 42
+              registrado_por: 7
+              ocorrido_em: "2026-03-08T19:30:00Z"
+              participantes:
+                - usuario_id: 10
+                  status: presente
+                  observacao: null
+                - usuario_id: 11
+                  status: ausente
+                  observacao: null
+                - usuario_virtual_id: 3
+                  status: justificado
+                  observacao: "Viagem de trabalho"
+                - usuario_id: 12
+                  status: presente
+                  observacao: null
+      responses:
+        "200":
+          description: Lote processado com sucesso (parcial ou total)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BulkCreateParticipacaoEventoResponse"
+              example:
+                success: true
+                total: 4
+                processados: 4
+                erros: []
+        "400":
+          description: |
+            Validation error. Exemplos:
+            - Lista de participantes vazia
+            - ocorrencia_id ausente
+            - Evento finalizado há mais de 24h (responsável não-admin)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Usuário sem permissão VALIDAR_PRESENCA_GRUPO
+
+components:
+  schemas:
+    BulkCreateParticipacaoEventoRequest:
+      type: object
+      required:
+        - ocorrencia_id
+        - evento_id
+        - registrado_por
+        - ocorrido_em
+        - participantes
+      properties:
+        ocorrencia_id:
+          type: integer
+          description: ID da OcorrenciaEvento alvo
+          example: 101
+        evento_id:
+          type: integer
+          description: ID do Evento pai
+          example: 42
+        registrado_por:
+          type: integer
+          description: ID do usuário responsável que está registrando as presenças
+          example: 7
+        ocorrido_em:
+          type: string
+          format: date-time
+          description: Data/hora da ocorrência do evento
+          example: "2026-03-08T19:30:00Z"
+        participantes:
+          type: array
+          minItems: 1
+          description: Lista de participantes com seus status de presença
+          items:
+            $ref: "#/components/schemas/BulkParticipanteItem"
+
+    BulkParticipanteItem:
+      type: object
+      description: |
+        Exatamente um de usuario_id ou usuario_virtual_id deve estar preenchido.
+      properties:
+        usuario_id:
+          type: integer
+          nullable: true
+          description: ID do usuário real (null se usuário virtual)
+        usuario_virtual_id:
+          type: integer
+          nullable: true
+          description: ID do usuário virtual (null se usuário real)
+        status:
+          type: string
+          enum:
+            - presente
+            - ausente
+            - justificado
+          description: Status de presença a ser registrado
+        observacao:
+          type: string
+          nullable: true
+          description: |
+            - Obrigatória quando status = "justificado"
+            - Opcional quando status = "ausente"
+            - Ignorada quando status = "presente"
+      example:
+        usuario_id: 10
+        status: presente
+        observacao: null
+
+    BulkCreateParticipacaoEventoResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: true se todos processados sem erros; false se houve erros parciais
+        total:
+          type: integer
+          description: Total de participantes no request
+        processados:
+          type: integer
+          description: Quantidade processada com sucesso (inserted ou updated)
+        erros:
+          type: array
+          description: Lista de erros por participante (vazia se tudo ok)
+          items:
+            $ref: "#/components/schemas/BulkPresencaErro"
+
+    BulkPresencaErro:
+      type: object
+      properties:
+        usuario_id:
+          type: integer
+          nullable: true
+        usuario_virtual_id:
+          type: integer
+          nullable: true
+        mensagem:
+          type: string
+          description: Descrição do erro para este participante específico
+
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string

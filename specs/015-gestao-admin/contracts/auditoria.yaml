@@ -1,0 +1,73 @@
+openapi: "3.0.3"
+info:
+  title: Auditoria API
+  version: "1.0"
+  description: Log de auditoria — somente leitura. Nenhum endpoint de escrita exposto.
+paths:
+  /api/auditoria:
+    get:
+      summary: Listar log de auditoria com filtros
+      parameters:
+        - name: estrutura_id
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: usuario_id
+          in: query
+          schema: { type: integer }
+          description: Filtrar por usuário específico
+        - name: entidade
+          in: query
+          schema: { type: string }
+          description: "Ex: Papel, TipoGrupo, TipoEvento, Grupo, Evento, Usuario"
+        - name: acao
+          in: query
+          schema:
+            type: string
+            enum: [CREATE, UPDATE, DELETE]
+        - name: data_inicio
+          in: query
+          schema: { type: string, format: date }
+          description: Início do período (inclusive)
+        - name: data_fim
+          in: query
+          schema: { type: string, format: date }
+          description: Fim do período (inclusive)
+        - name: skip
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: take
+          in: query
+          schema: { type: integer, default: 50, maximum: 100 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AuditoriaRecord"
+                  total: { type: integer }
+                  skip: { type: integer }
+                  take: { type: integer }
+
+components:
+  schemas:
+    AuditoriaRecord:
+      type: object
+      properties:
+        id: { type: integer }
+        usuario_id: { type: integer }
+        nome_usuario: { type: string }
+        acao:
+          type: string
+          enum: [CREATE, UPDATE, DELETE]
+        entidade: { type: string, example: "Papel" }
+        entidade_id: { type: integer }
+        descricao: { type: string }
+        dados_antigos: { type: string, nullable: true, description: "JSON serializado com valores antes da alteração" }
+        dados_novos: { type: string, nullable: true, description: "JSON serializado com valores após a alteração" }
+        criado_em: { type: string, format: date-time }

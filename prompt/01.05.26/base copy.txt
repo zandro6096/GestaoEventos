@@ -1,0 +1,10 @@
+1) Preciamos pensar em um modulo de curso onde tera materias "XPTO A" tera aulas a cada 2 vezes na semana etc podemos usar o recurso de Eventos para isso que é dinamico, sõ temos alguns pontos
+
+Curso tem professor, status quando o usuario Entra em Andamento, Concluido ou Reprovado ou Aprovado
+
+A ideia é conseguir tambem vincular o curso ao membro de um evento exemplo na celula da Dayane o membro XPTO entrou no curso A e esta en andamento quando terminar ficara Concluido
+
+O Obreiro Roney por exemplo fara a gestão do curso add as materias, professores etc, para o professor deveria ter material de apoio, e conseguir associar o aluno da Dayane acho que por e-mail na materia, caso sei la o Roney nao saiba o e-mail ou crie um usuario que seja o da dayane mas com outro nome a Dayane deveria ter liberdade de conseguir associar o curso e informar que foi finalizado.
+
+Mas acredito que o curso deve ser vinculado ao grupo na sua criação, pois poderia ter cursos especificos para grupos e não para todos etc
+

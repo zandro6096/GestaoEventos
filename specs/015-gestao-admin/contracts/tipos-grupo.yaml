@@ -1,0 +1,128 @@
+openapi: "3.0.3"
+info:
+  title: Tipos de Grupo API
+  version: "1.0"
+  description: >
+    Endpoints existentes: GET /api/tipos-grupo, POST /api/tipos-grupo.
+    Endpoints NOVOS (criar nesta feature): PUT /api/tipos-grupo/{id}, DELETE /api/tipos-grupo/{id}.
+paths:
+  /api/tipos-grupo:
+    get:
+      summary: Listar tipos de grupo da estrutura
+      parameters:
+        - name: estrutura_id
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: apenas_ativos
+          in: query
+          schema: { type: boolean, default: true }
+        - name: skip
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: take
+          in: query
+          schema: { type: integer, default: 50 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TipoGrupoRecord"
+                  total: { type: integer }
+    post:
+      summary: Criar tipo de grupo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SalvarTipoGrupoRequest"
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TipoGrupoRecord"
+
+  /api/tipos-grupo/{id}:
+    put:
+      summary: Atualizar tipo de grupo [NOVO]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SalvarTipoGrupoRequest"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TipoGrupoRecord"
+        "404":
+          description: Tipo não encontrado
+    delete:
+      summary: Excluir tipo de grupo [NOVO] — bloqueado se grupos vinculados existirem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Tipo desativado
+        "400":
+          description: Tipo em uso — grupos vinculados impedem exclusão
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  grupos_afetados: { type: integer }
+                  grupos:
+                    type: array
+                    items: { type: string }
+
+components:
+  schemas:
+    TipoGrupoRecord:
+      type: object
+      properties:
+        id: { type: integer }
+        nome: { type: string }
+        descricao: { type: string, nullable: true }
+        icone: { type: string, nullable: true, example: "pi-users" }
+        cor: { type: string, nullable: true, example: "#10B981" }
+        estrutura_id: { type: integer }
+        permite_subgrupos: { type: boolean }
+        nivel_hierarquico_padrao: { type: integer, nullable: true }
+        ordem: { type: integer }
+        ativo: { type: boolean }
+        criado_em: { type: string, format: date-time }
+        atualizado_em: { type: string, format: date-time, nullable: true }
+
+    SalvarTipoGrupoRequest:
+      type: object
+      required: [nome, estrutura_id]
+      properties:
+        nome: { type: string, minLength: 2, maxLength: 80 }
+        descricao: { type: string, maxLength: 300, nullable: true }
+        icone: { type: string, nullable: true }
+        cor: { type: string, nullable: true }
+        estrutura_id: { type: integer }
+        permite_subgrupos: { type: boolean, default: true }
+        nivel_hierarquico_padrao: { type: integer, nullable: true }
+        ordem: { type: integer, default: 0 }
+        ativo: { type: boolean, default: true }

@@ -1,0 +1,130 @@
+openapi: "3.0.3"
+info:
+  title: Tipos de Evento API
+  version: "1.0"
+  description: >
+    Endpoints existentes: GET /api/tipos-evento, POST /api/tipos-evento.
+    Endpoints NOVOS (criar nesta feature): PUT /api/tipos-evento/{id}, DELETE /api/tipos-evento/{id}.
+paths:
+  /api/tipos-evento:
+    get:
+      summary: Listar tipos de evento da estrutura
+      parameters:
+        - name: estrutura_id
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: apenas_ativos
+          in: query
+          schema: { type: boolean, default: true }
+        - name: skip
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: take
+          in: query
+          schema: { type: integer, default: 50 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TipoEventoRecord"
+                  total: { type: integer }
+    post:
+      summary: Criar tipo de evento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SalvarTipoEventoRequest"
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TipoEventoRecord"
+
+  /api/tipos-evento/{id}:
+    put:
+      summary: Atualizar tipo de evento [NOVO]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SalvarTipoEventoRequest"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TipoEventoRecord"
+        "404":
+          description: Tipo não encontrado
+    delete:
+      summary: Excluir tipo de evento [NOVO] — bloqueado se templates vinculados existirem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Tipo desativado
+        "400":
+          description: Tipo em uso — templates vinculados impedem exclusão
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  templates_afetados: { type: integer }
+                  templates:
+                    type: array
+                    items: { type: string }
+
+components:
+  schemas:
+    TipoEventoRecord:
+      type: object
+      properties:
+        id: { type: integer }
+        nome: { type: string }
+        descricao: { type: string, nullable: true }
+        icone: { type: string, nullable: true, example: "pi-calendar" }
+        cor: { type: string, nullable: true, example: "#0066FF" }
+        estrutura_id: { type: integer }
+        permite_recorrencia: { type: boolean }
+        requer_confirmacao: { type: boolean }
+        duracao_padrao_minutos: { type: integer, nullable: true }
+        ordem: { type: integer }
+        ativo: { type: boolean }
+        criado_em: { type: string, format: date-time }
+        atualizado_em: { type: string, format: date-time, nullable: true }
+
+    SalvarTipoEventoRequest:
+      type: object
+      required: [nome, estrutura_id]
+      properties:
+        nome: { type: string, minLength: 2, maxLength: 80 }
+        descricao: { type: string, maxLength: 300, nullable: true }
+        icone: { type: string, nullable: true }
+        cor: { type: string, nullable: true }
+        estrutura_id: { type: integer }
+        permite_recorrencia: { type: boolean, default: true }
+        requer_confirmacao: { type: boolean, default: false }
+        duracao_padrao_minutos: { type: integer, nullable: true, minimum: 15 }
+        ordem: { type: integer, default: 0 }
+        ativo: { type: boolean, default: true }

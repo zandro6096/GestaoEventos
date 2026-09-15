@@ -1,0 +1,30 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Angular Dev Server",
+			"type": "shell",
+			"command": "cd C:\\Users\\Sandr\\source\\repos\\GestaoEventos\\GestaoEventos.Angular && npx ng serve --port 4200",
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "API Server",
+			"type": "shell",
+			"command": "cd C:\\Users\\Sandr\\source\\repos\\GestaoEventos\\GestaoEventos.API\\src\\GestaoEventos.Web && dotnet run --launch-profile https",
+			"isBackground": true,
+			"group": "build"
+		},
+		{
+			"label": "Build API",
+			"type": "shell",
+			"command": "cd /d C:\\Users\\Sandr\\source\\repos\\GestaoEventos\\GestaoEventos.API && dotnet build src\\GestaoEventos.Web\\GestaoEventos.API.Web.csproj -c Debug --nologo && echo BUILD_OK",
+			"isBackground": false,
+			"problemMatcher": [
+				"$msCompile"
+			],
+			"group": "build"
+		}
+	]
+}

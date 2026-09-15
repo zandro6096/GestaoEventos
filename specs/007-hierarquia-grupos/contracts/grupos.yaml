@@ -1,0 +1,253 @@
+openapi: "3.0.3"
+info:
+  title: "Grupos API"
+  description: "Endpoints de criação, listagem, edição, exclusão e visualização hierárquica de grupos."
+  version: "1.0.0"
+
+paths:
+  /api/grupos:
+    get:
+      summary: "Listar grupos da estrutura (flat, paginado)"
+      tags: [Grupos]
+      parameters:
+        - name: estrutura_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          example: 1
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: take
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: nome
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Lista paginada de grupos"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageResult"
+
+    post:
+      summary: "Criar novo grupo"
+      tags: [Grupos]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGrupoRequest"
+      responses:
+        "201":
+          description: "Grupo criado com sucesso"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrupoResponse"
+        "400":
+          description: "Dados inválidos (ex: ciclo hierárquico detectado)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "422":
+          description: "Validação falhou"
+
+  /api/grupos/hierarquia:
+    get:
+      summary: "Listar grupos em formato de árvore hierárquica"
+      description: "Retorna grupos raiz com `gruposFilhos` aninhados recursivamente. Inclui `metadados` por grupo."
+      tags: [Grupos]
+      parameters:
+        - name: estrutura_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: "Árvore hierárquica de grupos"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GrupoCompletoResponse"
+
+  /api/grupos/{id}:
+    get:
+      summary: "Obter grupo por ID"
+      tags: [Grupos]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: "Dados completos do grupo"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrupoCompletoResponse"
+        "404":
+          description: "Grupo não encontrado"
+
+    put:
+      summary: "Atualizar grupo"
+      tags: [Grupos]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateGrupoRequest"
+      responses:
+        "200":
+          description: "Grupo atualizado"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrupoResponse"
+        "400":
+          description: "Ciclo hierárquico detectado ou dados inválidos"
+
+    delete:
+      summary: "Excluir grupo"
+      description: "Retorna aviso se o grupo possui subgrupos antes de deletar."
+      tags: [Grupos]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: "Grupo excluído com sucesso"
+        "409":
+          description: "Grupo possui subgrupos — exclusão bloqueada"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+components:
+  schemas:
+    CreateGrupoRequest:
+      type: object
+      required: [nome, estrutura_id]
+      properties:
+        nome:
+          type: string
+          example: "Célula Norte"
+        estrutura_id:
+          type: integer
+          example: 1
+        grupo_superior_id:
+          type: integer
+          nullable: true
+          example: 5
+        tipo_grupo_id:
+          type: integer
+          nullable: true
+          example: 2
+
+    UpdateGrupoRequest:
+      type: object
+      properties:
+        nome:
+          type: string
+        grupo_superior_id:
+          type: integer
+          nullable: true
+
+    GrupoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        estrutura_id:
+          type: integer
+        nivel_hierarquico:
+          type: integer
+        grupo_superior_id:
+          type: integer
+          nullable: true
+        criado_em:
+          type: string
+          format: date-time
+
+    GrupoCompletoResponse:
+      allOf:
+        - $ref: "#/components/schemas/GrupoResponse"
+      properties:
+        grupos_filhos:
+          type: array
+          items:
+            $ref: "#/components/schemas/GrupoCompletoResponse"
+        metadados:
+          $ref: "#/components/schemas/MetadadosGrupo"
+
+    MetadadosGrupo:
+      type: object
+      properties:
+        total_membros:
+          type: integer
+        total_membros_ativos:
+          type: integer
+        total_subgrupos:
+          type: integer
+        total_eventos_ativos:
+          type: integer
+
+    PageResult:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/GrupoResponse"
+        page_info:
+          type: object
+          properties:
+            total_count:
+              type: integer
+            page_size:
+              type: integer
+            page_number:
+              type: integer
+
+    ProblemDetails:
+      type: object
+      properties:
+        title:
+          type: string
+        detail:
+          type: string
+        status:
+          type: integer

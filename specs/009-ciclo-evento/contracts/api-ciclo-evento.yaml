@@ -1,0 +1,612 @@
+openapi: 3.0.3
+info:
+  title: GestaoEventos — Ciclo do Evento (009)
+  description: |
+    Contratos de API utilizados pela spec 009-ciclo-evento.
+    Todos os endpoints já existem no backend. Este documento é a referência
+    para integração frontend → backend durante a implementação.
+  version: "1.0.0"
+
+servers:
+  - url: https://localhost:57678
+    description: Desenvolvimento local
+
+paths:
+
+  # ─────────────────────────────────────────────────────────
+  # OCORRÊNCIAS
+  # ─────────────────────────────────────────────────────────
+
+  /api/ocorrencias:
+    get:
+      summary: Listar ocorrências do usuário
+      operationId: listarOcorrencias
+      tags: [Ocorrencias]
+      parameters:
+        - name: usuario_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: estrutura_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: take
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: evento_id
+          in: query
+          schema:
+            type: integer
+          description: Filtrar por configuração de evento
+        - name: data_inicio
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Retornar ocorrências a partir desta data
+      responses:
+        "200":
+          description: Lista paginada de ocorrências
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOcorrenciasResponse'
+
+  /api/ocorrencias/{id}/status:
+    put:
+      summary: Atualizar status de uma ocorrência (Iniciar / Finalizar / Cancelar)
+      operationId: atualizarStatusOcorrencia
+      tags: [Ocorrencias]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStatusRequest'
+            examples:
+              iniciar:
+                summary: Iniciar evento
+                value:
+                  novo_status: "EmAndamento"
+              finalizar:
+                summary: Finalizar evento
+                value:
+                  novo_status: "Realizada"
+                  observacoes: "Ótima participação hoje"
+              cancelar:
+                summary: Cancelar evento
+                value:
+                  novo_status: "Cancelada"
+                  motivo: "Responsável viajando"
+      responses:
+        "200":
+          description: Ocorrência atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcorrenciaRecord'
+        "404":
+          description: Ocorrência não encontrada
+
+  # ─────────────────────────────────────────────────────────
+  # CONFIGURAÇÕES DE EVENTO
+  # ─────────────────────────────────────────────────────────
+
+  /api/eventos/configuracoes:
+    get:
+      summary: Listar configurações de evento (Meus Eventos)
+      operationId: listarConfiguracoes
+      tags: [EventoConfiguracoes]
+      parameters:
+        - name: responsavel_id
+          in: query
+          schema:
+            type: integer
+          description: Filtrar por responsável (usar para "Meus Eventos")
+        - name: estrutura_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: grupo_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lista de configurações
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventoConfiguracaoRecord'
+    post:
+      summary: Criar nova configuração de evento a partir de template
+      operationId: criarConfiguracao
+      tags: [EventoConfiguracoes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConfiguracaoRequest'
+      responses:
+        "201":
+          description: Configuração criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoConfiguracaoRecord'
+
+  /api/eventos/configuracoes/{id}:
+    put:
+      summary: Editar configuração de evento
+      operationId: editarConfiguracao
+      tags: [EventoConfiguracoes]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConfiguracaoRequest'
+      responses:
+        "200":
+          description: Configuração atualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventoConfiguracaoRecord'
+
+  /api/eventos/configuracoes/{id}/historico:
+    get:
+      summary: Histórico de ocorrências de uma configuração
+      operationId: getHistoricoOcorrencias
+      tags: [EventoConfiguracoes]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Lista de ocorrências históricas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OcorrenciaRecord'
+
+  /api/eventos/configuracoes/{id}/responsaveis:
+    post:
+      summary: Adicionar co-responsável ao evento
+      operationId: adicionarResponsavel
+      tags: [EventoConfiguracoes]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddResponsavelRequest'
+      responses:
+        "200":
+          description: Co-responsável adicionado
+
+  # ─────────────────────────────────────────────────────────
+  # GERAR / MATERIALIZAR OCORRÊNCIAS
+  # ─────────────────────────────────────────────────────────
+
+  /api/eventos/{eventoId}/gerar-ocorrencias:
+    post:
+      summary: Gerar ocorrências virtuais baseadas na RRule do template
+      operationId: gerarOcorrencias
+      tags: [Ocorrencias]
+      parameters:
+        - name: eventoId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data_inicio:
+                  type: string
+                  format: date-time
+                data_fim:
+                  type: string
+                  format: date-time
+                max_ocorrencias:
+                  type: integer
+                  default: 52
+      responses:
+        "200":
+          description: Lista de ocorrências geradas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OcorrenciaRecord'
+
+  # ─────────────────────────────────────────────────────────
+  # EXCEÇÕES DE RECORRÊNCIA
+  # ─────────────────────────────────────────────────────────
+
+  /api/excecoes-evento:
+    post:
+      summary: Criar exceção — pular uma ocorrência específica
+      operationId: criarExcecaoEvento
+      tags: [ExcecoesEvento]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExcecaoEventoRequest'
+            example:
+              nome: "Feriado de Páscoa"
+              evento_id: 42
+              data: "2026-04-05T00:00:00Z"
+              tipo: "CANCELAMENTO"
+              motivo: "Feriado nacional"
+      responses:
+        "201":
+          description: Exceção criada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExcecaoEventoRecord'
+
+  /api/excecoes-evento/{id}:
+    delete:
+      summary: Restaurar ocorrência (remover exceção)
+      operationId: deletarExcecaoEvento
+      tags: [ExcecoesEvento]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Exceção removida — ocorrência restaurada
+
+  # ─────────────────────────────────────────────────────────
+  # CONFLITOS
+  # ─────────────────────────────────────────────────────────
+
+  /api/eventos/conflitos:
+    get:
+      summary: Verificar conflitos de horário
+      operationId: verificarConflitos
+      tags: [Eventos]
+      parameters:
+        - name: responsavel_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: data_hora_inicio
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: duracao_minutos
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: evento_id
+          in: query
+          schema:
+            type: integer
+          description: Excluir este evento da verificação (ao editar)
+      responses:
+        "200":
+          description: Conflitos encontrados (lista vazia = sem conflitos)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    evento_id:
+                      type: integer
+                    titulo:
+                      type: string
+                    data_hora:
+                      type: string
+                      format: date-time
+
+# ─────────────────────────────────────────────────────────
+# USUÁRIOS VIRTUAIS (CONVIDADOS EXTERNOS)
+# ─────────────────────────────────────────────────────────
+
+  /api/usuarios-virtuais:
+    post:
+      summary: Criar convidado externo sem conta (UsuarioVirtual)
+      operationId: criarUsuarioVirtual
+      tags: [UsuariosVirtuais]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUsuarioVirtualRequest'
+            example:
+              nome: "João da Silva"
+              email: "joao@email.com"
+              estrutura_id: 6
+      responses:
+        "201":
+          description: Convidado externo criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioVirtualRecord'
+
+# ─────────────────────────────────────────────────────────
+# SCHEMAS
+# ─────────────────────────────────────────────────────────
+
+components:
+  schemas:
+
+    StatusOcorrencia:
+      type: string
+      enum: [Agendada, EmAndamento, Realizada, Cancelada, Reagendada]
+      description: |
+        - Agendada: aguardando início
+        - EmAndamento: evento iniciado (botão Iniciar clicado)
+        - Realizada: evento finalizado com presenças
+        - Cancelada: cancelado antes ou durante
+        - Reagendada: data/hora ajustada
+
+    OcorrenciaRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        evento_id:
+          type: integer
+        evento_titulo:
+          type: string
+        data_hora:
+          type: string
+          format: date-time
+        data_efetiva:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/StatusOcorrencia'
+        cancelada:
+          type: boolean
+        motivo_cancelamento:
+          type: string
+          nullable: true
+        observacoes:
+          type: string
+          nullable: true
+        criado_em:
+          type: string
+          format: date-time
+        grupo_id:
+          type: integer
+        grupo_nome:
+          type: string
+        local:
+          type: string
+          nullable: true
+
+    ListOcorrenciasResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/OcorrenciaRecord'
+        page_info:
+          type: object
+          properties:
+            current_page:
+              type: integer
+            total_items:
+              type: integer
+            total_pages:
+              type: integer
+            items_per_page:
+              type: integer
+
+    UpdateStatusRequest:
+      type: object
+      required: [novo_status]
+      properties:
+        novo_status:
+          $ref: '#/components/schemas/StatusOcorrencia'
+        motivo:
+          type: string
+          nullable: true
+          description: Obrigatório quando novo_status = Cancelada
+        nova_data_hora:
+          type: string
+          format: date-time
+          nullable: true
+          description: Usado apenas para Reagendada
+        observacoes:
+          type: string
+          nullable: true
+
+    EventoConfiguracaoRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        evento_template_id:
+          type: integer
+        grupo_id:
+          type: integer
+        responsavel_id:
+          type: integer
+        dia:
+          type: string
+          example: "Terça-feira"
+        hora:
+          type: string
+          example: "18:00"
+        local:
+          type: string
+        membros_ids:
+          type: array
+          items:
+            type: integer
+        status:
+          type: string
+          enum: [ativa, inativa, arquivada]
+        criado_em:
+          type: string
+          format: date-time
+
+    CreateConfiguracaoRequest:
+      type: object
+      required: [evento_template_id, grupo_id, responsavel_id, dia, hora, local]
+      properties:
+        evento_template_id:
+          type: integer
+        grupo_id:
+          type: integer
+        responsavel_id:
+          type: integer
+        dia:
+          type: string
+        hora:
+          type: string
+        local:
+          type: string
+        membros_ids:
+          type: array
+          items:
+            type: integer
+          default: []
+
+    UpdateConfiguracaoRequest:
+      type: object
+      properties:
+        dia:
+          type: string
+        hora:
+          type: string
+        local:
+          type: string
+        membros_ids:
+          type: array
+          items:
+            type: integer
+
+    AddResponsavelRequest:
+      type: object
+      required: [usuario_id]
+      properties:
+        usuario_id:
+          type: integer
+        permissoes:
+          type: array
+          items:
+            type: string
+          example: ["VALIDAR_PRESENCA_GRUPO"]
+
+    CreateExcecaoEventoRequest:
+      type: object
+      required: [nome, evento_id, data, tipo, motivo]
+      properties:
+        nome:
+          type: string
+        evento_id:
+          type: integer
+        data:
+          type: string
+          format: date-time
+        tipo:
+          type: string
+          enum: [CANCELAMENTO, REAGENDAMENTO]
+        motivo:
+          type: string
+
+    ExcecaoEventoRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        evento_id:
+          type: integer
+        data:
+          type: string
+          format: date-time
+        tipo:
+          type: string
+        motivo:
+          type: string
+
+    CreateUsuarioVirtualRequest:
+      type: object
+      required: [nome, estrutura_id]
+      properties:
+        nome:
+          type: string
+          example: "João da Silva"
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Opcional — convidado pode não ter e-mail
+        estrutura_id:
+          type: integer
+
+    UsuarioVirtualRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        email:
+          type: string
+          nullable: true
+        estrutura_id:
+          type: integer
+        criado_em:
+          type: string
+          format: date-time

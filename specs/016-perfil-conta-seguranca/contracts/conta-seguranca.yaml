@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: GestaoEventos - Perfil, Conta e Seguranca
+  version: 1.0.0
+paths:
+  /api/me/perfil:
+    get:
+      summary: Obter perfil do usuario autenticado
+      tags: [Conta]
+      responses:
+        '200':
+          description: Perfil carregado com sucesso
+    put:
+      summary: Atualizar nome e foto do usuario autenticado
+      tags: [Conta]
+      requestBody:
+        required: true
+      responses:
+        '200':
+          description: Perfil atualizado
+        '400':
+          description: Validacao invalida
+  /api/me/email/solicitar-alteracao:
+    post:
+      summary: Solicitar alteracao de e-mail
+      tags: [Conta]
+      requestBody:
+        required: true
+      responses:
+        '202':
+          description: Solicitacao criada e e-mail enviado
+        '409':
+          description: E-mail indisponivel
+  /api/me/email/confirmar:
+    post:
+      summary: Confirmar alteracao de e-mail via token
+      tags: [Conta]
+      requestBody:
+        required: true
+      responses:
+        '200':
+          description: E-mail confirmado e aplicado
+        '400':
+          description: Token invalido ou expirado
+  /api/me/email/cancelar:
+    post:
+      summary: Cancelar alteracao de e-mail pendente
+      tags: [Conta]
+      responses:
+        '204':
+          description: Solicitacao cancelada
+  /api/me/senha/alterar:
+    post:
+      summary: Alterar senha da conta autenticada
+      tags: [Conta]
+      requestBody:
+        required: true
+      responses:
+        '200':
+          description: Senha alterada com sucesso
+        '400':
+          description: Senha atual invalida ou payload invalido
+  /api/me/conta/exclusao-preview:
+    get:
+      summary: Consultar impacto e bloqueios antes da exclusao da conta
+      tags: [Conta]
+      responses:
+        '200':
+          description: Preflight retornado com sucesso
+  /api/me/conta:
+    delete:
+      summary: Excluir conta autenticada preservando historico
+      tags: [Conta]
+      requestBody:
+        required: true
+      responses:
+        '204':
+          description: Conta excluida/desativada com sucesso
+        '409':
+          description: Exclusao bloqueada por ownership ou outra dependencia
+components:
+  schemas:
+    MeuPerfilResponse:
+      type: object
+      properties:
+        usuario_id:
+          type: integer
+        nome:
+          type: string
+        email_atual:
+          type: string
+        foto_perfil_url:
+          type: string
+          nullable: true
+        criado_em:
+          type: string
+          format: date-time
+    SolicitarAlteracaoEmailRequest:
+      type: object
+      required: [novo_email]
+      properties:
+        novo_email:
+          type: string
+          format: email
+    ConfirmarAlteracaoEmailRequest:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+    AlterarSenhaRequest:
+      type: object
+      required: [senha_atual, nova_senha, confirmar_nova_senha]
+      properties:
+        senha_atual:
+          type: string
+        nova_senha:
+          type: string
+        confirmar_nova_senha:
+          type: string
+    ExclusaoPreviewResponse:
+      type: object
+      properties:
+        pode_excluir:
+          type: boolean
+        motivo_bloqueio:
+          type: string
+          nullable: true
+        estruturas_como_owner:
+          type: array
+          items:
+            type: object
+        estruturas_como_membro:
+          type: array
+          items:
+            type: object
+        eventos_historicos:
+          type: integer
+        presencas_historicas:
+          type: integer
+        mensagem_impacto:
+          type: string
+    ExcluirContaRequest:
+      type: object
+      required: [senha_atual, frase_confirmacao]
+      properties:
+        senha_atual:
+          type: string
+        frase_confirmacao:
+          type: string

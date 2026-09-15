@@ -1,0 +1,133 @@
+openapi: "3.0.3"
+info:
+  title: "Grupos Membros API"
+  description: "Endpoints para vincular e desvincular membros (usuários já cadastrados na estrutura) de grupos."
+  version: "1.0.0"
+
+paths:
+  /api/grupos-membros:
+    get:
+      summary: "Listar membros de um grupo"
+      tags: [GruposMembros]
+      parameters:
+        - name: grupo_id
+          in: query
+          required: true
+          schema:
+            type: integer
+          example: 5
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: take
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: "Lista de membros do grupo"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GrupoMembroResponse"
+
+    post:
+      summary: "Adicionar membro ao grupo"
+      tags: [GruposMembros]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGrupoMembroRequest"
+      responses:
+        "201":
+          description: "Membro adicionado com sucesso"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrupoMembroResponse"
+        "409":
+          description: "Usuário já é membro deste grupo"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        "422":
+          description: "Dados inválidos"
+
+  /api/grupos-membros/{id}:
+    delete:
+      summary: "Remover membro do grupo"
+      tags: [GruposMembros]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: "ID do GrupoMembro (não do usuário)"
+      responses:
+        "204":
+          description: "Membro removido com sucesso"
+        "404":
+          description: "Membro não encontrado"
+
+components:
+  schemas:
+    CreateGrupoMembroRequest:
+      type: object
+      required: [grupo_id, usuario_id]
+      properties:
+        grupo_id:
+          type: integer
+          example: 5
+        usuario_id:
+          type: integer
+          example: 12
+
+    GrupoMembroResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        grupo_id:
+          type: integer
+        usuario_id:
+          type: integer
+        usuario:
+          $ref: "#/components/schemas/UsuarioResumo"
+        data_entrada:
+          type: string
+          format: date-time
+
+    UsuarioResumo:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome:
+          type: string
+        email:
+          type: string
+        foto_url:
+          type: string
+          nullable: true
+
+    ProblemDetails:
+      type: object
+      properties:
+        title:
+          type: string
+        detail:
+          type: string
+        status:
+          type: integer

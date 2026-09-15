@@ -1,0 +1,118 @@
+openapi: 3.0.3
+info:
+  title: GestaoEventos - Desvinculacao, Ownership e Usuario Virtual
+  version: 1.0.0
+paths:
+  /api/estruturas/{estruturaId}/saida-preview:
+    get:
+      summary: Consultar impacto e bloqueios antes de sair da estrutura
+      tags: [Estrutura, Ownership]
+      parameters:
+        - in: path
+          name: estruturaId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Preview retornado com sucesso
+  /api/estruturas/{estruturaId}/sair:
+    post:
+      summary: Auto-remover usuario autenticado da estrutura
+      tags: [Estrutura, Ownership]
+      parameters:
+        - in: path
+          name: estruturaId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Saida concluida com sucesso
+        '409':
+          description: Bloqueado por ownership ou outra dependencia
+  /api/estruturas/{estruturaId}/ownership/opcoes:
+    get:
+      summary: Listar membros elegiveis para receber ownership
+      tags: [Ownership]
+      parameters:
+        - in: path
+          name: estruturaId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de elegiveis retornada
+  /api/estruturas/{estruturaId}/ownership/transferir:
+    post:
+      summary: Transferir ownership da estrutura
+      tags: [Ownership]
+      parameters:
+        - in: path
+          name: estruturaId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+      responses:
+        '200':
+          description: Ownership transferida com sucesso
+        '400':
+          description: Sucessor invalido
+        '409':
+          description: Estrutura sem sucessor elegivel
+  /api/usuarios-estrutura/{usuarioId}:
+    delete:
+      summary: Remover membro da estrutura com preservacao historica
+      tags: [Estrutura, Hierarquia]
+      parameters:
+        - in: path
+          name: usuarioId
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Membro removido com sucesso
+        '403':
+          description: Fora do escopo hierarquico
+        '409':
+          description: Bloqueado por ownership ou dependencia operacional
+components:
+  schemas:
+    SaidaPreviewResponse:
+      type: object
+      properties:
+        pode_sair:
+          type: boolean
+        motivo_bloqueio:
+          type: string
+          nullable: true
+        eventos_ativos_como_responsavel:
+          type: integer
+        historico_preservado:
+          type: boolean
+        mensagem_impacto:
+          type: string
+    TransferirOwnershipRequest:
+      type: object
+      required: [novo_owner_usuario_id]
+      properties:
+        novo_owner_usuario_id:
+          type: integer
+    OwnershipOptionResponse:
+      type: object
+      properties:
+        usuario_id:
+          type: integer
+        nome:
+          type: string
+        papel_atual:
+          type: string
+        elegivel:
+          type: boolean
+        motivo_inelegibilidade:
+          type: string
+          nullable: true

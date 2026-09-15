@@ -1,0 +1,1071 @@
+Building codeuri: C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Web runtime: dotnet8 architecture: x86_64 functions: GestaoEventosApiFunction
+Workflow DotnetCliPackageBuilder does not support value "False" for building in source. Using default value "True".
+ Running DotnetCliPackageBuilder:GlobalToolInstall
+Tool 'amazon.lambda.tools' is already installed.
+ Running DotnetCliPackageBuilder:RunPackageAction
+Amazon Lambda Tools for .NET Core applications (7.0.0)
+
+Project Home: https://github.com/aws/aws-extensions-for-dotnet-cli, https://github.com/aws/aws-lambda-dotnet
+
+	
+
+Executing publish command
+
+Deleted previous publish folder
+
+... invoking 'dotnet publish', working folder 'C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Web\bin\Release\net8.0\publish'
+
+... dotnet publish "C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Web" --output "C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Web\bin\Release\net8.0\publish" --configuration "Release" --framework "net8.0" --runtime linux-x64 /p:GenerateRuntimeConfigurationFiles=true --self-contained False 
+
+... publish:   Determining projects to restore...
+
+... publish:   Restored C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.ServiceDefaults\GestaoEventos.API.ServiceDefaults.csproj (in 1,06 sec).
+
+... publish:   Restored C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Infrastructure\GestaoEventos.API.Infrastructure.csproj (in 1,06 sec).
+
+... publish:   Restored C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Core\GestaoEventos.API.Core.csproj (in 1,06 sec).
+
+... publish:   Restored C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.UseCases\GestaoEventos.API.UseCases.csproj (in 1,06 sec).
+
+... publish:   Restored C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Web\GestaoEventos.API.Web.csproj (in 1,09 sec).
+
+... publish:   GestaoEventos.API.ServiceDefaults -> C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.ServiceDefaults\bin\Release\net8.0\GestaoEventos.API.ServiceDefaults.dll
+
+... publish:   GestaoEventos.API.Core -> C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Core\bin\Release\net8.0\GestaoEventos.API.Core.dll
+
+... publish:   GestaoEventos.API.UseCases -> C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.UseCases\bin\Release\net8.0\GestaoEventos.API.UseCases.dll
+
+... publish: C:\Program Files\dotnet\sdk\9.0.101\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.Sdk.targets(322,5): warning NETSDK1206: Found version-specific or distribution-specific runtime identifier(s): win7-x64, win7-x86. Affected libraries: SQLite. In .NET 8.0 and higher, assets for version-specific and distribution-specific runtime identifiers will not be found by default. See https://aka.ms/dotnet/rid-usage for details. [C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Infrastructure\GestaoEventos.API.Infrastructure.csproj]
+
+... publish:   GestaoEventos.API.Infrastructure -> C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Infrastructure\bin\Release\net8.0\GestaoEventos.API.Infrastructure.dll
+
+... publish:   GestaoEventos.API.Web -> C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Web\bin\Release\net8.0\linux-x64\GestaoEventos.API.Web.dll
+
+... publish:   GestaoEventos.API.Web -> C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Web\bin\Release\net8.0\publish\
+
+Zipping publish folder C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.API\src\GestaoEventos.Web\bin\Release\net8.0\publish to C:\Users\Sandr\source\repos\GestaoEventos\.aws-sam\build\GestaoEventosApiFunction\GestaoEventos.Web.zip
+
+Creating directory C:\Users\Sandr\source\repos\GestaoEventos\.aws-sam\build\GestaoEventosApiFunction
+
+... zipping: Amazon.Lambda.APIGatewayEvents.dll
+
+... zipping: Amazon.Lambda.ApplicationLoadBalancerEvents.dll
+
+... zipping: Amazon.Lambda.AspNetCoreServer.dll
+
+... zipping: Amazon.Lambda.AspNetCoreServer.Hosting.dll
+
+... zipping: Amazon.Lambda.Core.dll
+
+... zipping: Amazon.Lambda.Logging.AspNetCore.dll
+
+... zipping: Amazon.Lambda.RuntimeSupport.dll
+
+... zipping: Amazon.Lambda.Serialization.SystemTextJson.dll
+
+... zipping: appsettings.json
+
+... zipping: Ardalis.GuardClauses.dll
+
+... zipping: Ardalis.ListStartupServices.dll
+
+... zipping: Ardalis.Result.AspNetCore.dll
+
+... zipping: Ardalis.Result.dll
+
+... zipping: Ardalis.SharedKernel.dll
+
+... zipping: Ardalis.SmartEnum.dll
+
+... zipping: Ardalis.Specification.dll
+
+... zipping: Ardalis.Specification.EntityFrameworkCore.dll
+
+... zipping: AutoMapper.dll
+
+... zipping: AWSSDK.Core.dll
+
+... zipping: AWSSDK.SimpleEmailV2.dll
+
+... zipping: Azure.Core.dll
+
+... zipping: Azure.Identity.dll
+
+... zipping: BouncyCastle.Cryptography.dll
+
+... zipping: FastEndpoints.Attributes.dll
+
+... zipping: FastEndpoints.dll
+
+... zipping: FastEndpoints.Messaging.Core.dll
+
+... zipping: FastEndpoints.Security.dll
+
+... zipping: FastEndpoints.Swagger.dll
+
+... zipping: FluentValidation.dll
+
+... zipping: GestaoEventos.API.Core.dll
+
+... zipping: GestaoEventos.API.Core.pdb
+
+... zipping: GestaoEventos.API.Infrastructure.dll
+
+... zipping: GestaoEventos.API.Infrastructure.pdb
+
+... zipping: GestaoEventos.API.ServiceDefaults.dll
+
+... zipping: GestaoEventos.API.ServiceDefaults.pdb
+
+... zipping: GestaoEventos.API.UseCases.dll
+
+... zipping: GestaoEventos.API.UseCases.pdb
+
+... zipping: GestaoEventos.API.Web
+
+... zipping: GestaoEventos.API.Web.deps.json
+
+... zipping: GestaoEventos.API.Web.dll
+
+... zipping: GestaoEventos.API.Web.pdb
+
+... zipping: GestaoEventos.API.Web.runtimeconfig.json
+
+... zipping: GestaoEventos.API.Web.staticwebassets.endpoints.json
+
+... zipping: GestaoEventos.API.Web.xml
+
+... zipping: Google.Protobuf.dll
+
+... zipping: Grpc.Core.Api.dll
+
+... zipping: Grpc.Net.Client.dll
+
+... zipping: Grpc.Net.Common.dll
+
+... zipping: libsqlite3.so
+
+... zipping: MailKit.dll
+
+... zipping: MediatR.Contracts.dll
+
+... zipping: MediatR.dll
+
+... zipping: Microsoft.AspNetCore.Authentication.JwtBearer.dll
+
+... zipping: Microsoft.Bcl.AsyncInterfaces.dll
+
+... zipping: Microsoft.EntityFrameworkCore.Abstractions.dll
+
+... zipping: Microsoft.EntityFrameworkCore.dll
+
+... zipping: Microsoft.EntityFrameworkCore.Relational.dll
+
+... zipping: Microsoft.Extensions.AmbientMetadata.Application.dll
+
+... zipping: Microsoft.Extensions.Caching.Memory.dll
+
+... zipping: Microsoft.Extensions.Compliance.Abstractions.dll
+
+... zipping: Microsoft.Extensions.Configuration.Abstractions.dll
+
+... zipping: Microsoft.Extensions.Configuration.Binder.dll
+
+... zipping: Microsoft.Extensions.Configuration.dll
+
+... zipping: Microsoft.Extensions.DependencyInjection.Abstractions.dll
+
+... zipping: Microsoft.Extensions.DependencyInjection.AutoActivation.dll
+
+... zipping: Microsoft.Extensions.DependencyInjection.dll
+
+... zipping: Microsoft.Extensions.DependencyModel.dll
+
+... zipping: Microsoft.Extensions.Diagnostics.Abstractions.dll
+
+... zipping: Microsoft.Extensions.Diagnostics.dll
+
+... zipping: Microsoft.Extensions.Diagnostics.ExceptionSummarization.dll
+
+... zipping: Microsoft.Extensions.Features.dll
+
+... zipping: Microsoft.Extensions.FileProviders.Abstractions.dll
+
+... zipping: Microsoft.Extensions.Hosting.Abstractions.dll
+
+... zipping: Microsoft.Extensions.Http.Diagnostics.dll
+
+... zipping: Microsoft.Extensions.Http.dll
+
+... zipping: Microsoft.Extensions.Http.Resilience.dll
+
+... zipping: Microsoft.Extensions.Logging.Abstractions.dll
+
+... zipping: Microsoft.Extensions.Logging.Configuration.dll
+
+... zipping: Microsoft.Extensions.Logging.dll
+
+... zipping: Microsoft.Extensions.ObjectPool.dll
+
+... zipping: Microsoft.Extensions.Options.ConfigurationExtensions.dll
+
+... zipping: Microsoft.Extensions.Options.dll
+
+... zipping: Microsoft.Extensions.Primitives.dll
+
+... zipping: Microsoft.Extensions.Resilience.dll
+
+... zipping: Microsoft.Extensions.ServiceDiscovery.Abstractions.dll
+
+... zipping: Microsoft.Extensions.ServiceDiscovery.dll
+
+... zipping: Microsoft.Extensions.Telemetry.Abstractions.dll
+
+... zipping: Microsoft.Extensions.Telemetry.dll
+
+... zipping: Microsoft.Identity.Client.dll
+
+... zipping: Microsoft.Identity.Client.Extensions.Msal.dll
+
+... zipping: Microsoft.IdentityModel.Abstractions.dll
+
+... zipping: Microsoft.IdentityModel.JsonWebTokens.dll
+
+... zipping: Microsoft.IdentityModel.Logging.dll
+
+... zipping: Microsoft.IdentityModel.Protocols.dll
+
+... zipping: Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+
+... zipping: Microsoft.IdentityModel.Tokens.dll
+
+... zipping: Microsoft.IO.RecyclableMemoryStream.dll
+
+... zipping: MimeKit.dll
+
+... zipping: MySqlConnector.dll
+
+... zipping: Namotion.Reflection.dll
+
+... zipping: Newtonsoft.Json.dll
+
+... zipping: NJsonSchema.Annotations.dll
+
+... zipping: NJsonSchema.dll
+
+... zipping: NJsonSchema.NewtonsoftJson.dll
+
+... zipping: NJsonSchema.Yaml.dll
+
+... zipping: NSwag.Annotations.dll
+
+... zipping: NSwag.AspNetCore.dll
+
+... zipping: NSwag.Core.dll
+
+... zipping: NSwag.Core.Yaml.dll
+
+... zipping: NSwag.Generation.AspNetCore.dll
+
+... zipping: NSwag.Generation.dll
+
+... zipping: OpenTelemetry.Api.dll
+
+... zipping: OpenTelemetry.Api.ProviderBuilderExtensions.dll
+
+... zipping: OpenTelemetry.dll
+
+... zipping: OpenTelemetry.Exporter.OpenTelemetryProtocol.dll
+
+... zipping: OpenTelemetry.Extensions.Hosting.dll
+
+... zipping: OpenTelemetry.Instrumentation.AspNetCore.dll
+
+... zipping: OpenTelemetry.Instrumentation.Http.dll
+
+... zipping: OpenTelemetry.Instrumentation.Runtime.dll
+
+... zipping: Polly.Core.dll
+
+... zipping: Polly.Extensions.dll
+
+... zipping: Polly.RateLimiting.dll
+
+... zipping: Pomelo.EntityFrameworkCore.MySql.dll
+
+... zipping: Serilog.AspNetCore.dll
+
+... zipping: Serilog.dll
+
+... zipping: Serilog.Extensions.Hosting.dll
+
+... zipping: Serilog.Extensions.Logging.dll
+
+... zipping: Serilog.Formatting.Compact.dll
+
+... zipping: Serilog.Settings.Configuration.dll
+
+... zipping: Serilog.Sinks.Console.dll
+
+... zipping: Serilog.Sinks.Debug.dll
+
+... zipping: Serilog.Sinks.File.dll
+
+... zipping: SnapshotRestore.Registry.dll
+
+... zipping: Stripe.net.dll
+
+... zipping: System.ClientModel.dll
+
+... zipping: System.Configuration.ConfigurationManager.dll
+
+... zipping: System.Diagnostics.DiagnosticSource.dll
+
+... zipping: System.IdentityModel.Tokens.Jwt.dll
+
+... zipping: System.IO.Pipelines.dll
+
+... zipping: System.Memory.Data.dll
+
+... zipping: System.Security.Cryptography.Pkcs.dll
+
+... zipping: System.Security.Cryptography.ProtectedData.dll
+
+... zipping: System.Text.Encodings.Web.dll
+
+... zipping: System.Text.Json.dll
+
+... zipping: YamlDotNet.dll
+
+... zipping: publish_out/appsettings.json
+
+... zipping: publish_out/GestaoEventos.API.Web.deps.json
+
+... zipping: publish_out/GestaoEventos.API.Web.runtimeconfig.json
+
+... zipping: publish_out/GestaoEventos.API.Web.staticwebassets.endpoints.json
+
+... zipping: refs/Microsoft.AspNetCore.Antiforgery.dll
+
+... zipping: refs/Microsoft.AspNetCore.Authentication.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.Authentication.BearerToken.dll
+
+... zipping: refs/Microsoft.AspNetCore.Authentication.Cookies.dll
+
+... zipping: refs/Microsoft.AspNetCore.Authentication.Core.dll
+
+... zipping: refs/Microsoft.AspNetCore.Authentication.dll
+
+... zipping: refs/Microsoft.AspNetCore.Authentication.OAuth.dll
+
+... zipping: refs/Microsoft.AspNetCore.Authorization.dll
+
+... zipping: refs/Microsoft.AspNetCore.Authorization.Policy.dll
+
+... zipping: refs/Microsoft.AspNetCore.Components.Authorization.dll
+
+... zipping: refs/Microsoft.AspNetCore.Components.dll
+
+... zipping: refs/Microsoft.AspNetCore.Components.Endpoints.dll
+
+... zipping: refs/Microsoft.AspNetCore.Components.Forms.dll
+
+... zipping: refs/Microsoft.AspNetCore.Components.Server.dll
+
+... zipping: refs/Microsoft.AspNetCore.Components.Web.dll
+
+... zipping: refs/Microsoft.AspNetCore.Connections.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.CookiePolicy.dll
+
+... zipping: refs/Microsoft.AspNetCore.Cors.dll
+
+... zipping: refs/Microsoft.AspNetCore.Cryptography.Internal.dll
+
+... zipping: refs/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+
+... zipping: refs/Microsoft.AspNetCore.DataProtection.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.DataProtection.dll
+
+... zipping: refs/Microsoft.AspNetCore.DataProtection.Extensions.dll
+
+... zipping: refs/Microsoft.AspNetCore.Diagnostics.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.Diagnostics.dll
+
+... zipping: refs/Microsoft.AspNetCore.Diagnostics.HealthChecks.dll
+
+... zipping: refs/Microsoft.AspNetCore.dll
+
+... zipping: refs/Microsoft.AspNetCore.HostFiltering.dll
+
+... zipping: refs/Microsoft.AspNetCore.Hosting.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.Hosting.dll
+
+... zipping: refs/Microsoft.AspNetCore.Hosting.Server.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.Html.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.Http.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.Http.Connections.Common.dll
+
+... zipping: refs/Microsoft.AspNetCore.Http.Connections.dll
+
+... zipping: refs/Microsoft.AspNetCore.Http.dll
+
+... zipping: refs/Microsoft.AspNetCore.Http.Extensions.dll
+
+... zipping: refs/Microsoft.AspNetCore.Http.Features.dll
+
+... zipping: refs/Microsoft.AspNetCore.Http.Results.dll
+
+... zipping: refs/Microsoft.AspNetCore.HttpLogging.dll
+
+... zipping: refs/Microsoft.AspNetCore.HttpOverrides.dll
+
+... zipping: refs/Microsoft.AspNetCore.HttpsPolicy.dll
+
+... zipping: refs/Microsoft.AspNetCore.Identity.dll
+
+... zipping: refs/Microsoft.AspNetCore.Localization.dll
+
+... zipping: refs/Microsoft.AspNetCore.Localization.Routing.dll
+
+... zipping: refs/Microsoft.AspNetCore.Metadata.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.ApiExplorer.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.Core.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.Cors.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.DataAnnotations.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.Formatters.Json.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.Formatters.Xml.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.Localization.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.Razor.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.RazorPages.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.TagHelpers.dll
+
+... zipping: refs/Microsoft.AspNetCore.Mvc.ViewFeatures.dll
+
+... zipping: refs/Microsoft.AspNetCore.OutputCaching.dll
+
+... zipping: refs/Microsoft.AspNetCore.RateLimiting.dll
+
+... zipping: refs/Microsoft.AspNetCore.Razor.dll
+
+... zipping: refs/Microsoft.AspNetCore.Razor.Runtime.dll
+
+... zipping: refs/Microsoft.AspNetCore.RequestDecompression.dll
+
+... zipping: refs/Microsoft.AspNetCore.ResponseCaching.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.ResponseCaching.dll
+
+... zipping: refs/Microsoft.AspNetCore.ResponseCompression.dll
+
+... zipping: refs/Microsoft.AspNetCore.Rewrite.dll
+
+... zipping: refs/Microsoft.AspNetCore.Routing.Abstractions.dll
+
+... zipping: refs/Microsoft.AspNetCore.Routing.dll
+
+... zipping: refs/Microsoft.AspNetCore.Server.HttpSys.dll
+
+... zipping: refs/Microsoft.AspNetCore.Server.IIS.dll
+
+... zipping: refs/Microsoft.AspNetCore.Server.IISIntegration.dll
+
+... zipping: refs/Microsoft.AspNetCore.Server.Kestrel.Core.dll
+
+... zipping: refs/Microsoft.AspNetCore.Server.Kestrel.dll
+
+... zipping: refs/Microsoft.AspNetCore.Server.Kestrel.Transport.NamedPipes.dll
+
+... zipping: refs/Microsoft.AspNetCore.Server.Kestrel.Transport.Quic.dll
+
+... zipping: refs/Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.dll
+
+... zipping: refs/Microsoft.AspNetCore.Session.dll
+
+... zipping: refs/Microsoft.AspNetCore.SignalR.Common.dll
+
+... zipping: refs/Microsoft.AspNetCore.SignalR.Core.dll
+
+... zipping: refs/Microsoft.AspNetCore.SignalR.dll
+
+... zipping: refs/Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+
+... zipping: refs/Microsoft.AspNetCore.StaticFiles.dll
+
+... zipping: refs/Microsoft.AspNetCore.WebSockets.dll
+
+... zipping: refs/Microsoft.AspNetCore.WebUtilities.dll
+
+... zipping: refs/Microsoft.CSharp.dll
+
+... zipping: refs/Microsoft.Extensions.Caching.Abstractions.dll
+
+... zipping: refs/Microsoft.Extensions.Caching.Memory.dll
+
+... zipping: refs/Microsoft.Extensions.Configuration.CommandLine.dll
+
+... zipping: refs/Microsoft.Extensions.Configuration.EnvironmentVariables.dll
+
+... zipping: refs/Microsoft.Extensions.Configuration.FileExtensions.dll
+
+... zipping: refs/Microsoft.Extensions.Configuration.Ini.dll
+
+... zipping: refs/Microsoft.Extensions.Configuration.Json.dll
+
+... zipping: refs/Microsoft.Extensions.Configuration.KeyPerFile.dll
+
+... zipping: refs/Microsoft.Extensions.Configuration.UserSecrets.dll
+
+... zipping: refs/Microsoft.Extensions.Configuration.Xml.dll
+
+... zipping: refs/Microsoft.Extensions.Diagnostics.dll
+
+... zipping: refs/Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll
+
+... zipping: refs/Microsoft.Extensions.Diagnostics.HealthChecks.dll
+
+... zipping: refs/Microsoft.Extensions.Features.dll
+
+... zipping: refs/Microsoft.Extensions.FileProviders.Composite.dll
+
+... zipping: refs/Microsoft.Extensions.FileProviders.Embedded.dll
+
+... zipping: refs/Microsoft.Extensions.FileProviders.Physical.dll
+
+... zipping: refs/Microsoft.Extensions.FileSystemGlobbing.dll
+
+... zipping: refs/Microsoft.Extensions.Hosting.dll
+
+... zipping: refs/Microsoft.Extensions.Http.dll
+
+... zipping: refs/Microsoft.Extensions.Identity.Core.dll
+
+... zipping: refs/Microsoft.Extensions.Identity.Stores.dll
+
+... zipping: refs/Microsoft.Extensions.Localization.Abstractions.dll
+
+... zipping: refs/Microsoft.Extensions.Localization.dll
+
+... zipping: refs/Microsoft.Extensions.Logging.Console.dll
+
+... zipping: refs/Microsoft.Extensions.Logging.Debug.dll
+
+... zipping: refs/Microsoft.Extensions.Logging.EventLog.dll
+
+... zipping: refs/Microsoft.Extensions.Logging.EventSource.dll
+
+... zipping: refs/Microsoft.Extensions.Logging.TraceSource.dll
+
+... zipping: refs/Microsoft.Extensions.ObjectPool.dll
+
+... zipping: refs/Microsoft.Extensions.Options.DataAnnotations.dll
+
+... zipping: refs/Microsoft.Extensions.WebEncoders.dll
+
+... zipping: refs/Microsoft.JSInterop.dll
+
+... zipping: refs/Microsoft.Net.Http.Headers.dll
+
+... zipping: refs/Microsoft.VisualBasic.Core.dll
+
+... zipping: refs/Microsoft.VisualBasic.dll
+
+... zipping: refs/Microsoft.Win32.Primitives.dll
+
+... zipping: refs/Microsoft.Win32.Registry.dll
+
+... zipping: refs/mscorlib.dll
+
+... zipping: refs/netstandard.dll
+
+... zipping: refs/System.AppContext.dll
+
+... zipping: refs/System.Buffers.dll
+
+... zipping: refs/System.Collections.Concurrent.dll
+
+... zipping: refs/System.Collections.dll
+
+... zipping: refs/System.Collections.Immutable.dll
+
+... zipping: refs/System.Collections.NonGeneric.dll
+
+... zipping: refs/System.Collections.Specialized.dll
+
+... zipping: refs/System.ComponentModel.Annotations.dll
+
+... zipping: refs/System.ComponentModel.DataAnnotations.dll
+
+... zipping: refs/System.ComponentModel.dll
+
+... zipping: refs/System.ComponentModel.EventBasedAsync.dll
+
+... zipping: refs/System.ComponentModel.Primitives.dll
+
+... zipping: refs/System.ComponentModel.TypeConverter.dll
+
+... zipping: refs/System.Configuration.dll
+
+... zipping: refs/System.Console.dll
+
+... zipping: refs/System.Core.dll
+
+... zipping: refs/System.Data.Common.dll
+
+... zipping: refs/System.Data.DataSetExtensions.dll
+
+... zipping: refs/System.Data.dll
+
+... zipping: refs/System.Diagnostics.Contracts.dll
+
+... zipping: refs/System.Diagnostics.Debug.dll
+
+... zipping: refs/System.Diagnostics.EventLog.dll
+
+... zipping: refs/System.Diagnostics.FileVersionInfo.dll
+
+... zipping: refs/System.Diagnostics.Process.dll
+
+... zipping: refs/System.Diagnostics.StackTrace.dll
+
+... zipping: refs/System.Diagnostics.TextWriterTraceListener.dll
+
+... zipping: refs/System.Diagnostics.Tools.dll
+
+... zipping: refs/System.Diagnostics.TraceSource.dll
+
+... zipping: refs/System.Diagnostics.Tracing.dll
+
+... zipping: refs/System.dll
+
+... zipping: refs/System.Drawing.dll
+
+... zipping: refs/System.Drawing.Primitives.dll
+
+... zipping: refs/System.Dynamic.Runtime.dll
+
+... zipping: refs/System.Formats.Asn1.dll
+
+... zipping: refs/System.Formats.Tar.dll
+
+... zipping: refs/System.Globalization.Calendars.dll
+
+... zipping: refs/System.Globalization.dll
+
+... zipping: refs/System.Globalization.Extensions.dll
+
+... zipping: refs/System.IO.Compression.Brotli.dll
+
+... zipping: refs/System.IO.Compression.dll
+
+... zipping: refs/System.IO.Compression.FileSystem.dll
+
+... zipping: refs/System.IO.Compression.ZipFile.dll
+
+... zipping: refs/System.IO.dll
+
+... zipping: refs/System.IO.FileSystem.AccessControl.dll
+
+... zipping: refs/System.IO.FileSystem.dll
+
+... zipping: refs/System.IO.FileSystem.DriveInfo.dll
+
+... zipping: refs/System.IO.FileSystem.Primitives.dll
+
+... zipping: refs/System.IO.FileSystem.Watcher.dll
+
+... zipping: refs/System.IO.IsolatedStorage.dll
+
+... zipping: refs/System.IO.MemoryMappedFiles.dll
+
+... zipping: refs/System.IO.Pipes.AccessControl.dll
+
+... zipping: refs/System.IO.Pipes.dll
+
+... zipping: refs/System.IO.UnmanagedMemoryStream.dll
+
+... zipping: refs/System.Linq.dll
+
+... zipping: refs/System.Linq.Expressions.dll
+
+... zipping: refs/System.Linq.Parallel.dll
+
+... zipping: refs/System.Linq.Queryable.dll
+
+... zipping: refs/System.Memory.dll
+
+... zipping: refs/System.Net.dll
+
+... zipping: refs/System.Net.Http.dll
+
+... zipping: refs/System.Net.Http.Json.dll
+
+... zipping: refs/System.Net.HttpListener.dll
+
+... zipping: refs/System.Net.Mail.dll
+
+... zipping: refs/System.Net.NameResolution.dll
+
+... zipping: refs/System.Net.NetworkInformation.dll
+
+... zipping: refs/System.Net.Ping.dll
+
+... zipping: refs/System.Net.Primitives.dll
+
+... zipping: refs/System.Net.Quic.dll
+
+... zipping: refs/System.Net.Requests.dll
+
+... zipping: refs/System.Net.Security.dll
+
+... zipping: refs/System.Net.ServicePoint.dll
+
+... zipping: refs/System.Net.Sockets.dll
+
+... zipping: refs/System.Net.WebClient.dll
+
+... zipping: refs/System.Net.WebHeaderCollection.dll
+
+... zipping: refs/System.Net.WebProxy.dll
+
+... zipping: refs/System.Net.WebSockets.Client.dll
+
+... zipping: refs/System.Net.WebSockets.dll
+
+... zipping: refs/System.Numerics.dll
+
+... zipping: refs/System.Numerics.Vectors.dll
+
+... zipping: refs/System.ObjectModel.dll
+
+... zipping: refs/System.Reflection.DispatchProxy.dll
+
+... zipping: refs/System.Reflection.dll
+
+... zipping: refs/System.Reflection.Emit.dll
+
+... zipping: refs/System.Reflection.Emit.ILGeneration.dll
+
+... zipping: refs/System.Reflection.Emit.Lightweight.dll
+
+... zipping: refs/System.Reflection.Extensions.dll
+
+... zipping: refs/System.Reflection.Metadata.dll
+
+... zipping: refs/System.Reflection.Primitives.dll
+
+... zipping: refs/System.Reflection.TypeExtensions.dll
+
+... zipping: refs/System.Resources.Reader.dll
+
+... zipping: refs/System.Resources.ResourceManager.dll
+
+... zipping: refs/System.Resources.Writer.dll
+
+... zipping: refs/System.Runtime.CompilerServices.Unsafe.dll
+
+... zipping: refs/System.Runtime.CompilerServices.VisualC.dll
+
+... zipping: refs/System.Runtime.dll
+
+... zipping: refs/System.Runtime.Extensions.dll
+
+... zipping: refs/System.Runtime.Handles.dll
+
+... zipping: refs/System.Runtime.InteropServices.dll
+
+... zipping: refs/System.Runtime.InteropServices.JavaScript.dll
+
+... zipping: refs/System.Runtime.InteropServices.RuntimeInformation.dll
+
+... zipping: refs/System.Runtime.Intrinsics.dll
+
+... zipping: refs/System.Runtime.Loader.dll
+
+... zipping: refs/System.Runtime.Numerics.dll
+
+... zipping: refs/System.Runtime.Serialization.dll
+
+... zipping: refs/System.Runtime.Serialization.Formatters.dll
+
+... zipping: refs/System.Runtime.Serialization.Json.dll
+
+... zipping: refs/System.Runtime.Serialization.Primitives.dll
+
+... zipping: refs/System.Runtime.Serialization.Xml.dll
+
+... zipping: refs/System.Security.AccessControl.dll
+
+... zipping: refs/System.Security.Claims.dll
+
+... zipping: refs/System.Security.Cryptography.Algorithms.dll
+
+... zipping: refs/System.Security.Cryptography.Cng.dll
+
+... zipping: refs/System.Security.Cryptography.Csp.dll
+
+... zipping: refs/System.Security.Cryptography.dll
+
+... zipping: refs/System.Security.Cryptography.Encoding.dll
+
+... zipping: refs/System.Security.Cryptography.OpenSsl.dll
+
+... zipping: refs/System.Security.Cryptography.Primitives.dll
+
+... zipping: refs/System.Security.Cryptography.X509Certificates.dll
+
+... zipping: refs/System.Security.Cryptography.Xml.dll
+
+... zipping: refs/System.Security.dll
+
+... zipping: refs/System.Security.Principal.dll
+
+... zipping: refs/System.Security.Principal.Windows.dll
+
+... zipping: refs/System.Security.SecureString.dll
+
+... zipping: refs/System.ServiceModel.Web.dll
+
+... zipping: refs/System.ServiceProcess.dll
+
+... zipping: refs/System.Text.Encoding.CodePages.dll
+
+... zipping: refs/System.Text.Encoding.dll
+
+... zipping: refs/System.Text.Encoding.Extensions.dll
+
+... zipping: refs/System.Text.RegularExpressions.dll
+
+... zipping: refs/System.Threading.Channels.dll
+
+... zipping: refs/System.Threading.dll
+
+... zipping: refs/System.Threading.Overlapped.dll
+
+... zipping: refs/System.Threading.RateLimiting.dll
+
+... zipping: refs/System.Threading.Tasks.Dataflow.dll
+
+... zipping: refs/System.Threading.Tasks.dll
+
+... zipping: refs/System.Threading.Tasks.Extensions.dll
+
+... zipping: refs/System.Threading.Tasks.Parallel.dll
+
+... zipping: refs/System.Threading.Thread.dll
+
+... zipping: refs/System.Threading.ThreadPool.dll
+
+... zipping: refs/System.Threading.Timer.dll
+
+... zipping: refs/System.Transactions.dll
+
+... zipping: refs/System.Transactions.Local.dll
+
+... zipping: refs/System.ValueTuple.dll
+
+... zipping: refs/System.Web.dll
+
+... zipping: refs/System.Web.HttpUtility.dll
+
+... zipping: refs/System.Windows.dll
+
+... zipping: refs/System.Xml.dll
+
+... zipping: refs/System.Xml.Linq.dll
+
+... zipping: refs/System.Xml.ReaderWriter.dll
+
+... zipping: refs/System.Xml.Serialization.dll
+
+... zipping: refs/System.Xml.XDocument.dll
+
+... zipping: refs/System.Xml.XmlDocument.dll
+
+... zipping: refs/System.Xml.XmlSerializer.dll
+
+... zipping: refs/System.Xml.XPath.dll
+
+... zipping: refs/System.Xml.XPath.XDocument.dll
+
+... zipping: refs/WindowsBase.dll
+
+... zipping: wwwroot/.gitkeep
+
+... zipping: publish_out/publish_out/appsettings.json
+
+... zipping: publish_out/publish_out/GestaoEventos.API.Web.deps.json
+
+... zipping: publish_out/publish_out/GestaoEventos.API.Web.runtimeconfig.json
+
+... zipping: publish_out/publish_out/GestaoEventos.API.Web.staticwebassets.endpoints.json
+
+Created publish archive (C:\Users\Sandr\source\repos\GestaoEventos\.aws-sam\build\GestaoEventosApiFunction\GestaoEventos.Web.zip).
+
+Lambda project successfully packaged: C:\Users\Sandr\source\repos\GestaoEventos\.aws-sam\build\GestaoEventosApiFunction\GestaoEventos.Web.zip
+
+Build Succeeded
+
+Built Artifacts  : .aws-sam\build
+Built Template   : .aws-sam\build\template.yaml
+
+Commands you can use next
+=========================
+[*] Validate SAM template: sam validate
+
+[*] Invoke Function: sam local invoke
+
+[*] Test Function in the Cloud: sam sync --stack-name {{stack-name}} --watch
+
+[*] Deploy: sam deploy --guided
+
+	Managed S3 bucket: aws-sam-cli-managed-default-samclisourcebucket-6lbiuvcu9gn8
+	Auto resolution of buckets can be turned off by setting resolve_s3=False
+	To use a specific S3 bucket, set --s3-bucket=<bucket_name>
+	Above settings can be stored in samconfig.toml
+
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  1048576 / 20668076  (5.07%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  2097152 / 20668076  (10.15%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  3145728 / 20668076  (15.22%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  4194304 / 20668076  (20.29%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  5242880 / 20668076  (25.37%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  6291456 / 20668076  (30.44%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  7340032 / 20668076  (35.51%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  8388608 / 20668076  (40.59%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  9437184 / 20668076  (45.66%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  10485760 / 20668076  (50.73%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  11534336 / 20668076  (55.81%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  12582912 / 20668076  (60.88%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  13631488 / 20668076  (65.95%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  14680064 / 20668076  (71.03%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  15728640 / 20668076  (76.10%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  16473772 / 20668076  (79.71%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  17522348 / 20668076  (84.78%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  18570924 / 20668076  (89.85%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  19619500 / 20668076  (94.93%)
+	Uploading to f366f16a8c933d8b1cecfdf0004c7386  20668076 / 20668076  (100.00%)
+
+
+	Deploying with following values
+	===============================
+	Stack name                   : gestao-eventos-api
+	Region                       : us-east-1
+	Confirm changeset            : False
+	Disable rollback             : False
+	Deployment s3 bucket         : aws-sam-cli-managed-default-samclisourcebucket-6lbiuvcu9gn8
+	Capabilities                 : ["CAPABILITY_IAM"]
+	Parameter overrides          : {"StageName": "$default", "AppUrl": "https://sistema-eventos.seven-projetos.com", "MysqlConnectionString": "*****", "SsoDefaultReturnUrl": "https://sistema-eventos.seven-projetos.com/auth/sso/callback", "SsoStateSigningKey": "*****", "SesRegion": "us-east-1", "SesFromEmail": "noreply@seven-projetos.com", "SesFromName": "Gestao"}
+	Signing Profiles             : {}
+
+Initiating deployment
+=====================
+
+
+	Uploading to 07bd529fdc9e37538801e3441f8f3eb4.template  6332 / 6332  (100.00%)
+
+
+
+Waiting for changeset to be created..
+
+CloudFormation stack changeset
+-------------------------------------------------------------------------------------------------
+Operation                LogicalResourceId        ResourceType             Replacement            
+-------------------------------------------------------------------------------------------------
++ Add                    GestaoEventosApiFuncti   AWS::Lambda::Version     N/A                    
+                         onVersionc73c9bf476                                                      
+* Modify                 GestaoEventosApiFuncti   AWS::Lambda::Alias       False                  
+                         onAliaslive                                                              
+* Modify                 GestaoEventosApiFuncti   AWS::Lambda::Function    False                  
+                         on                                                                       
+- Delete                 GestaoEventosApiFuncti   AWS::Lambda::Version     N/A                    
+                         onVersion4570022db3                                                      
+-------------------------------------------------------------------------------------------------
+
+
+Changeset created successfully. arn:aws:cloudformation:us-east-1:905418147879:changeSet/samcli-deploy1783045863/4dee50e1-28b3-4b05-990b-8e00c670a164
+
+
+2026-07-02 23:31:17 - Waiting for stack create/update to complete
+
+CloudFormation events from stack operations (refresh every 5.0 seconds)
+-------------------------------------------------------------------------------------------------
+ResourceStatus           ResourceType             LogicalResourceId        ResourceStatusReason   
+-------------------------------------------------------------------------------------------------
+UPDATE_IN_PROGRESS       AWS::CloudFormation::S   gestao-eventos-api       User Initiated         
+                         tack                                                                     
+UPDATE_IN_PROGRESS       AWS::Lambda::Function    GestaoEventosApiFuncti   -                      
+                                                  on                                              
+UPDATE_COMPLETE          AWS::Lambda::Function    GestaoEventosApiFuncti   -                      
+                                                  on                                              
+CREATE_IN_PROGRESS       AWS::Lambda::Version     GestaoEventosApiFuncti   -                      
+                                                  onVersionc73c9bf476                             
+CREATE_IN_PROGRESS       AWS::Lambda::Version     GestaoEventosApiFuncti   Resource creation      
+                                                  onVersionc73c9bf476      Initiated              
+CREATE_COMPLETE          AWS::Lambda::Version     GestaoEventosApiFuncti   -                      
+                                                  onVersionc73c9bf476                             
+UPDATE_IN_PROGRESS       AWS::Lambda::Alias       GestaoEventosApiFuncti   -                      
+                                                  onAliaslive                                     
+UPDATE_COMPLETE          AWS::Lambda::Alias       GestaoEventosApiFuncti   -                      
+                                                  onAliaslive                                     
+UPDATE_COMPLETE_CLEANU   AWS::CloudFormation::S   gestao-eventos-api       -                      
+P_IN_PROGRESS            tack                                                                     
+DELETE_SKIPPED           AWS::Lambda::Version     GestaoEventosApiFuncti   -                      
+                                                  onVersion4570022db3                             
+UPDATE_COMPLETE          AWS::CloudFormation::S   gestao-eventos-api       -                      
+                         tack                                                                     
+-------------------------------------------------------------------------------------------------
+
+CloudFormation outputs from deployed stack
+-------------------------------------------------------------------------------------------------
+Outputs                                                                                         
+-------------------------------------------------------------------------------------------------
+Key                 ApiOriginDomainName                                                         
+Description         Domain used by CloudFront API origin                                        
+Value               jee98f3yug.execute-api.us-east-1.amazonaws.com                              
+
+Key                 LambdaFunctionName                                                          
+Description         Lambda function name                                                        
+Value               gestao-eventos-api-api                                                      
+
+Key                 HttpApiInvokeUrl                                                            
+Description         API invoke URL (stage may be implicit for $default)                         
+Value               https://jee98f3yug.execute-api.us-east-1.amazonaws.com                      
+
+Key                 HttpApiId                                                                   
+Description         HTTP API identifier                                                         
+Value               jee98f3yug                                                                  
+
+Key                 HttpApiStageName                                                            
+Description         HTTP API stage name                                                         
+Value               $default                                                                    
+
+Key                 ApiOriginPath                                                               
+Description         Origin path to use in CloudFront for stage routing                          
+Value                                                                                           
+-------------------------------------------------------------------------------------------------
+
+
+Successfully created/updated stack - gestao-eventos-api in us-east-1
+
+API stack deployed: gestao-eventos-api

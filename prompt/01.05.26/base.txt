@@ -1,0 +1,5 @@
+1) tentei aceitar o convite com o Dexter http://localhost:4200/aceitar-convite?token=2e0cab5e-1aa9-412f-80aa-5f44d3c04aba que nao tem conta e quando cliquei em "Criar conta e aceitar convite" não aconteceu nada e percebi que o Dono da estrutura não apareceu o nome, pois depois disso esse usuario seria add na Estrutura do Sandro, como membro da Celula da Dayane Inabalavel
+
+2) Esta faltando na parte dos membros associar uma função exemplo usuario X tem o papel de anfitriao para depois conseguirmos ver quem sao os anfitrioes se tem crescido diminuido etc
+
+3) a Landing esta sem valor não aparece nenhum dado

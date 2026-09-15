@@ -1,0 +1,177 @@
+openapi: "3.0.3"
+info:
+  title: Papéis API
+  version: "1.0"
+paths:
+  /api/papeis:
+    get:
+      summary: Listar papéis da estrutura
+      parameters:
+        - name: estrutura_id
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: skip
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: take
+          in: query
+          schema: { type: integer, default: 50 }
+        - name: nome
+          in: query
+          schema: { type: string }
+        - name: apenas_ativos
+          in: query
+          schema: { type: boolean, default: true }
+      responses:
+        "200":
+          description: Lista paginada de papéis
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PapelRecord"
+                  total: { type: integer }
+                  skip: { type: integer }
+                  take: { type: integer }
+    post:
+      summary: Criar papel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SalvarPapelRequest"
+      responses:
+        "201":
+          description: Papel criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PapelRecord"
+        "422":
+          description: Validação falhou
+
+  /api/papeis/{id}:
+    get:
+      summary: Buscar papel por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PapelRecord"
+        "404":
+          description: Papel não encontrado
+    put:
+      summary: Atualizar papel (bloqueado para papéis padrão do sistema)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SalvarPapelRequest"
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PapelRecord"
+        "403":
+          description: Papel padrão do sistema — não editável
+    delete:
+      summary: Excluir papel (bloqueado se papel em uso ou padrão do sistema)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: papel_substituto_id
+          in: query
+          required: false
+          schema: { type: integer }
+          description: Papel para reatribuição quando houver usuários afetados
+      responses:
+        "200":
+          description: Papel desativado com sucesso
+        "400":
+          description: >
+            Papel em uso e papel_substituto_id não fornecido.
+            Retorna lista de usuários afetados.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  usuarios_afetados: { type: integer }
+                  usuarios:
+                    type: array
+                    items: { type: string }
+        "403":
+          description: Papel padrão do sistema — não excluível
+
+components:
+  schemas:
+    PapelPermissaoRecord:
+      type: object
+      properties:
+        id: { type: integer }
+        recurso: { type: string, example: "eventos" }
+        acao: { type: integer, description: "1=Criar, 2=Ler, 3=Editar, 4=Excluir, 5=Aprovar" }
+        escopo: { type: integer, description: "1=Proprio, 2=Grupo, 3=GrupoEFilhos, 4=Estrutura" }
+
+    PapelRecord:
+      type: object
+      properties:
+        id: { type: integer }
+        nome: { type: string }
+        descricao: { type: string, nullable: true }
+        estrutura_id: { type: integer }
+        nivel_hierarquico: { type: integer }
+        cor: { type: string, nullable: true, example: "#6366F1" }
+        icone: { type: string, nullable: true, example: "pi-users" }
+        ordem: { type: integer }
+        ativo: { type: boolean }
+        is_sistema: { type: boolean, description: "true = papel padrão, somente leitura" }
+        criado_em: { type: string, format: date-time }
+        atualizado_em: { type: string, format: date-time, nullable: true }
+        permissoes:
+          type: array
+          items:
+            $ref: "#/components/schemas/PapelPermissaoRecord"
+
+    SalvarPapelRequest:
+      type: object
+      required: [nome, estrutura_id]
+      properties:
+        nome: { type: string, minLength: 2, maxLength: 100 }
+        descricao: { type: string, maxLength: 300, nullable: true }
+        estrutura_id: { type: integer }
+        nivel_hierarquico: { type: integer, default: 1 }
+        cor: { type: string, nullable: true }
+        icone: { type: string, nullable: true }
+        ordem: { type: integer, default: 0 }
+        ativo: { type: boolean, default: true }
+        permissoes:
+          type: array
+          items:
+            type: object
+            properties:
+              recurso: { type: string }
+              acao: { type: integer }
+              escopo: { type: integer }

@@ -1,0 +1,122 @@
+openapi: "3.0.3"
+info:
+  title: Usuários da Estrutura API
+  version: "1.0"
+  description: >
+    Endpoints NOVOS — gerenciam a relação EstruturaUsuario (usuário ↔ estrutura).
+    Distintos de /api/usuarios (que gerencia contas do sistema).
+paths:
+  /api/usuarios-estrutura:
+    get:
+      summary: Listar usuários vinculados a uma estrutura (com filtros) [NOVO]
+      parameters:
+        - name: estrutura_id
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: papel_id
+          in: query
+          schema: { type: integer }
+          description: Filtrar por papel
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ativo, inativo, convidado]
+          description: Filtrar por status do vínculo
+        - name: nome
+          in: query
+          schema: { type: string }
+          description: Busca parcial por nome
+        - name: ultimo_acesso_antes_de
+          in: query
+          schema: { type: string, format: date }
+          description: Filtrar usuários cujo último acesso é anterior a esta data
+        - name: skip
+          in: query
+          schema: { type: integer, default: 0 }
+        - name: take
+          in: query
+          schema: { type: integer, default: 50 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UsuarioEstruturaRecord"
+                  total: { type: integer }
+                  skip: { type: integer }
+                  take: { type: integer }
+
+  /api/usuarios-estrutura/{id}/papel:
+    put:
+      summary: Alterar papel do usuário na estrutura [NOVO]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [papel]
+              properties:
+                papel:
+                  type: string
+                  enum: [Dono, Participante]
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsuarioEstruturaRecord"
+        "404":
+          description: Usuário ou papel não encontrado
+        "422":
+          description: Não é possível remover papel de owner sem designar outro owner
+
+  /api/usuarios-estrutura/{id}:
+    delete:
+      summary: Remover usuário da estrutura (soft delete — preserva histórico) [NOVO]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Usuário removido (status → inativo, histórico preservado)
+        "422":
+          description: Não é possível remover o único owner da estrutura
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  codigo: { type: string, example: "ORPHAN_OWNER" }
+
+components:
+  schemas:
+    UsuarioEstruturaRecord:
+      type: object
+      properties:
+        id: { type: integer }
+        estrutura_id: { type: integer }
+        usuario_id: { type: integer }
+        nome_usuario: { type: string }
+        email_usuario: { type: string }
+        papel_nome: { type: string }
+        ativo: { type: boolean }
+        associado_em: { type: string, format: date-time }
+        aceito_em: { type: string, format: date-time, nullable: true }
+        criado_em: { type: string, format: date-time }
+        atualizado_em: { type: string, format: date-time, nullable: true }
