@@ -1,0 +1,11 @@
+{
+  "route": "/admin/eventos",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "expectations": {
+    "layout": "filter-panel-plus-cards",
+    "primaryAction": "card-button"
+  }
+}

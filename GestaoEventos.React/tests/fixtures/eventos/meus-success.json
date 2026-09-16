@@ -1,0 +1,48 @@
+{
+  "route": "/admin/eventos/meus",
+  "context": {
+    "usuarioId": 10,
+    "estruturaId": 7,
+    "grupoId": 3
+  },
+  "sections": {
+    "aAcompanhar": [
+      {
+        "eventoId": 301,
+        "ocorrenciaId": 701,
+        "titulo": "Encontro em andamento",
+        "status": "EM_ANDAMENTO",
+        "grupoId": 3,
+        "grupoNome": "Grupo Norte",
+        "responsavelId": 10,
+        "cancelada": false
+      }
+    ],
+    "futuros": [
+      {
+        "eventoId": 302,
+        "ocorrenciaId": null,
+        "titulo": "Encontro futuro",
+        "status": "AGENDADA",
+        "grupoId": 3,
+        "grupoNome": "Grupo Norte",
+        "responsavelId": 10,
+        "cancelada": false,
+        "isVirtual": true
+      }
+    ],
+    "historico": [
+      {
+        "eventoId": 303,
+        "ocorrenciaId": 703,
+        "titulo": "Encontro cancelado",
+        "status": "CANCELADA",
+        "grupoId": 3,
+        "grupoNome": "Grupo Norte",
+        "responsavelId": 10,
+        "cancelada": true,
+        "motivoCancelamento": "Agenda local indisponivel"
+      }
+    ]
+  }
+}

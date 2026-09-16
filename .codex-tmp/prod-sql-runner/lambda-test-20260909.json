@@ -1,0 +1,1 @@
+{"ok":false,"code":"ER_ACCESS_DENIED_ERROR","errno":1045,"sqlState":"28000","error":"Access denied for user 'gestao_app'@'ec2-44-204-246-78.compute-1.amazonaws.com' (using password: YES)"}

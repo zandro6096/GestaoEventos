@@ -1,0 +1,12 @@
+{
+  "route": "/admin/jornada",
+  "context": {
+    "usuarioId": 10,
+    "estruturaId": 7,
+    "grupoId": 3
+  },
+  "error": {
+    "status": 403,
+    "message": "Permissao insuficiente"
+  }
+}

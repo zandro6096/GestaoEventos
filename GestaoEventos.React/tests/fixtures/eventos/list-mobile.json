@@ -1,0 +1,12 @@
+{
+  "route": "/admin/eventos",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "expectations": {
+    "layout": "cards",
+    "primaryAction": "card-button",
+    "wideHorizontalTable": false
+  }
+}

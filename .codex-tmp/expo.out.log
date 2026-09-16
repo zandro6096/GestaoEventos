@@ -1,0 +1,412 @@
+env: load .env.local
+env: export EXPO_PUBLIC_API_URL EXPO_PUBLIC_ENV
+Starting project at C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.React
+Starting Metro Bundler
+
+Waiting on http://localhost:8083
+
+Logs for your project will appear below.
+λ Bundled 1441ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1321 modules)
+Web Bundled 1983ms node_modules\expo-router\entry.js (1212 modules)
+Web Bundled 325ms node_modules\expo-router\entry.js (866 modules)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 25ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 380ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 24ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+Web Bundled 2650ms node_modules\expo-router\entry.js (1 module)
+λ Bundled 2724ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 672ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 38ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 462ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 42ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 46ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 518ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 37ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 31ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 482ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 30ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+Web Bundled 2082ms node_modules\expo-router\entry.js (1 module)
+λ Bundled 2115ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 521ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 45ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 511ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 54ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 37ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 372ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 29ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 1295ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 2083ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 361ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 35ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 426ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 26ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 33ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 407ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 35ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 31ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 437ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 35ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 28ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 424ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 38ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 31ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 420ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 33ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 30ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 433ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 38ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 24ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 361ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 29ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 35ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 374ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 31ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 43ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 392ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 29ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 32ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 446ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 28ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 27ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 363ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 24ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 44ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 508ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 51ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 26ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 379ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 22ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 35ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 436ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 28ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 24ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 376ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 26ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 31ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 424ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 33ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+λ Bundled 33ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+Web Bundled 341ms node_modules\expo-router\entry.js (1 module)
+Web Bundled 25ms node_modules\expo-router\entry.js (1 module)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"} 
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+Web Bundling failed 2831ms node_modules\expo-router\entry.js (1 module)
+λ Bundling failed 2866ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+
+Metro error: Unable to resolve module ../../../features/configuracoes/admin-route from C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.React\app\(app)\admin\assinatura.tsx: 
+
+None of these files exist:
+  * features\configuracoes\admin-route(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css)
+  * features\configuracoes\admin-route
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { [33mAdminRoute[39m } [36mfrom[39m [32m'../../../features/configuracoes/admin-route'[39m[33m;[39m
+ [90m   |[39m                             [31m[1m^[22m[39m
+ [90m 2 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAssinaturaRoute[39m() { [36mreturn[39m [33m<[39m[33mAdminRoute[39m title[33m=[39m[32m"Assinatura"[39m resource[33m=[39m[32m"assinatura"[39m action[33m=[39m[32m"ler"[39m [33m/[39m[33m>[39m[33m;[39m }
+ [90m 3 |[39m[0m
+
+Import stack:
+
+ app\(app)\admin\assinatura.tsx
+ | import "../../../features/configuracoes/admin-route"
+
+ app (require.context)
+
+
+
+Web Bundled 115ms .expo\static-tmp\_error.js (133 modules)
+Web Bundling failed 2075ms node_modules\expo-router\entry.js (1 module)
+λ Bundling failed 2099ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+
+Metro error: Unable to resolve module ../../../features/configuracoes/admin-route from C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.React\app\(app)\admin\assinatura.tsx: 
+
+None of these files exist:
+  * features\configuracoes\admin-route(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css)
+  * features\configuracoes\admin-route
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { [33mAdminRoute[39m } [36mfrom[39m [32m'../../../features/configuracoes/admin-route'[39m[33m;[39m
+ [90m   |[39m                             [31m[1m^[22m[39m
+ [90m 2 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAssinaturaRoute[39m() { [36mreturn[39m [33m<[39m[33mAdminRoute[39m title[33m=[39m[32m"Assinatura"[39m resource[33m=[39m[32m"assinatura"[39m action[33m=[39m[32m"ler"[39m [33m/[39m[33m>[39m[33m;[39m }
+ [90m 3 |[39m[0m
+
+Import stack:
+
+ app\(app)\admin\assinatura.tsx
+ | import "../../../features/configuracoes/admin-route"
+
+ app (require.context)
+
+
+
+Web Bundled 12ms .expo\static-tmp\_error.js (1 module)
+Web Bundling failed 2048ms node_modules\expo-router\entry.js (1 module)
+λ Bundling failed 2061ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+
+Metro error: Unable to resolve module ../../../features/configuracoes/admin-route from C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.React\app\(app)\admin\assinatura.tsx: 
+
+None of these files exist:
+  * features\configuracoes\admin-route(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css)
+  * features\configuracoes\admin-route
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { [33mAdminRoute[39m } [36mfrom[39m [32m'../../../features/configuracoes/admin-route'[39m[33m;[39m
+ [90m   |[39m                             [31m[1m^[22m[39m
+ [90m 2 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAssinaturaRoute[39m() { [36mreturn[39m [33m<[39m[33mAdminRoute[39m title[33m=[39m[32m"Assinatura"[39m resource[33m=[39m[32m"assinatura"[39m action[33m=[39m[32m"ler"[39m [33m/[39m[33m>[39m[33m;[39m }
+ [90m 3 |[39m[0m
+
+Import stack:
+
+ app\(app)\admin\assinatura.tsx
+ | import "../../../features/configuracoes/admin-route"
+
+ app (require.context)
+
+
+
+Web Bundled 12ms .expo\static-tmp\_error.js (1 module)
+Web Bundling failed 2079ms node_modules\expo-router\entry.js (1 module)
+λ Bundling failed 2095ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+
+Metro error: Unable to resolve module ../../../features/configuracoes/admin-route from C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.React\app\(app)\admin\assinatura.tsx: 
+
+None of these files exist:
+  * features\configuracoes\admin-route(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css)
+  * features\configuracoes\admin-route
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { [33mAdminRoute[39m } [36mfrom[39m [32m'../../../features/configuracoes/admin-route'[39m[33m;[39m
+ [90m   |[39m                             [31m[1m^[22m[39m
+ [90m 2 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAssinaturaRoute[39m() { [36mreturn[39m [33m<[39m[33mAdminRoute[39m title[33m=[39m[32m"Assinatura"[39m resource[33m=[39m[32m"assinatura"[39m action[33m=[39m[32m"ler"[39m [33m/[39m[33m>[39m[33m;[39m }
+ [90m 3 |[39m[0m
+
+Import stack:
+
+ app\(app)\admin\assinatura.tsx
+ | import "../../../features/configuracoes/admin-route"
+
+ app (require.context)
+
+
+
+Web Bundled 9ms .expo\static-tmp\_error.js (1 module)
+Web Bundling failed 2098ms node_modules\expo-router\entry.js (1 module)
+λ Bundling failed 2120ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+
+Metro error: Unable to resolve module ../../../features/configuracoes/admin-route from C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.React\app\(app)\admin\assinatura.tsx: 
+
+None of these files exist:
+  * features\configuracoes\admin-route(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css)
+  * features\configuracoes\admin-route
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { [33mAdminRoute[39m } [36mfrom[39m [32m'../../../features/configuracoes/admin-route'[39m[33m;[39m
+ [90m   |[39m                             [31m[1m^[22m[39m
+ [90m 2 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAssinaturaRoute[39m() { [36mreturn[39m [33m<[39m[33mAdminRoute[39m title[33m=[39m[32m"Assinatura"[39m resource[33m=[39m[32m"assinatura"[39m action[33m=[39m[32m"ler"[39m [33m/[39m[33m>[39m[33m;[39m }
+ [90m 3 |[39m[0m
+
+Import stack:
+
+ app\(app)\admin\assinatura.tsx
+ | import "../../../features/configuracoes/admin-route"
+
+ app (require.context)
+
+
+
+Web Bundled 8ms .expo\static-tmp\_error.js (1 module)
+Web Bundling failed 1755ms node_modules\expo-router\entry.js (1 module)
+λ Bundling failed 1770ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+
+Metro error: Unable to resolve module ../../../features/configuracoes/admin-route from C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.React\app\(app)\admin\assinatura.tsx: 
+
+None of these files exist:
+  * features\configuracoes\admin-route(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css)
+  * features\configuracoes\admin-route
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { [33mAdminRoute[39m } [36mfrom[39m [32m'../../../features/configuracoes/admin-route'[39m[33m;[39m
+ [90m   |[39m                             [31m[1m^[22m[39m
+ [90m 2 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAssinaturaRoute[39m() { [36mreturn[39m [33m<[39m[33mAdminRoute[39m title[33m=[39m[32m"Assinatura"[39m resource[33m=[39m[32m"assinatura"[39m action[33m=[39m[32m"ler"[39m [33m/[39m[33m>[39m[33m;[39m }
+ [90m 3 |[39m[0m
+
+Import stack:
+
+ app\(app)\admin\assinatura.tsx
+ | import "../../../features/configuracoes/admin-route"
+
+ app (require.context)
+
+
+
+Web Bundled 10ms .expo\static-tmp\_error.js (1 module)
+Web Bundling failed 1709ms node_modules\expo-router\entry.js (1 module)
+λ Bundling failed 1722ms node_modules\expo\node_modules\@expo\cli\node_modules\@expo\router-server\node\render.js (1 module)
+
+Metro error: Unable to resolve module ../../../features/configuracoes/admin-route from C:\Users\Sandr\source\repos\GestaoEventos\GestaoEventos.React\app\(app)\admin\assinatura.tsx: 
+
+None of these files exist:
+  * features\configuracoes\admin-route(.web.ts|.ts|.web.tsx|.tsx|.web.mjs|.mjs|.web.js|.js|.web.jsx|.jsx|.web.json|.json|.web.cjs|.cjs|.web.scss|.scss|.web.sass|.sass|.web.css|.css)
+  * features\configuracoes\admin-route
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { [33mAdminRoute[39m } [36mfrom[39m [32m'../../../features/configuracoes/admin-route'[39m[33m;[39m
+ [90m   |[39m                             [31m[1m^[22m[39m
+ [90m 2 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAssinaturaRoute[39m() { [36mreturn[39m [33m<[39m[33mAdminRoute[39m title[33m=[39m[32m"Assinatura"[39m resource[33m=[39m[32m"assinatura"[39m action[33m=[39m[32m"ler"[39m [33m/[39m[33m>[39m[33m;[39m }
+ [90m 3 |[39m[0m
+
+Import stack:
+
+ app\(app)\admin\assinatura.tsx
+ | import "../../../features/configuracoes/admin-route"
+
+ app (require.context)
+
+
+
+Web Bundled 10ms .expo\static-tmp\_error.js (1 module)

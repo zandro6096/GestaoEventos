@@ -1,0 +1,45 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "moduleResolution": "bundler",
+    "moduleSuffixes": [
+      ".web",
+      ".ios",
+      ".android",
+      ""
+    ],
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@app/*": [
+        "./app/*"
+      ],
+      "@features/*": [
+        "./features/*"
+      ],
+      "@services/*": [
+        "./services/*"
+      ],
+      "@shared/*": [
+        "./shared/*"
+      ],
+      "@stores/*": [
+        "./stores/*"
+      ],
+      "@tests/*": [
+        "./tests/*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    ".expo/types/**/*.d.ts",
+    "expo-env.d.ts"
+  ]
+}

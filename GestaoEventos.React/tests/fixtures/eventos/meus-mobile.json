@@ -1,0 +1,12 @@
+{
+  "route": "/admin/eventos/meus",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "expectations": {
+    "layout": "section-cards",
+    "primaryAction": "card-button",
+    "wideHorizontalTable": false
+  }
+}

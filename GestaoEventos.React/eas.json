@@ -1,0 +1,48 @@
+{
+  "cli": {
+    "version": ">= 10.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "dev",
+      "environment": "development",
+      "env": {
+        "EXPO_PUBLIC_ENV": "development"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "channel": "preview",
+      "environment": "preview",
+      "env": {
+        "EXPO_PUBLIC_ENV": "preview"
+      }
+    },
+    "production": {
+      "channel": "prod",
+      "autoIncrement": true,
+      "environment": "production",
+      "android": {
+        "image": "ubuntu-26.04-jdk-17-ndk-r27b-sdk-57"
+      },
+      "env": {
+        "EXPO_PUBLIC_ENV": "prod",
+        "EXPO_PUBLIC_API_URL": "https://sistema-eventos.seven-projetos.com"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6810320235",
+        "appleTeamId": "HSBKP8Q82R",
+        "ascApiKeyPath": "./credentials/AuthKey_D5C674836Z.p8",
+        "ascApiKeyId": "D5C674836Z",
+        "ascApiKeyIssuerId": "66a05206-c4b9-4faa-8435-c211c6ac3fc5"
+      }
+    }
+  }
+}

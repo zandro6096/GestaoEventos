@@ -1,0 +1,24 @@
+{
+  "route": "/jornada",
+  "context": {
+    "usuarioId": 10,
+    "estruturaId": 7,
+    "grupoId": 3
+  },
+  "data": {
+    "ocorrencias": [],
+    "participacoes": [],
+    "frequencia": {
+      "percentualFrequencia": 0,
+      "totalParticipacoes": 0,
+      "totalPresencas": 0,
+      "totalAusencias": 0,
+      "totalPendentes": 0
+    },
+    "pendencias": {
+      "total": 0,
+      "maiorAtrasoDias": 0,
+      "grupos": []
+    }
+  }
+}

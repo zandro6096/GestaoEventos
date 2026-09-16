@@ -1,0 +1,12 @@
+{
+  "route": "/jornada",
+  "viewport": {
+    "width": 1280,
+    "height": 900
+  },
+  "expected": {
+    "layout": "desktopGrid",
+    "actionSurface": "sidePanel",
+    "minTouchTarget": 44
+  }
+}

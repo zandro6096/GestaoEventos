@@ -19,6 +19,11 @@ Este documento detalha os **fluxos de autenticação** - porta de entrada do sis
 - **Validation em Tempo Real**: Feedback imediato enquanto usuário digita
 - **Accessibility**: Labels claros, contrast ratio WCAG AA, keyboard navigation
 
+> **React atual**: o login publicado no app Expo mantém apenas e-mail/login, senha,
+> recuperação de senha e registro de conta. Os provedores sociais e o reenvio de
+> confirmação permanecem disponíveis na API/fluxos auxiliares, mas não são exibidos
+> na tela principal de login.
+
 ---
 
 ## Flow 1: Login (Existing User)

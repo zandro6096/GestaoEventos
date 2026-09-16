@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import path from 'node:path';
+const root = process.cwd();
+const required = ['services/api/painel-api.ts', 'features/painel/cockpit/useCockpit.ts', 'features/painel/cockpit/CockpitScreen.tsx', 'features/painel/cockpit/FilaSemanalScreen.tsx', 'tests/cockpit.smoke.cjs'];
+const missing = required.filter((file) => !fs.existsSync(path.join(root, file)));
+if (missing.length) throw new Error(`Arquivos ausentes: ${missing.join(', ')}`);
+const source = required.slice(0, 4).map((file) => fs.readFileSync(path.join(root, file), 'utf8')).join('\n');
+for (const contract of ['/api/paineis/cockpit', 'matriz-template', 'getFaltas', 'getGrupoAnalitico', '/api/paineis/cockpit/fila-pessoas', 'atualizarFilaPessoa', 'estruturaId', 'grupoId', 'cockpit:detalhe_faltas_abrir', 'Salvar acompanhamento']) if (!source.includes(contract)) throw new Error(`Evidencia ausente: ${contract}`);
+const smoke = fs.readFileSync(path.join(root, 'tests/cockpit.smoke.cjs'), 'utf8');
+for (const width of ['390', '1440']) if (!smoke.includes(width)) throw new Error(`Smoke nao cobre ${width}px`);
+const manifest = fs.readFileSync(path.join(root, 'docs/parity-manifest.md'), 'utf8');
+if (!manifest.includes('operational-cockpit')) throw new Error('Manifesto sem a linha do cockpit');
+console.log('[validate-cockpit] OK');

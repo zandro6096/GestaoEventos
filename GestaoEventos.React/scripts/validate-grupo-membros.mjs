@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
+const root = process.cwd();
+const files = ['services/api/grupos-membros-api.ts', 'services/api/responsaveis-grupo-api.ts', 'services/api/usuarios-estrutura-api.ts', 'services/api/usuarios-virtuais-api.ts', 'features/grupos/membros/membros.rules.ts', 'features/grupos/membros/membros.service.ts', 'features/grupos/membros/useGrupoMembros.ts', 'features/grupos/detalhe/GrupoDetalheScreen.tsx', 'tests/grupo-membros.test.cjs', 'tests/grupo-membros.smoke.cjs', 'docs/grupo-membros-parity.md'];
+const missing = files.filter((file) => !fs.existsSync(path.join(root, file)));
+if (missing.length) throw new Error(`Arquivos ausentes: ${missing.join(', ')}`);
+const source = files.slice(0, 8).map((file) => fs.readFileSync(path.join(root, file), 'utf8')).join('\n');
+for (const contract of ['/api/grupos-membros', '/api/responsaveis-grupo', '/api/usuarios-virtuais', 'can(', 'Reativar', 'Reenviar convite', 'estruturaId', 'grupoId']) if (!source.includes(contract)) throw new Error(`Contrato ou regra ausente: ${contract}`);
+const manifest = fs.readFileSync(path.join(root, 'docs/parity-manifest.md'), 'utf8');
+if (!manifest.includes('group-members-management') || !manifest.includes('check:grupo-membros')) throw new Error('Manifesto sem evidencia de membros/responsaveis');
+console.log('[validate-grupo-membros] OK');

@@ -1,0 +1,12 @@
+{
+  "route": "/jornada",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "expected": {
+    "layout": "tabs",
+    "actionSurface": "sheet",
+    "minTouchTarget": 44
+  }
+}

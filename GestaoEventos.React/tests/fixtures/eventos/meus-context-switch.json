@@ -1,0 +1,18 @@
+{
+  "route": "/admin/eventos/meus",
+  "previousContext": {
+    "usuarioId": 10,
+    "estruturaId": 7,
+    "grupoId": 3
+  },
+  "nextContext": {
+    "usuarioId": 10,
+    "estruturaId": 11,
+    "grupoId": 9
+  },
+  "expected": {
+    "queryKeyIncludesEstrutura": true,
+    "queryKeyIncludesGrupo": true,
+    "staleDataVisible": false
+  }
+}

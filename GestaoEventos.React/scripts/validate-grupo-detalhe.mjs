@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
+const root = process.cwd();
+const files = ['services/api/grupos-api.ts', 'features/grupos/detalhe/detalhe.service.ts', 'features/grupos/detalhe/useGrupoDetalhe.ts', 'features/grupos/detalhe/GrupoDetalheScreen.tsx', 'app/(app)/admin/grupos/[id].tsx', 'tests/grupo-detalhe.test.cjs', 'tests/grupo-detalhe.smoke.cjs', 'docs/grupo-detalhe-parity.md'];
+const missing = files.filter((file) => !fs.existsSync(path.join(root, file)));
+if (missing.length) throw new Error(`Arquivos ausentes: ${missing.join(', ')}`);
+const source = files.slice(0, 5).map((file) => fs.readFileSync(path.join(root, file), 'utf8')).join('\n');
+for (const contract of ['/api/grupos-membros', '/api/responsaveis-grupo', 'listOcorrencias', 'grupo-detalhe', 'estruturaId']) if (!source.includes(contract)) throw new Error(`Contrato ausente: ${contract}`);
+const manifest = fs.readFileSync(path.join(root, 'docs/parity-manifest.md'), 'utf8');
+if (!manifest.includes('group-detail') || !manifest.includes('check:grupo-detalhe')) throw new Error('Manifesto sem evidencia de detalhe de grupo');
+console.log('[validate-grupo-detalhe] OK');

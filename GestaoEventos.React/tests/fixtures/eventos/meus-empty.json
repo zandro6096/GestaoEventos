@@ -1,0 +1,13 @@
+{
+  "route": "/admin/eventos/meus",
+  "context": {
+    "usuarioId": 10,
+    "estruturaId": 7,
+    "grupoId": 3
+  },
+  "sections": {
+    "aAcompanhar": [],
+    "futuros": [],
+    "historico": []
+  }
+}

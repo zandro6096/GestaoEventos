@@ -1,0 +1,54 @@
+{
+  "route": "/jornada",
+  "context": {
+    "usuarioId": 10,
+    "estruturaId": 7,
+    "grupoId": 3
+  },
+  "data": {
+    "ocorrencias": [
+      {
+        "id": 101,
+        "eventoId": 201,
+        "eventoTitulo": "Reuniao semanal",
+        "grupoNome": "Grupo Norte",
+        "inicioEm": "2026-09-02T19:00:00Z",
+        "fimEm": "2026-09-02T20:00:00Z",
+        "local": "Sala 1",
+        "status": "PUBLICADO",
+        "podeFazerCheckin": true
+      }
+    ],
+    "participacoes": [
+      {
+        "id": 301,
+        "eventoId": 201,
+        "eventoTitulo": "Reuniao semanal",
+        "grupoNome": "Grupo Norte",
+        "ocorridoEm": "2026-09-02T19:00:00Z",
+        "status": "PRESENTE"
+      }
+    ],
+    "frequencia": {
+      "percentualFrequencia": 90,
+      "totalParticipacoes": 10,
+      "totalPresencas": 9,
+      "totalAusencias": 1,
+      "totalPendentes": 0
+    },
+    "pendencias": {
+      "total": 1,
+      "maiorAtrasoDias": 0,
+      "grupos": [
+        {
+          "grupoId": 3,
+          "grupoNome": "Grupo Norte",
+          "total": 1,
+          "atrasadas": 0,
+          "naSemana": 0,
+          "noDia": 1
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "route": "/admin/eventos",
+  "context": {
+    "usuarioId": 10,
+    "estruturaId": 7,
+    "grupoId": 3
+  },
+  "filters": {
+    "periodo": "historico",
+    "status": "cancelado",
+    "tipo": "todos",
+    "titulo": "",
+    "grupo": "",
+    "responsavel": ""
+  },
+  "data": {
+    "eventos": [
+      {
+        "id": 201,
+        "titulo": "Encontro semanal",
+        "descricao": "Planejamento de atividades do grupo",
+        "grupoId": 3,
+        "grupoNome": "Grupo Norte",
+        "status": "ATIVO",
+        "recorrente": true,
+        "responsavelAtualId": 10,
+        "responsavelAtualNome": "Responsavel A",
+        "dataInicio": "2026-09-08T19:00:00Z",
+        "dataFim": "2026-09-08T20:00:00Z"
+      }
+    ],
+    "ocorrencias": [
+      {
+        "id": 501,
+        "eventoId": 201,
+        "eventoTitulo": "Encontro semanal",
+        "grupoId": 3,
+        "grupoNome": "Grupo Norte",
+        "dataEfetiva": "2026-08-25T19:00:00Z",
+        "status": "CANCELADA",
+        "cancelada": true,
+        "motivoCancelamento": "Agenda local indisponivel",
+        "responsavelId": 10,
+        "responsavelNome": "Responsavel A"
+      }
+    ]
+  }
+}
