@@ -211,6 +211,14 @@ Resources:
           Sso__Microsoft__ClientSecret: !Ref SsoMicrosoftClientSecret
       Policies:
         - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Sid: SesSendEmail
+              Effect: Allow
+              Action:
+                - ses:SendEmail
+                - ses:SendRawEmail
+              Resource:
+                - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/seven-projetos.com"
       Events:
         Root:
           Type: HttpApi

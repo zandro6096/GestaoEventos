@@ -27,5 +27,11 @@ android/local.properties
 *.log
 .env*.local
 .codex-tmp/
+/.codex-tmp/
+/.codex-tmp/**
+**/.codex-tmp/**
+**/.codex/**
+**/.claude/**
+**/*.log
 .codex-web-*.log
 .codex-web-*.err.log

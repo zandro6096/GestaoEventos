@@ -32,6 +32,14 @@ export type AcompanhamentoDraft = {
   observacao?: string | null;
 };
 
+export type ParticipanteAcompanhamentoResumo = {
+  usuarioId: number | null;
+  usuarioVirtualId: number | null;
+  nome: string;
+  grupoId: number | null;
+  acompanhamentos: ParticipanteAcompanhamento[];
+};
+
 function readList<T>(value: unknown): T[] {
   const body = toCamelCase<{ data?: T[]; items?: T[] } | T[]>(value);
   if (Array.isArray(body)) return body;
@@ -51,6 +59,16 @@ export const acompanhamentosApi = {
       params: identity.tipo === 'usuario' ? { usuario_id: identity.id } : { usuario_virtual_id: identity.id },
     });
     return readList<ParticipanteAcompanhamento>(response.data);
+  },
+
+  async listEstrutura(estruturaId: number): Promise<ParticipanteAcompanhamento[]> {
+    const response = await httpClient.get(apiRoute(`/api/estruturas/${estruturaId}/acompanhamentos`));
+    return readList<ParticipanteAcompanhamento>(response.data);
+  },
+
+  async listGrupoResumo(estruturaId: number, grupoId: number): Promise<ParticipanteAcompanhamentoResumo[]> {
+    const response = await httpClient.get(apiRoute(`/api/estruturas/${estruturaId}/grupos/${grupoId}/acompanhamentos`));
+    return readList<ParticipanteAcompanhamentoResumo>(response.data);
   },
 
   async save(estruturaId: number, identity: { tipo: 'usuario' | 'usuario_virtual'; id: number }, draft: AcompanhamentoDraft) {
