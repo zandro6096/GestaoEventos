@@ -187,6 +187,8 @@ export function SignupScreen() {
               onChangeText={onChange}
               autoComplete="new-password"
               placeholder="Repita a senha"
+              returnKeyType="done"
+              onSubmitEditing={handleSignupPress}
               error={errors.confirmarSenha?.message}
             />
           )}

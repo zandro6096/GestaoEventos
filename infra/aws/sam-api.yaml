@@ -10,7 +10,7 @@ Parameters:
 
   FunctionMemorySize:
     Type: Number
-    Default: 512
+    Default: 1024
     MinValue: 128
     MaxValue: 10240
 

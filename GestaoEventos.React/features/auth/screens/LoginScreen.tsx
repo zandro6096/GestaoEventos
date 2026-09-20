@@ -127,6 +127,7 @@ export function LoginScreen() {
               keyboardType="email-address"
               autoComplete="username"
               placeholder="seu@email.com"
+              returnKeyType="next"
               error={errors.login?.message}
             />
           )}
@@ -143,6 +144,8 @@ export function LoginScreen() {
               onChangeText={onChange}
               autoComplete="current-password"
               placeholder="Sua senha"
+              returnKeyType="go"
+              onSubmitEditing={handleLoginPress}
               error={errors.senha?.message}
             />
           )}

@@ -3,7 +3,7 @@
     "name": "GestaoEventos",
     "slug": "gestaoeventos-react",
     "owner": "sandsen",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "scheme": "gestaoeventos",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

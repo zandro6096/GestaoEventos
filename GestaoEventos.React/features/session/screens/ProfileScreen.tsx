@@ -4,6 +4,7 @@ import { can } from '../../../services/permissions/permission.facade';
 import { useAuthStore } from '../../../stores/auth.store';
 import { useContextStore } from '../../../stores/context.store';
 import { colors, radius, spacing, typography } from '../../../shared/design/tokens';
+import { DeleteAccountPanel } from '../components/DeleteAccountPanel';
 
 export function ProfileScreen() {
   const user = useAuthStore((state) => state.user);
@@ -15,7 +16,7 @@ export function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
         <View style={styles.header}>
           <Text style={styles.eyebrow}>Perfil</Text>
           <Text style={styles.title}>{user?.nome ?? usuarioNome ?? 'Usuario autenticado'}</Text>
@@ -32,6 +33,8 @@ export function ProfileScreen() {
         <Pressable accessibilityRole="button" style={styles.logoutButton} onPress={() => void logout()}>
           <Text style={styles.logoutText}>Sair</Text>
         </Pressable>
+
+        <DeleteAccountPanel />
       </ScrollView>
     </SafeAreaView>
   );

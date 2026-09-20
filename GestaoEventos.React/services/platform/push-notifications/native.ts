@@ -9,8 +9,13 @@ export const PUSH_CHANNEL_ID = 'pendencias';
 
 let foregroundConfigured = false;
 
+// Definido em app.config.js (extra.pushEnabled); builds sem o plugin nao devem nem pedir permissao.
+function isPushEnabled() {
+  return Constants.expoConfig?.extra?.pushEnabled === true;
+}
+
 export function configureNativeForegroundNotifications() {
-  if (foregroundConfigured) return;
+  if (!isPushEnabled() || foregroundConfigured) return;
   foregroundConfigured = true;
 
   Notifications.setNotificationHandler({
@@ -24,6 +29,7 @@ export function configureNativeForegroundNotifications() {
 }
 
 export async function registerNativePush(platform: PushPlatform): Promise<PushRegistrationResult> {
+  if (!isPushEnabled()) return { status: 'unsupported', reason: 'Push desativado neste build.' };
   if (!Device.isDevice) return { status: 'unsupported', reason: 'Push exige um aparelho fisico.' };
 
   if (platform === 'android') {
@@ -48,6 +54,8 @@ export async function registerNativePush(platform: PushPlatform): Promise<PushRe
 }
 
 export function subscribeNativeNotificationTaps(listener: PushTapListener): PushUnsubscribe {
+  if (!isPushEnabled()) return () => undefined;
+
   const deliver = (response: Notifications.NotificationResponse) => {
     const data = response.notification.request.content.data;
     listener(data && typeof data === 'object' ? (data as Record<string, unknown>) : {});

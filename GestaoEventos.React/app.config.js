@@ -12,6 +12,11 @@ if (!['development', 'preview', 'prod'].includes(lane)) {
 const apiUrl = (process.env.EXPO_PUBLIC_API_URL || '').trim();
 if (releaseLanes.has(configuredLane)) assertReleaseApiUrl(apiUrl, lane);
 
+// Push exige o plugin expo-notifications (entitlement aps-environment + capability na Apple) e Firebase no Android.
+// Fica desligado ate as credenciais existirem: ligue com EXPO_PUBLIC_PUSH_ENABLED=1 no profile do EAS.
+const pushEnabled = process.env.EXPO_PUBLIC_PUSH_ENABLED === '1';
+const isNotificationsPlugin = (plugin) => (Array.isArray(plugin) ? plugin[0] : plugin) === 'expo-notifications';
+
 const suffix = lane === 'development' ? '.dev' : lane === 'preview' ? '.preview' : '';
 const laneLabel = lane === 'development' ? 'Dev' : lane === 'preview' ? 'Preview' : 'Prod';
 
@@ -31,14 +36,17 @@ module.exports = ({ config }) => ({
     package: `${appIdentifier}${suffix.replaceAll('.', '')}`,
     ...(googleServicesFile ? { googleServicesFile } : {}),
   },
-  plugins: (config.plugins ?? []).map((plugin) => (
-    Array.isArray(plugin) && plugin[0] === 'expo-notifications'
-      ? [plugin[0], { ...plugin[1], mode: lane === 'development' ? 'development' : 'production' }]
-      : plugin
-  )),
+  plugins: (config.plugins ?? [])
+    .filter((plugin) => pushEnabled || !isNotificationsPlugin(plugin))
+    .map((plugin) => (
+      Array.isArray(plugin) && isNotificationsPlugin(plugin)
+        ? [plugin[0], { ...plugin[1], mode: lane === 'development' ? 'development' : 'production' }]
+        : plugin
+    )),
   extra: {
     ...config.extra,
     appEnvironment: lane,
+    pushEnabled,
   },
 });
 

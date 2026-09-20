@@ -5,6 +5,7 @@ import { useAuthStore } from '../../../stores/auth.store';
 import { useContextStore } from '../../../stores/context.store';
 import { colors, radius, spacing, typography } from '../../../shared/design/tokens';
 import { useContextActions } from '../hooks/useContextActions';
+import { DeleteAccountPanel } from '../../session/components/DeleteAccountPanel';
 
 export function StructureSelectionScreen() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export function StructureSelectionScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets>
         <View style={styles.header}>
           <Text style={styles.title}>Selecione uma estrutura</Text>
           <Text style={styles.subtitle}>Escolha o contexto para continuar sem misturar dados.</Text>
@@ -46,7 +47,9 @@ export function StructureSelectionScreen() {
           {!temEstrutura || estruturas.length === 0 ? (
             <View style={styles.empty}>
               <Text style={styles.emptyTitle}>Nenhuma estrutura vinculada</Text>
-              <Text style={styles.emptyText}>Seu acesso foi validado, mas ainda nao ha estrutura disponivel neste contexto.</Text>
+              <Text style={styles.emptyText}>
+                Sua conta esta ativa, mas voce ainda nao faz parte de nenhuma organizacao. Peca a um administrador para enviar um convite para o seu e-mail.
+              </Text>
             </View>
           ) : null}
         </View>
@@ -54,6 +57,8 @@ export function StructureSelectionScreen() {
         <Pressable accessibilityRole="button" style={styles.secondaryButton} onPress={() => void logout()}>
           <Text style={styles.secondaryButtonText}>Sair</Text>
         </Pressable>
+
+        <DeleteAccountPanel />
       </ScrollView>
     </SafeAreaView>
   );

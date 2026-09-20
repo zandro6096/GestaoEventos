@@ -102,6 +102,8 @@ Add-ParameterOverrideIfPresent -Name "SsoFacebookClientSecret" -Value $env:GESTA
 Add-ParameterOverrideIfPresent -Name "SsoMicrosoftClientId" -Value $env:GESTAO_EVENTOS_SSO_MICROSOFT_CLIENT_ID
 Add-ParameterOverrideIfPresent -Name "SsoMicrosoftClientSecret" -Value $env:GESTAO_EVENTOS_SSO_MICROSOFT_CLIENT_SECRET
 Add-ParameterOverrideIfPresent -Name "PushJobKey" -Value $env:GESTAO_EVENTOS_PUSH_JOB_KEY
+# Sem override o CloudFormation mantem o valor antigo do parametro; bcrypt/JIT precisam de CPU.
+Add-ParameterOverrideIfPresent -Name "FunctionMemorySize" -Value $env:GESTAO_EVENTOS_FUNCTION_MEMORY -DefaultValue "1024"
 
 $buildArgs = @("build", "--template-file", $TemplateFile)
 if ($UseContainer.IsPresent) {
