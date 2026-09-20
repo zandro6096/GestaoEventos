@@ -1,3 +1,5 @@
+const { existsSync } = require('node:fs');
+
 const releaseLanes = new Set(['preview', 'prod', 'production']);
 const appIdentifier = 'manager.events';
 const configuredLane = (process.env.EXPO_PUBLIC_ENV || 'development').trim().toLowerCase();
@@ -13,6 +15,10 @@ if (releaseLanes.has(configuredLane)) assertReleaseApiUrl(apiUrl, lane);
 const suffix = lane === 'development' ? '.dev' : lane === 'preview' ? '.preview' : '';
 const laneLabel = lane === 'development' ? 'Dev' : lane === 'preview' ? 'Preview' : 'Prod';
 
+// Firebase (FCM) do Android: no EAS vem como arquivo em GOOGLE_SERVICES_JSON; local, ./google-services.json.
+// Sem o arquivo o app compila normalmente, mas o Android nao recebe push.
+const googleServicesFile = process.env.GOOGLE_SERVICES_JSON || (existsSync('./google-services.json') ? './google-services.json' : undefined);
+
 module.exports = ({ config }) => ({
   ...config,
   name: lane === 'prod' ? 'Gestao de Eventos' : `Gestao de Eventos ${laneLabel}`,
@@ -23,7 +29,13 @@ module.exports = ({ config }) => ({
   android: {
     ...config.android,
     package: `${appIdentifier}${suffix.replaceAll('.', '')}`,
+    ...(googleServicesFile ? { googleServicesFile } : {}),
   },
+  plugins: (config.plugins ?? []).map((plugin) => (
+    Array.isArray(plugin) && plugin[0] === 'expo-notifications'
+      ? [plugin[0], { ...plugin[1], mode: lane === 'development' ? 'development' : 'production' }]
+      : plugin
+  )),
   extra: {
     ...config.extra,
     appEnvironment: lane,

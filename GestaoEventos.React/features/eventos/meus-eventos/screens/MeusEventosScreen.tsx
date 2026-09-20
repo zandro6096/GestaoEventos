@@ -16,6 +16,7 @@ import { can } from '../../../../services/permissions/permission.facade';
 import { track } from '../../../../services/analytics/analytics.service';
 import { colors, radius, spacing, typography } from '../../../../shared/design/tokens';
 import { layoutMetrics } from '../../../../shared/theme';
+import { readFilters, useMeusEventosViewStore } from '../../../../stores/meus-eventos-view.store';
 import { useMeusEventos } from '../hooks/useMeusEventos';
 import type { MeusEventoItem } from '../services/meus-eventos.service';
 
@@ -45,9 +46,12 @@ export function MeusEventosScreen() {
   const compact = width < layoutMetrics.desktopBreakpoint;
   const [cancelTarget, setCancelTarget] = useState<MeusEventoItem | null>(null);
   const [cancelReason, setCancelReason] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<string | null | undefined>(undefined);
+  const storedFilters = useMeusEventosViewStore((state) => state.filters);
+  const patchFilters = useMeusEventosViewStore((state) => state.patchFilters);
+  const { year: selectedYear, month: selectedMonth, eventGroup: selectedGroup } = readFilters(storedFilters, meusEventos.contextKey);
+  const setSelectedGroup = (eventGroup: string | null) => patchFilters(meusEventos.contextKey, { eventGroup });
+  const setSelectedYear = (year: number | null) => patchFilters(meusEventos.contextKey, { year });
+  const setSelectedMonth = (month: string | null | undefined) => patchFilters(meusEventos.contextKey, { month });
   const [groupSearch, setGroupSearch] = useState('');
   const [showCancelled, setShowCancelled] = useState(true);
   const canCreateEvents = can('criar', 'eventos');
@@ -574,7 +578,14 @@ function ScreenShell({ children }: { children: ReactNode }) {
   const compact = width < layoutMetrics.desktopBreakpoint;
   return (
     <View style={styles.safe}>
-      <ScrollView contentContainerStyle={[styles.content, compact ? styles.mobileContent : null]}>{children}</ScrollView>
+      <ScrollView
+        contentContainerStyle={[styles.content, compact ? styles.mobileContent : null]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        automaticallyAdjustKeyboardInsets
+      >
+        {children}
+      </ScrollView>
     </View>
   );
 }

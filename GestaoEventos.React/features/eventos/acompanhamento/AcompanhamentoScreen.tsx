@@ -150,6 +150,27 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
     if (requiresReason) openAttendance(targets, status);
     else void runAttendance(targets, status, targets.length === 1 ? participantObservation(targets[0]) : '');
   };
+  const pendingAttendance = presenca.mutation.isPending ? presenca.mutation.variables : undefined;
+  const isAttendancePending = (participant: Participante, status: AttendanceStatus) => {
+    if (!pendingAttendance) return false;
+    return pendingAttendance.mode === 'single'
+      ? pendingAttendance.participant.id === participant.id && pendingAttendance.status === status
+      : pendingAttendance.items.some((item) => item.participant.id === participant.id && item.status === status);
+  };
+  const renderAttendanceActions = (p: Participante) => attendanceOptions.map((option) => (
+    <Action
+      key={option.status}
+      shortLabel={option.short}
+      active={p.status?.toUpperCase() === option.status}
+      loading={isAttendancePending(p, option.status)}
+      label={`Marcar ${p.nomeExibicao || p.nome} como ${option.verb}`}
+      icon={option.icon}
+      iconOnly
+      variant={option.variant}
+      disabled={presenca.mutation.isPending}
+      onPress={() => applyAttendance([p], option.status)}
+    />
+  ));
   const saveParticipant = async (participant: Participante, values: { nome: string; email: string | null; telefone: string | null; dataNascimento: string | null; papelIds: number[]; papelPrincipalId: number | null }) => {
     setParticipantEditPending(true);
     setParticipantEditError(null);
@@ -324,13 +345,9 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
                   <Pressable style={[styles.participantMenuItem, styles.participantMenuItemDanger]} onPress={() => { setOpenParticipantMenuId(null); openPanel('remover', p); }}><Ionicons name="person-remove-outline" size={16} color={colors.error} /><Text style={styles.participantMenuDangerText}>Remover participante</Text></Pressable>
                 </View> : null}
               </View>
-              <Action shortLabel="P" active={p.status?.toUpperCase() === 'PRESENTE'} label={`Marcar ${p.nomeExibicao || p.nome} como presente`} icon="checkmark-outline" iconOnly variant="success" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'PRESENTE')} />
-              <Action shortLabel="A" active={p.status?.toUpperCase() === 'AUSENTE'} label={`Marcar ${p.nomeExibicao || p.nome} como ausente`} icon="close-outline" iconOnly variant="danger" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'AUSENTE')} />
-              <Action shortLabel="J" active={p.status?.toUpperCase() === 'JUSTIFICADO'} label={`Marcar ${p.nomeExibicao || p.nome} como justificado`} icon="document-text-outline" iconOnly variant="secondary" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'JUSTIFICADO')} />
+              {renderAttendanceActions(p)}
             </View> : state.actions?.participantes ? <View style={styles.participantActions}>
-              <Action shortLabel="P" active={p.status?.toUpperCase() === 'PRESENTE'} label={`Marcar ${p.nomeExibicao || p.nome} como presente`} icon="checkmark-outline" iconOnly variant="success" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'PRESENTE')} />
-              <Action shortLabel="A" active={p.status?.toUpperCase() === 'AUSENTE'} label={`Marcar ${p.nomeExibicao || p.nome} como ausente`} icon="close-outline" iconOnly variant="danger" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'AUSENTE')} />
-              <Action shortLabel="J" active={p.status?.toUpperCase() === 'JUSTIFICADO'} label={`Marcar ${p.nomeExibicao || p.nome} como justificado`} icon="document-text-outline" iconOnly variant="secondary" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'JUSTIFICADO')} />
+              {renderAttendanceActions(p)}
             </View> : null}
           </View>
           {openObservationId === p.id ? <View style={styles.observationPanel}><View style={styles.observationHeading}><Ionicons name="chatbubble-outline" size={16} color={colors.brandBlue} /><Text style={styles.label}>Observacao</Text><Text style={styles.observationHint}>{['PRESENTE', 'AUSENTE', 'JUSTIFICADO'].includes(p.status?.toUpperCase() ?? '') ? 'Atualiza o registro atual.' : 'Sera enviada ao marcar presenca.'}</Text></View><TextInput accessibilityLabel={`Observacao de ${p.nomeExibicao || p.nome}`} multiline maxLength={500} value={participantObservation(p)} onChangeText={(value) => setObservationDrafts((current) => ({ ...current, [p.id]: value }))} placeholder="Adicionar observacao opcional" placeholderTextColor={colors.textMuted} style={styles.observationInput} /><View style={styles.observationActions}><Text style={styles.observationCount}>{participantObservation(p).length}/500</Text><Pressable style={styles.secondaryButton} onPress={() => setOpenObservationId(null)}><Text style={styles.secondaryButtonText}>Fechar</Text></Pressable><Pressable disabled={savingObservationId === p.id} style={[styles.primaryButton, savingObservationId === p.id && styles.actionDisabled]} onPress={() => void saveObservation(p)}><Ionicons name="save-outline" size={17} color={colors.surfacePrimary} /><Text style={styles.primaryButtonText}>{savingObservationId === p.id ? 'Salvando...' : 'Salvar'}</Text></Pressable></View></View> : null}
@@ -398,10 +415,33 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
   </ScrollView>;
 }
 
-function Action({ label, icon, shortLabel, onPress, disabled = false, iconOnly = false, active = true, variant = 'secondary' }: { label: string; icon: React.ComponentProps<typeof Ionicons>['name']; shortLabel?: string; onPress: () => void; disabled?: boolean; iconOnly?: boolean; active?: boolean; variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'icon' }) {
+const attendanceOptions = [
+  { status: 'PRESENTE', short: 'P', icon: 'checkmark-outline', variant: 'success', verb: 'presente' },
+  { status: 'AUSENTE', short: 'A', icon: 'close-outline', variant: 'danger', verb: 'ausente' },
+  { status: 'JUSTIFICADO', short: 'J', icon: 'document-text-outline', variant: 'secondary', verb: 'justificado' },
+] as const;
+
+const markTones = {
+  success: { solid: '#059669', tint: '#ECFDF5' },
+  danger: { solid: colors.error, tint: '#FEF2F2' },
+  warning: { solid: '#D97706', tint: '#FFFBEB' },
+} as const;
+
+function Action({ label, icon, shortLabel, onPress, disabled = false, loading = false, iconOnly = false, active = true, variant = 'secondary' }: { label: string; icon: React.ComponentProps<typeof Ionicons>['name']; shortLabel?: string; onPress: () => void; disabled?: boolean; loading?: boolean; iconOnly?: boolean; active?: boolean; variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'icon' }) {
   const iconColor = variant === 'primary' ? colors.surfacePrimary : variant === 'success' ? '#059669' : variant === 'danger' ? colors.error : colors.brandBlue;
-  return <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled, selected: active }} disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.action, iconOnly ? styles.actionIcon : null, shortLabel ? styles.action_icon : styles[`action_${variant}`], iconOnly && !active ? styles.actionInactive : null, pressed ? styles.actionPressed : null, disabled && styles.actionDisabled]}>
-    {shortLabel ? <View style={styles.actionMark}><Ionicons name={icon} size={14} color={colors.textSecondary} /><Text style={styles.actionLetter}>{shortLabel}</Text></View> : <Ionicons name={icon} size={iconOnly ? 20 : 18} color={iconColor} />}{!iconOnly && <Text style={[styles.actionText, variant === 'primary' ? styles.actionTextPrimary : null]}>{label}</Text>}
+  const markTone = shortLabel ? markTones[variant === 'success' ? 'success' : variant === 'danger' ? 'danger' : 'warning'] : null;
+  const filled = Boolean(markTone && active && !loading);
+  const markStyle = markTone
+    ? loading
+      ? { backgroundColor: markTone.tint, borderColor: markTone.solid }
+      : active ? { backgroundColor: markTone.solid, borderColor: markTone.solid } : null
+    : null;
+  return <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled, selected: active, busy: loading }} disabled={disabled || loading} onPress={onPress} style={({ pressed }) => [styles.action, iconOnly ? styles.actionIcon : null, shortLabel ? styles.action_icon : styles[`action_${variant}`], iconOnly && !active ? styles.actionInactive : null, markStyle, pressed ? styles.actionPressed : null, disabled && !loading && styles.actionDisabled]}>
+    {shortLabel && markTone
+      ? <View style={styles.actionMark}>{loading
+        ? <ActivityIndicator size="small" color={markTone.solid} />
+        : <><Ionicons name={icon} size={14} color={filled ? colors.surfacePrimary : colors.textSecondary} /><Text style={[styles.actionLetter, filled ? { color: colors.surfacePrimary } : null]}>{shortLabel}</Text></>}</View>
+      : <Ionicons name={icon} size={iconOnly ? 20 : 18} color={iconColor} />}{!iconOnly && <Text style={[styles.actionText, variant === 'primary' ? styles.actionTextPrimary : null]}>{label}</Text>}
   </Pressable>;
 }
 

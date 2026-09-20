@@ -8,6 +8,7 @@ import { queryKeys } from '../../../../services/query/query-keys';
 import { gruposApi, type GrupoDto } from '../../../../services/api/grupos-api';
 import { useAuthStore } from '../../../../stores/auth.store';
 import { useContextStore } from '../../../../stores/context.store';
+import { useMeusEventosViewStore } from '../../../../stores/meus-eventos-view.store';
 import {
   meusEventosService,
   mergeMeusEventos,
@@ -30,11 +31,12 @@ export function useMeusEventos() {
   const enabled = Boolean(usuarioId && estruturaId);
   const contextError = enabled ? null : 'Meus Eventos exige usuario autenticado e estrutura ativa.';
   const contextSelectionKey = `${usuarioId ?? 0}:${estruturaId ?? 0}:${grupoId ?? 'all'}`;
-  const [groupSelection, setGroupSelection] = useState<{ contextKey: string; groupId: number | null }>({ contextKey: '', groupId: null });
+  const groupSelection = useMeusEventosViewStore((state) => state.groupSelection);
+  const setGroupSelection = useMeusEventosViewStore((state) => state.setGroupSelection);
   const selectedGroupId = groupSelection.contextKey === contextSelectionKey ? groupSelection.groupId : null;
   const selectGroup = useCallback((groupId: number) => {
     setGroupSelection({ contextKey: contextSelectionKey, groupId });
-  }, [contextSelectionKey]);
+  }, [contextSelectionKey, setGroupSelection]);
   const groupQueryEnabled = Boolean(enabled && !grupoId);
   const gruposQuery = useQuery({
     queryKey: queryKeys.eventos.gruposFiltro(estruturaId),
@@ -215,6 +217,7 @@ export function useMeusEventos() {
   }
 
   return {
+    contextKey: contextSelectionKey,
     contextError,
     usuarioId,
     estruturaId,

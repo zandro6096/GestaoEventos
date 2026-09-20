@@ -16,6 +16,9 @@ type Tab = 'resumo' | 'membros' | 'responsaveis' | 'eventos';
 type ListItem = { id: number; title: string; subtitle: string };
 type RemovalTarget = { kind: ManagementKind; id: number; title: string };
 
+// A tela desmonta ao abrir um evento (Slot); lembrar a aba evita voltar sempre para "Resumo".
+const lastTabByGroup = new Map<number, Tab>();
+
 export function GrupoDetalheScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const grupoId = Number(id);
@@ -24,7 +27,7 @@ export function GrupoDetalheScreen() {
   const compact = width < layoutMetrics.desktopBreakpoint;
   const { usuarioId, estruturaId } = useContextStore();
   const state = useGrupoDetalhe(grupoId);
-  const [tab, setTab] = useState<Tab>('resumo');
+  const [tab, setTab] = useState<Tab>(() => lastTabByGroup.get(grupoId) ?? 'resumo');
   const [managementKind, setManagementKind] = useState<ManagementKind | null>(null);
   const [directoryTerm, setDirectoryTerm] = useState('');
   const [inviteName, setInviteName] = useState('');
@@ -65,7 +68,7 @@ export function GrupoDetalheScreen() {
   if (state.query.isError) return <Centered><Text accessibilityRole="alert" style={styles.error}>{normalizeApiError(state.query.error, 'Nao foi possivel carregar o grupo.').message}</Text><Action label="Voltar para grupos" icon="arrow-back-outline" onPress={() => router.replace('/admin/grupos' as Href)} /></Centered>;
   if (!data) return null;
   const path = groupPath(data.hierarquia, data.grupo);
-  const pendingTab = (next: Tab) => { setTab(next); track('simulation', 'grupos:aba_trocar', { extra: { aba: next } }); };
+  const pendingTab = (next: Tab) => { setTab(next); lastTabByGroup.set(grupoId, next); track('simulation', 'grupos:aba_trocar', { extra: { aba: next } }); };
   const events: ListItem[] = data.eventos.map((item) => ({ id: item.id, title: item.eventoTitulo, subtitle: `${item.status} · ${item.dataHora.slice(0, 16).replace('T', ' ')}` }));
   const feedbackError = management.mutation.error ?? management.inviteMutation.error;
   return <SafeAreaView style={styles.safe}><ScrollView contentContainerStyle={[styles.content, compact && styles.contentCompact]} keyboardShouldPersistTaps="handled">

@@ -41,9 +41,10 @@ export function usePresenca(data: AttendanceData | undefined, queryKey: readonly
       track('confirmation', 'acompanhar_evento:salvar_presencas_success', { extra: { total: items.length } });
       return items;
     },
+    // Retornar a promise mantem isPending ate a lista refletir o novo status (feedback do P/A/J).
     onSuccess: () => {
-      void client.invalidateQueries({ queryKey });
       void client.invalidateQueries({ queryKey: ['jornada'] });
+      return client.invalidateQueries({ queryKey });
     },
   });
   return { mutation, templateQuery, requerJustificativaAusencia };

@@ -143,8 +143,15 @@ Parameters:
     Default: ""
     NoEcho: true
 
+  PushJobKey:
+    Type: String
+    Default: ""
+    NoEcho: true
+    Description: Chave do job de push (header X-Job-Key). Vazia desativa o endpoint e o agendamento.
+
 Conditions:
   IsDefaultStage: !Equals [!Ref StageName, "$default"]
+  HasPushJobKey: !Not [!Equals [!Ref PushJobKey, ""]]
 
 Resources:
   GestaoEventosHttpApi:
@@ -209,6 +216,7 @@ Resources:
           Sso__Facebook__ClientSecret: !Ref SsoFacebookClientSecret
           Sso__Microsoft__ClientId: !Ref SsoMicrosoftClientId
           Sso__Microsoft__ClientSecret: !Ref SsoMicrosoftClientSecret
+          Push__JobKey: !Ref PushJobKey
       Policies:
         - AWSLambdaBasicExecutionRole
         - Statement:
@@ -232,6 +240,25 @@ Resources:
             ApiId: !Ref GestaoEventosHttpApi
             Path: /{proxy+}
             Method: ANY
+        # Push de pendencias de presenca. O Scheduler invoca o Lambda com um evento no formato
+        # HTTP API v2 (a aplicacao trata como uma requisicao comum); sem API Destination, que
+        # tem timeout de 5s.
+        PushPendenciasManha:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0 8 * * ? *)
+            ScheduleExpressionTimezone: America/Sao_Paulo
+            State: !If [HasPushJobKey, ENABLED, DISABLED]
+            Input: !Sub |
+              {"version":"2.0","routeKey":"POST /api/interno/push/pendencias","rawPath":"/api/interno/push/pendencias","rawQueryString":"tipo=manha","queryStringParameters":{"tipo":"manha"},"headers":{"x-job-key":"${PushJobKey}","content-type":"application/json","host":"scheduler.internal"},"requestContext":{"http":{"method":"POST","path":"/api/interno/push/pendencias","protocol":"HTTP/1.1","sourceIp":"127.0.0.1","userAgent":"eventbridge-scheduler"},"stage":"$default","requestId":"push-manha","domainName":"scheduler.internal"},"isBase64Encoded":false}
+        PushPendenciasNoite:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0 19 * * ? *)
+            ScheduleExpressionTimezone: America/Sao_Paulo
+            State: !If [HasPushJobKey, ENABLED, DISABLED]
+            Input: !Sub |
+              {"version":"2.0","routeKey":"POST /api/interno/push/pendencias","rawPath":"/api/interno/push/pendencias","rawQueryString":"tipo=noite","queryStringParameters":{"tipo":"noite"},"headers":{"x-job-key":"${PushJobKey}","content-type":"application/json","host":"scheduler.internal"},"requestContext":{"http":{"method":"POST","path":"/api/interno/push/pendencias","protocol":"HTTP/1.1","sourceIp":"127.0.0.1","userAgent":"eventbridge-scheduler"},"stage":"$default","requestId":"push-noite","domainName":"scheduler.internal"},"isBase64Encoded":false}
 
   GestaoEventosApiLogGroup:
     Type: AWS::Logs::LogGroup
