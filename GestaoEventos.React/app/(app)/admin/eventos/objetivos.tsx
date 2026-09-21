@@ -3,7 +3,7 @@ import { EventoObjetivosScreen } from "../../../../features/eventos/objetivos/Ev
 
 export default function ObjetivosRoute() {
   return (
-    <RequirePermission action="criar" resource="eventos">
+    <RequirePermission action="gerenciar" resource="configuracoes">
       <EventoObjetivosScreen />
     </RequirePermission>
   );

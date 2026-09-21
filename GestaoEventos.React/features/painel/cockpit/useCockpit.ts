@@ -2,13 +2,18 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 
 import { normalizeApiError } from '../../../services/api/api-error';
+import { acompanhamentosApi } from '../../../services/api/acompanhamentos-api';
 import { painelApi, type CockpitMatrixCell, type CockpitMatrixRow } from '../../../services/api/painel-api';
 import { track } from '../../../services/analytics/analytics.service';
 import { can } from '../../../services/permissions/permission.facade';
 import { queryKeys } from '../../../services/query/query-keys';
 import { useContextStore } from '../../../stores/context.store';
+import { buildSituacao, peopleFromMatrix } from './acompanhamentos';
+import { buildObjectiveItems } from './objetivos';
 
 export const cockpitPeriodos = [7, 30, 90, 180, 365] as const;
+const MATRIX_PAGE = 50;
+const MATRIX_MAX = 200;
 export type CockpitPeriodo = (typeof cockpitPeriodos)[number];
 export type CockpitRisco = 'todos' | 'alto' | 'medio' | 'baixo';
 export type CockpitStatus = 'todos' | 'pendente' | 'em_andamento' | 'resolvido' | 'dispensado';
@@ -25,12 +30,31 @@ export function useCockpit() {
   const [busca, setBusca] = useState('');
   const [templateId, setTemplateId] = useState<number | null | undefined>(undefined);
   const [selectedCell, setSelectedCell] = useState<SelectedCell>(null);
+  const [matrixLimit, setMatrixLimit] = useState(MATRIX_PAGE);
+  const [acompanhamentosOpen, setAcompanhamentosOpen] = useState(false);
   const enabled = Boolean(usuarioId && estruturaId && can('ler', 'painel', { estruturaId, grupoId }));
   const dates = useMemo(() => getPeriodDates(periodo), [periodo]);
   const scope = { estruturaId: estruturaId ?? 0, grupoId, ...dates };
 
   const query = useQuery({ queryKey: queryKeys.painel.cockpit({ estruturaId, grupoId }, { periodo }), queryFn: () => painelApi.getCockpit(scope), enabled });
-  const matrixQuery = useQuery({ queryKey: queryKeys.painel.matriz({ estruturaId, grupoId }, { periodo, risco, status, busca, templateId }), queryFn: () => painelApi.getMatriz({ ...scope, risco, status, busca, templateId }), enabled });
+  const matrixQuery = useQuery({ queryKey: queryKeys.painel.matriz({ estruturaId, grupoId }, { periodo, risco, status, busca, templateId, limit: matrixLimit }), queryFn: () => painelApi.getMatriz({ ...scope, risco, status, busca, templateId, tamanhoPagina: matrixLimit }), enabled, placeholderData: (previous) => previous });
+  // Objetivos coletivos da celula: mesma consulta do painel web (sem filtros de pessoa, so grupo e periodo).
+  const coletivosQuery = useQuery({ queryKey: queryKeys.painel.matriz({ estruturaId, grupoId }, { periodo, coletivos: true }), queryFn: () => painelApi.getMatriz({ ...scope, tamanhoPagina: 1 }), enabled });
+  const objectiveItems = useMemo(() => buildObjectiveItems(query.data?.objetivosPapelEvento.itens ?? [], coletivosQuery.data?.objetivosColetivos ?? []), [query.data, coletivosQuery.data]);
+  const acompanhamentosEnabled = Boolean(enabled && acompanhamentosOpen);
+  const tiposQuery = useQuery({ queryKey: queryKeys.scoped('cockpit-acompanhamento-tipos', { estruturaId }, { usuarioId }), queryFn: () => acompanhamentosApi.listTipos(estruturaId!), enabled: acompanhamentosEnabled });
+  const registrosQuery = useQuery({ queryKey: queryKeys.scoped('cockpit-acompanhamento-registros', { estruturaId }, { usuarioId }), queryFn: () => acompanhamentosApi.listEstrutura(estruturaId!), enabled: acompanhamentosEnabled });
+  const pessoasQuery = useQuery({ queryKey: queryKeys.painel.matriz({ estruturaId, grupoId }, { periodo, pessoas: true }), queryFn: () => painelApi.getMatriz({ ...scope, tamanhoPagina: 200 }), enabled: acompanhamentosEnabled });
+  const situacao = useMemo(() => buildSituacao(tiposQuery.data ?? [], registrosQuery.data ?? [], peopleFromMatrix(pessoasQuery.data?.items ?? [])), [tiposQuery.data, registrosQuery.data, pessoasQuery.data]);
+  const acompanhamentos = {
+    open: acompanhamentosOpen,
+    toggle: () => setAcompanhamentosOpen((value) => !value),
+    loading: tiposQuery.isLoading || registrosQuery.isLoading || pessoasQuery.isLoading,
+    error: tiposQuery.isError || registrosQuery.isError || pessoasQuery.isError ? 'Nao foi possivel carregar os acompanhamentos.' : null,
+    situacao,
+    analisadas: pessoasQuery.data?.items.length ?? 0,
+    total: pessoasQuery.data?.total ?? 0,
+  };
   const absenceQuery = useQuery({
     queryKey: queryKeys.painel.faltas({ estruturaId, grupoId }, { participanteId: selectedCell?.row.participanteId, templateId: selectedCell?.cell.templateId, periodo }),
     queryFn: () => painelApi.getFaltas({ ...scope, tipo: selectedCell!.row.tipo, participanteId: selectedCell!.row.participanteId, templateId: selectedCell!.cell.templateId }),
@@ -59,7 +83,7 @@ export function useCockpit() {
   function clearCell() { setSelectedCell(null); }
 
   return {
-    query, matrixQuery, absenceQuery, groups: groupsQuery.data ?? [], selectedCell, setSelectedCell: selectCell, clearCell,
+    query, matrixQuery, coletivosQuery, objectiveItems, acompanhamentos, matrixLimit, showMoreMatrix: () => setMatrixLimit((value) => Math.min(value + MATRIX_PAGE, MATRIX_MAX)), absenceQuery, groups: groupsQuery.data ?? [], selectedCell, setSelectedCell: selectCell, clearCell,
     estruturaId, grupoId, periodo, risco, status, busca, templateId, enabled, dates,
     applyPeriodo: (value: CockpitPeriodo) => { setPeriodo(value); applyFilter('periodo'); },
     applyGrupo: (value: number | null) => { setGrupoId(value); applyFilter('grupo'); },

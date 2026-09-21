@@ -30,7 +30,8 @@
       },
       "env": {
         "EXPO_PUBLIC_ENV": "prod",
-        "EXPO_PUBLIC_API_URL": "https://sistema-eventos.seven-projetos.com"
+        "EXPO_PUBLIC_API_URL": "https://sistema-eventos.seven-projetos.com",
+        "EXPO_PUBLIC_PUSH_ENABLED": "1"
       }
     }
   },

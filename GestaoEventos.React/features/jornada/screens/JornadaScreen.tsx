@@ -385,6 +385,8 @@ function PendenciasSection({
 }) {
   const { width } = useWindowDimensions();
   const compact = width < layoutMetrics.desktopBreakpoint;
+  const groupLimit = compact ? 4 : 8;
+  const [showAllGroups, setShowAllGroups] = useState(false);
 
   const state = (
     <SectionState status={status} empty={!data || data.total === 0} emptyMessage="Nenhuma pendencia aberta." onRetry={onRetry}>
@@ -404,7 +406,7 @@ function PendenciasSection({
             </View>
           ) : null}
           <View style={styles.pendencyGroups}>
-            {data.grupos.slice(0, compact ? 4 : 8).map((grupo) => {
+            {(showAllGroups ? data.grupos : data.grupos.slice(0, groupLimit)).map((grupo) => {
               const isExpanded = expandedGrupoId === grupo.grupoId;
               const grupoDetail = isExpanded ? detail : null;
               const grupoTemAtrasadas = grupo.atrasadas > 0;
@@ -473,6 +475,11 @@ function PendenciasSection({
                 </View>
               );
             })}
+            {data.grupos.length > groupLimit ? (
+              <Pressable accessibilityRole="button" accessibilityLabel={showAllGroups ? 'Mostrar menos grupos' : 'Mostrar todos os grupos com pendencia'} style={styles.pendencyMoreButton} onPress={() => setShowAllGroups((value) => !value)}>
+                <Text style={styles.pendencyMoreText}>{showAllGroups ? 'Ver menos' : `Ver mais ${data.grupos.length - groupLimit} grupo(s)`}</Text>
+              </Pressable>
+            ) : null}
           </View>
         </View>
       ) : null}

@@ -3,7 +3,7 @@
     "name": "GestaoEventos",
     "slug": "gestaoeventos-react",
     "owner": "sandsen",
-    "version": "1.0.4",
+    "version": "1.0.6",
     "scheme": "gestaoeventos",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "manager.events.dev",
-      "buildNumber": "4",
+      "buildNumber": "7",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -23,7 +23,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "versionCode": 35,
+      "versionCode": 38,
       "package": "manager.eventsdev"
     },
     "web": {
@@ -35,7 +35,15 @@
       "expo-router",
       "expo-secure-store",
       "expo-local-authentication",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#0066FF",
+          "defaultChannel": "pendencias"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

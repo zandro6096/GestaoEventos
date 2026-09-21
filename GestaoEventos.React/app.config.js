@@ -12,12 +12,20 @@ if (!['development', 'preview', 'prod'].includes(lane)) {
 const apiUrl = (process.env.EXPO_PUBLIC_API_URL || '').trim();
 if (releaseLanes.has(configuredLane)) assertReleaseApiUrl(apiUrl, lane);
 
+// Push exige o plugin expo-notifications (entitlement aps-environment + capability na Apple) e Firebase no Android.
+// Fica desligado ate as credenciais existirem: ligue com EXPO_PUBLIC_PUSH_ENABLED=1 no profile do EAS.
+const isNotificationsPlugin = (plugin) => (Array.isArray(plugin) ? plugin[0] : plugin) === 'expo-notifications';
+
 const suffix = lane === 'development' ? '.dev' : lane === 'preview' ? '.preview' : '';
 const laneLabel = lane === 'development' ? 'Dev' : lane === 'preview' ? 'Preview' : 'Prod';
 
 // Firebase (FCM) do Android: no EAS vem como arquivo em GOOGLE_SERVICES_JSON; local, ./google-services.json.
 // Sem o arquivo o app compila normalmente, mas o Android nao recebe push.
 const googleServicesFile = process.env.GOOGLE_SERVICES_JSON || (existsSync('./google-services.json') ? './google-services.json' : undefined);
+
+// No build Android sem google-services.json o push nao funciona: nem inclui o plugin (evita pedir permissao a toa).
+const androidWithoutFirebase = process.env.EAS_BUILD_PLATFORM === 'android' && !googleServicesFile;
+const pushEnabled = process.env.EXPO_PUBLIC_PUSH_ENABLED === '1' && !androidWithoutFirebase;
 
 module.exports = ({ config }) => ({
   ...config,
@@ -31,9 +39,17 @@ module.exports = ({ config }) => ({
     package: `${appIdentifier}${suffix.replaceAll('.', '')}`,
     ...(googleServicesFile ? { googleServicesFile } : {}),
   },
+  plugins: (config.plugins ?? [])
+    .filter((plugin) => pushEnabled || !isNotificationsPlugin(plugin))
+    .map((plugin) => (
+      Array.isArray(plugin) && isNotificationsPlugin(plugin)
+        ? [plugin[0], { ...plugin[1], mode: lane === 'development' ? 'development' : 'production' }]
+        : plugin
+    )),
   extra: {
     ...config.extra,
     appEnvironment: lane,
+    pushEnabled,
   },
 });
 

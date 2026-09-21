@@ -96,8 +96,8 @@ const moreMenuSections: MoreMenuSection[] = [
         href: "/admin/eventos/modelos",
         icon: "copy-outline",
         activeIcon: "copy",
-        action: "criar",
-        resource: "eventos",
+        action: "gerenciar",
+        resource: "configuracoes",
       },
       {
         key: "more-objetivos",
@@ -105,8 +105,8 @@ const moreMenuSections: MoreMenuSection[] = [
         href: "/admin/eventos/objetivos",
         icon: "locate-outline",
         activeIcon: "locate",
-        action: "criar",
-        resource: "eventos",
+        action: "gerenciar",
+        resource: "configuracoes",
       },
       {
         key: "more-iniciar-evento",

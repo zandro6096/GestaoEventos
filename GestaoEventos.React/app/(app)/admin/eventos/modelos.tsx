@@ -3,7 +3,7 @@ import { RequirePermission } from "../../../../shared/guards/RequirePermission";
 
 export default function EventTemplatesRoute() {
   return (
-    <RequirePermission action="criar" resource="eventos">
+    <RequirePermission action="gerenciar" resource="configuracoes">
       <EventoTemplatesScreen />
     </RequirePermission>
   );

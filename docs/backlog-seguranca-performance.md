@@ -303,3 +303,29 @@ Enquanto o SEC-01 existir, **nenhum outro controle de acesso importa** — dá p
 ### Onda 4 — Higiene contínua
 
 15. SEC-09 a SEC-13; PERF-03, PERF-11 a PERF-16.
+
+---
+
+## Atualização 2026-09-21 — Autorização por recurso (SEC-14) · 🔴 corrigido em parte
+
+**Achado:** o `TenantIsolationMiddleware` só valida a estrutura quando o request traz `estrutura_id` (query, caminho ou corpo). Endpoints que recebem só `evento_id`, `ocorrencia_id`, `grupo_id` ou o id do próprio recurso não tinham **nenhuma** checagem de tenant nem de papel: qualquer usuário autenticado — inclusive sem vínculo com nenhuma estrutura — conseguia alterar dados de qualquer organização. Confirmado por teste (API local):
+
+- registrar/alterar presença (`POST /api/participacoes-evento`, `/lote`, incluindo `auto_registro` de terceiros);
+- mudar status de ocorrência (iniciar, finalizar, cancelar);
+- `GET /api/participacoes-eventos` listava as presenças de **todas** as organizações (o web usa como "minha frequência");
+- tornar-se responsável ou membro de um grupo de outra organização (`POST /api/responsaveis-grupo` e `/api/grupos-membros`) — escalada de privilégio;
+- `registrado_por` e `usuario_id` eram aceitos do corpo do request (falsificáveis) inclusive nas checagens que já existiam (`reabrir`, `descancelar`).
+
+**Correção (deployada 2026-09-21):** serviço central `IEventoAccessService` (`UseCases/Autorizacao/EventoAccessService.cs`). A identidade vem do token (`IUsuarioVigenteService`); a estrutura é derivada do próprio recurso (evento/grupo → estrutura). Níveis: `Membro` (vínculo ativo na estrutura), `Leitura` (+ membro do grupo) e `Gerenciar` (dono da estrutura, criador ou responsável principal do evento, responsável do grupo ou de um ancestral). Aplicado em:
+
+| Área | Endpoints |
+|---|---|
+| Presença | criar, lote, atualizar, remover, obter, listar (agora só o histórico do próprio usuário) |
+| Ocorrência | `PUT /ocorrencias/{id}/status`, `reabrir`, `descancelar`, `POST /eventos/{id}/materializar` (Leitura), `gerar-ocorrencias` |
+| Grupo | responsáveis: criar/atualizar/remover/obter/listar; membros: criar/remover/obter/listar (listar exige `grupo_id`) |
+
+Regras adicionais: a ocorrência informada deve pertencer ao evento; auto check-in só para a própria pessoa; falhas viram 401/403/404 (antes 400/vazio).
+
+**Impacto medido em produção antes do deploy:** 100% dos registros de presença dos últimos 90 dias (24 usuários) passariam pela regra nova; os 2 auto check-ins históricos eram do próprio usuário. Testes: 21 unitários (`tests/.../UseCases/Autorizacao`), bateria por perfil (dono, líder, membro, externo) na API local e checagem em produção sem gravar dados.
+
+**Ainda NÃO auditado (candidatos, mesma classe de falha — só o id do recurso, sem checagem de papel):** `DELETE/PATCH cancelar /api/eventos/{id}`, `POST/DELETE/PATCH /api/eventos/{id}/participantes`, `PUT participantes/papeis`, exceções de evento (`/api/excecoes-evento`), `DELETE/PUT /api/grupos/{id}`, `POST /api/grupos`, usuários virtuais (`/api/usuarios-virtuais`), tipos de evento/grupo, templates de evento, `PATCH /api/evento-objetivos`, merge de participantes, notificações internas, `GET` de evento/grupo por id (leitura entre organizações). Alguns já têm checagem própria (split de ciclo, reatribuir responsável, objetivos, papéis, painel, permissões). Próximo passo: repetir a bateria por perfil nesses endpoints e aplicar o mesmo serviço.

@@ -35,3 +35,13 @@ test('compra/gerenciamento de assinatura fora do app fica oculto no iOS (3.1.1)'
   assert.match(source, /\{canSellExternally \? <View style=\{styles\.section\}>/);
   assert.match(source, /\{!canSellExternally \? null : status\.podeGerenciar/);
 });
+
+test('push so entra no build quando EXPO_PUBLIC_PUSH_ENABLED=1 e o profile de producao liga', () => {
+  const config = read('app.config.js');
+  assert.match(config, /EXPO_PUBLIC_PUSH_ENABLED === '1'/);
+  assert.match(config, /pushEnabled \|\| !isNotificationsPlugin\(plugin\)/);
+  assert.match(read('services/platform/push-notifications/native.ts'), /extra\?\.pushEnabled === true/);
+  const eas = JSON.parse(read('eas.json'));
+  assert.equal(eas.build.production.env.EXPO_PUBLIC_PUSH_ENABLED, '1');
+  assert.equal(eas.build.preview.env.EXPO_PUBLIC_PUSH_ENABLED, undefined);
+});

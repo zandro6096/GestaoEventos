@@ -23,7 +23,7 @@ function listFiles(dir) {
   const result = [];
   for (const entry of readdirSync(absolute, { withFileTypes: true })) {
     const child = join(absolute, entry.name);
-    if (entry.name === 'node_modules' || entry.name === '.expo' || entry.name === 'dist') continue;
+    if (entry.name === 'node_modules' || entry.name === '.expo' || entry.name === 'dist' || entry.name === 'credentials') continue;
     if (entry.isDirectory()) {
       result.push(...listFiles(relative(root, child)));
       continue;
