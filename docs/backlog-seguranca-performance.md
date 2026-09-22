@@ -306,7 +306,7 @@ Enquanto o SEC-01 existir, **nenhum outro controle de acesso importa** — dá p
 
 ---
 
-## Atualização 2026-09-21 — Autorização por recurso (SEC-14) · 🔴 corrigido em parte
+## Atualização 2026-09-21 — Autorização por recurso (SEC-14) · 🟢 corrigido (fases 1 e 2)
 
 **Achado:** o `TenantIsolationMiddleware` só valida a estrutura quando o request traz `estrutura_id` (query, caminho ou corpo). Endpoints que recebem só `evento_id`, `ocorrencia_id`, `grupo_id` ou o id do próprio recurso não tinham **nenhuma** checagem de tenant nem de papel: qualquer usuário autenticado — inclusive sem vínculo com nenhuma estrutura — conseguia alterar dados de qualquer organização. Confirmado por teste (API local):
 
@@ -328,4 +328,35 @@ Regras adicionais: a ocorrência informada deve pertencer ao evento; auto check-
 
 **Impacto medido em produção antes do deploy:** 100% dos registros de presença dos últimos 90 dias (24 usuários) passariam pela regra nova; os 2 auto check-ins históricos eram do próprio usuário. Testes: 21 unitários (`tests/.../UseCases/Autorizacao`), bateria por perfil (dono, líder, membro, externo) na API local e checagem em produção sem gravar dados.
 
-**Ainda NÃO auditado (candidatos, mesma classe de falha — só o id do recurso, sem checagem de papel):** `DELETE/PATCH cancelar /api/eventos/{id}`, `POST/DELETE/PATCH /api/eventos/{id}/participantes`, `PUT participantes/papeis`, exceções de evento (`/api/excecoes-evento`), `DELETE/PUT /api/grupos/{id}`, `POST /api/grupos`, usuários virtuais (`/api/usuarios-virtuais`), tipos de evento/grupo, templates de evento, `PATCH /api/evento-objetivos`, merge de participantes, notificações internas, `GET` de evento/grupo por id (leitura entre organizações). Alguns já têm checagem própria (split de ciclo, reatribuir responsável, objetivos, papéis, painel, permissões). Próximo passo: repetir a bateria por perfil nesses endpoints e aplicar o mesmo serviço.
+## SEC-14 fase 2 — restante da classe (deployada 2026-09-21)
+
+**Achados adicionais (todos confirmados na API local antes da correção):**
+
+- `PUT /api/usuarios/{id}` aceitava qualquer id: **qualquer usuário logado trocava o e-mail de outra conta** e virava dono dela via "esqueci a senha". Agora só o próprio usuário (id do token).
+- `POST /api/convites/aceitar` vinculava o convite pendente de **qualquer** `virtual_user_id` ao e-mail informado no corpo: um usuário de fora entrava em qualquer organização (e como responsável de grupo, se o convite era assim). Agora a conta é a do token e o convite precisa ter sido enviado para o e-mail dela. `GET /api/usuarios/me/convites?email=` deixou de aceitar e-mail arbitrário.
+- Assinaturas cruas (`POST/PUT/DELETE /api/assinaturas`) e o catálogo (`/api/planos`, `/api/recursos`) eram graváveis por qualquer usuário: dava para se dar um plano de graça. Agora só administrador da plataforma (config `PlatformAdmins:UsuarioIds`; sem config, só o usuário 1). Leitura de planos/recursos e `assinaturas/status|checkout|portal` continuam abertos.
+- Usuário virtual: `criado_por` vinha do corpo e dava para convidar **como responsável para um grupo alheio** (entra ao aceitar). Agora `criado_por` é o do token e convidar/editar/excluir/reenviar exige gerenciar o grupo do convite (ou liderar a estrutura, se sem grupo).
+- `TenantIsolationMiddleware`: as chaves do corpo eram comparadas **diferenciando maiúsculas** (`ESTRUTURA_ID` ou chave repetida contornavam a checagem, pois o binder do FastEndpoints não diferencia) e só a 1ª ocorrência da query era conferida; corpo sem `Content-Length` (chunked) era ignorado. Corrigido: casa sem diferenciar caixa, confere todas as ocorrências e tenta ler o corpo mesmo sem Content-Length.
+
+**Regras por rota (`RegrasDeRotaAcesso` + `AutorizacaoPorRotaMiddleware`, roda após o isolamento de organizações):**
+
+| Rota (escrita) | Exige |
+|---|---|
+| `PUT/DELETE /eventos/{id}`, `PATCH /eventos/{id}/cancelar` | gerenciar o evento (+ gerenciar o grupo de destino se a edição mudar o `grupo_id`) |
+| `POST /excecoes-evento`, `PUT/DELETE /excecoes-evento/{id}` | gerenciar o evento da exceção |
+| `POST /grupos` | gerenciar o grupo superior (ou ser dono, se for raiz); o superior tem que ser da mesma estrutura |
+| `PUT /grupos/{id}` | gerenciar o grupo; mudar o superior exige gerenciar o novo (dono, se virar raiz); `estrutura_id` do corpo tem que ser a do grupo |
+| `DELETE /grupos/{id}` | gerenciar o grupo superior (ou ser dono, se for raiz) — responsável não exclui o próprio grupo |
+| `/evento-templates`, `/tipos-evento`, `/tipos-grupo` (criar/editar/excluir) | dono ou responsável de algum grupo da estrutura |
+| `PUT /estruturas/{id}/participantes/papeis` | dono ou responsável de algum grupo da estrutura |
+| `/usuarios-virtuais` (criar/editar/excluir/enviar-convite) | gerenciar o grupo do convite (líder da estrutura, se sem grupo) |
+| `/papeis` (criar/editar/excluir), `PUT/DELETE /estruturas/{id}`, `/estruturas/{id}/logo`, `POST /estruturas/{id}/membros` | dono da estrutura |
+| `/planos`, `/recursos` (escrita), `/assinaturas` (cru), `/eventos/configuracoes` (legado, 0 linhas em prod) | administrador da plataforma |
+
+Outros: participantes do evento (adicionar/remover/atualizar/mesclar), `contexto/inicial`, código de compartilhamento e split de ciclo passaram a usar o id do token; listagens (usuários, eventos, grupos, estruturas) escopadas às estruturas do usuário; `DELETE` de participante devolve 403 (antes 500) quando não autorizado.
+
+**Testes:** 86 unitários (`UseCases/Autorizacao`: serviço + tabela de rotas) e baterias por perfil (dono, líder, membro, externo) na API local — 153 casos de rota, 37 de participantes/convites/contexto e 18 de fluxos legítimos —, todos passando; verificação em produção sem gravar dados.
+
+**Mudança de comportamento a conhecer:** quem só é *membro* (sem ser dono nem responsável de grupo) não cria/edita modelos e tipos de evento. Em prod só a usuária 2 (Participante, sem grupo) criou modelos assim (2 em 2026-04-15). Se ela precisar continuar, torná-la responsável de um grupo ou relaxar a regra em `AutorizacaoPorRotaMiddleware`. Aceitar convite exige que o e-mail da conta seja o do convite.
+
+**Bugs antigos vistos no caminho (não corrigidos):** `DELETE /api/excecoes-evento/{id}` responde 500 (falta o mapa AutoMapper `DeleteExcecaoEventoRequest → DeleteExcecaoEventoCommand`) e não exclui; `POST /api/excecoes-evento` recusa o enum `tipo`; os endpoints de atualização (`PUT /eventos/{id}`, modelos, papéis) não validam campos obrigatórios — um PUT só com `titulo` apaga o resto.
