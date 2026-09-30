@@ -30,6 +30,18 @@ eas build --platform ios --profile production
 eas submit --platform ios --latest
 ```
 
+## Revisão Apple — assinatura empresarial
+
+Build enviada em 2026-09-30 para responder à solicitação 2.1(b): versão `1.0.6 (8)`.
+
+- EAS build: `a8bf2903-47c4-470a-ad28-cfb1dc8bac45`
+- EAS submission: `eb37a7f3-6ac7-4d13-a273-74f0ef378ba8`
+- No iOS, contratação, upgrade, checkout Stripe e gerenciamento de pagamento ficam ocultos.
+- O usuário iOS pode somente consultar o plano/limites já aplicados e usar os recursos contratados pela organização.
+- A contratação é feita pela organização no portal web; colaboradores acessam o serviço por contas vinculadas à organização.
+
+Texto de revisão: o GestaoEventos é vendido diretamente a organizações para uso de seus colaboradores. O app iOS não vende assinaturas individuais nem oferece pagamento ou link para checkout; ele apenas permite acessar uma assinatura empresarial previamente contratada.
+
 Estado da ficha iOS em 2026-09-09:
 
 - Nome, subtitulo, descricao, palavras-chave, URLs de suporte/marketing e copyright preenchidos.
