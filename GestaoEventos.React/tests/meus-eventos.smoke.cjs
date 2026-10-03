@@ -22,6 +22,8 @@ const ocorrenciasJanelaInicial = ocorrencias.filter(item => !item.data_efetiva.s
   try {
     for (const width of [390, 1440]) {
       const page = await browser.newPage({ viewport: { width, height: width === 390 ? 1200 : 1000 } });
+      // As fixtures e os filtros esperados pertencem a setembro, independentemente da data da release.
+      await page.clock.setFixedTime(new Date('2026-09-07T12:00:00-03:00'));
       const errors = [];
       const occurrenceRequests = [];
       const cycleRequests = [];

@@ -1,5 +1,6 @@
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 const tokenKey = 'biometric_login_token';
 const enabledKey = 'biometric_login_enabled';
@@ -9,11 +10,13 @@ const secureOptions: SecureStore.SecureStoreOptions = {
 };
 
 export async function biometricAvailability(): Promise<boolean> {
+  if (Platform.OS === 'web') return false;
   if (!(await LocalAuthentication.hasHardwareAsync())) return false;
   return LocalAuthentication.isEnrolledAsync();
 }
 
 export async function isBiometricLoginEnabled(): Promise<boolean> {
+  if (Platform.OS === 'web') return false;
   return (await SecureStore.getItemAsync(enabledKey)) === 'true';
 }
 

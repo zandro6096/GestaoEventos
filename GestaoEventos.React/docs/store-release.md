@@ -32,6 +32,25 @@ eas submit --platform ios --latest
 
 ## Revisão Apple — assinatura empresarial
 
+### Reenvio 3.1.1 — 2026-10-03
+
+A revisão de 2026-10-02 rejeitou `1.0.6 (8)` por interpretar o cadastro aberto como registro de empresas/organizações. O React já não oferecia criação de estruturas; a correção remove o cadastro público do iOS, inclusive por rota direta e business service. O iOS permite login de contas existentes e ativação pessoal por convite válido de organização existente. Android/web mantêm o cadastro público.
+
+Versão reenviada: `1.0.7 (9)`; o perfil EAS production incrementou o build iOS de `8` para `9`. Login, recuperação de senha, seleção de organização e exclusão de conta permanecem disponíveis. A tela sem vínculo orienta a solicitar convite. Não há direcionamento para cadastro empresarial ou pagamento externo.
+
+- EAS build concluído: `179e25e2-0a3c-4c7d-a080-96d9e13e83a4` (`1.0.7 (9)`).
+- EAS submission concluída: `8f0b896e-80c2-4dcc-b044-d92e58034fe7`; binário processado como `VALID`, ASC build ID `de28223c-29cb-4048-8bda-4f8b380bd49c`, associado à versão `1.0.7`.
+- Revisão `9ac6cf0c-d90b-4986-9fc9-923aca44cd58` reenviada e confirmada em `WAITING_FOR_REVIEW` em 2026-10-03. Publicação configurada `AFTER_APPROVAL`; aguarda aprovação da Apple.
+- Validação: 24 testes de revisão; TypeScript, lint, scaffold, analytics, offline e contratos de release passaram; export iOS Hermes compilou; login/contexto da conta demo produtiva confirmados.
+- Smokes web com export estático: Meus Eventos, login/offline, troca de contexto, jornada e acesso administrativo passaram. `smoke:core` completo permanece pendente por drift preexistente de acompanhamento/presença e hydration no export estático; o comando do servidor de desenvolvimento foi bloqueado pela revisão automática de permissões (`blocked by policy`). Não houve alteração dessas funcionalidades para forçar aprovação de testes.
+- A ficha ASC foi atualizada para `1.0.7` e as notas receberam o esclarecimento da Guideline 3.1.1. A mensagem na conversa da revisão depende de sessão de navegador conectada; nenhuma superfície Chrome/in-app estava disponível nesta sessão.
+
+Esclarecimento enviado nas notas de revisão. Texto pronto para repetir na conversa da Apple (mensagem no thread não enviada nesta sessão):
+
+> Olá! Em resposta à Guideline 3.1.1, removemos o cadastro aberto da versão iOS. A nova versão 1.0.7 permite login de usuários existentes e ativação de contas pessoais exclusivamente por convite válido de uma organização já existente. Não é possível cadastrar empresas ou organizações, contratar planos, fazer upgrade ou acessar checkout/portal de pagamento externo no app iOS. As credenciais de revisão continuam disponíveis na ficha e abrem a organização demo. Solicitamos uma nova avaliação da build corrigida. Obrigado!
+
+O envio pelo EAS Submit transfere o binário ao App Store Connect; a associação à versão e o reenvio para App Review são etapas distintas. A aprovação/publicação continua dependendo da Apple.
+
 Build enviada em 2026-09-30 para responder à solicitação 2.1(b): versão `1.0.6 (8)`.
 
 - EAS build: `a8bf2903-47c4-470a-ad28-cfb1dc8bac45`

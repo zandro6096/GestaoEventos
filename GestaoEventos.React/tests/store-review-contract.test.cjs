@@ -6,6 +6,28 @@ const test = require('node:test');
 const root = process.cwd();
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
+require('./registration-policy.test.cjs');
+
+test('iOS limita cadastro a convite na UI e no business service (3.1.1)', () => {
+  const login = read('features/auth/screens/LoginScreen.tsx');
+  const signup = read('features/auth/screens/SignupScreen.tsx');
+  const service = read('features/auth/services/public-auth.service.ts');
+  assert.match(login, /inviteToken \|\| allowsPublicRegistration\(Platform\.OS\)/);
+  assert.match(login, /params: inviteToken \? \{ convite: inviteToken \}/);
+  assert.match(signup, /if \(!publicRegistrationAllowed && \(!inviteToken \|\| !validInvite\)\)/);
+  assert.match(signup, /disabled=\{Boolean\(inviteToken && \(publicRegistrationAllowed \? inviteQuery\.error : !validInvite\)\)\}/);
+  assert.match(signup, /!inviteQuery\.isFetching && !inviteQuery\.isError/);
+  assert.match(signup, /if \(!publicRegistrationAllowed\) \{\s*if \(!validInvite\)/);
+  assert.match(signup, /if \(!validInvite\) throw new Error/);
+  assert.match(signup, /label="Tentar novamente".*inviteQuery\.refetch\(\)/);
+  assert.match(signup, /pathname: '\/auth\/login', params: inviteToken \? \{ convite: inviteToken \}/);
+  assert.match(login, /flexWrap: 'wrap'/);
+  assert.match(login, /flexShrink: 1/);
+  assert.match(service, /assertPublicRegistrationAllowed\(Platform\.OS\)/);
+  assert.match(service, /const invite = await authApi\.validateInviteToken\(request\.token\)/);
+  assert.match(service, /assertExistingOrganizationInvite\(invite\)/);
+});
+
 test('telas de autenticacao nao engolem o primeiro toque com o teclado aberto (rejeicao 2.1(a))', () => {
   const layout = read('features/auth/components/AuthLayout.tsx');
   assert.match(layout, /keyboardShouldPersistTaps="handled"/);
