@@ -25,6 +25,9 @@ const googleServicesFile = process.env.GOOGLE_SERVICES_JSON || (existsSync('./go
 
 // No build Android sem google-services.json o push nao funciona: nem inclui o plugin (evita pedir permissao a toa).
 const androidWithoutFirebase = process.env.EAS_BUILD_PLATFORM === 'android' && !googleServicesFile;
+if (androidWithoutFirebase && releaseLanes.has(configuredLane) && process.env.EXPO_PUBLIC_PUSH_ENABLED === '1') {
+  throw new Error('Build Android de producao bloqueado: GOOGLE_SERVICES_JSON ausente; push nativo nao funcionaria.');
+}
 const pushEnabled = process.env.EXPO_PUBLIC_PUSH_ENABLED === '1' && !androidWithoutFirebase;
 
 module.exports = ({ config }) => ({
@@ -40,6 +43,7 @@ module.exports = ({ config }) => ({
     ...(googleServicesFile ? { googleServicesFile } : {}),
   },
   plugins: (config.plugins ?? [])
+    .concat('@react-native-community/datetimepicker')
     .filter((plugin) => pushEnabled || !isNotificationsPlugin(plugin))
     .map((plugin) => (
       Array.isArray(plugin) && isNotificationsPlugin(plugin)

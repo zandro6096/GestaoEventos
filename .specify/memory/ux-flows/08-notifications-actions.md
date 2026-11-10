@@ -41,6 +41,22 @@ Este documento detalha o **sistema de notificações** - como usuários são ale
 | **Informativo** | Relatório pronto, nova pessoa adicionada | 🔵 Baixa |
 | **Social** | Alguém comentou, menção, conquista desbloqueada | 🟢 Baixa |
 
+### Push nativo de pendências de presença na hierarquia
+
+- Os envios automáticos da manhã e da noite respeitam a cobrança de presença configurada no evento/template. Eventos cancelados, sem cobrança ativa ou com presença já registrada não geram pendência.
+- Cada responsável recebe a contagem das pendências nos grupos pelos quais responde diretamente, além dos nomes dos responsáveis mais próximos abaixo dele que também têm pendências. A mensagem não soma nem lista os eventos dos grupos desses outros responsáveis.
+- A hierarquia recebe o aviso em cascata: cada líder cobra seus responsáveis diretos, e esses líderes recebem o mesmo tipo de resumo sobre seus próprios grupos e liderados.
+- O owner recebe as pendências dos grupos raiz pelos quais responde e os nomes dos líderes abaixo com pendências; não recebe o total de eventos de toda a estrutura. A notificação só é enviada a usuários com dispositivo push ativo e segue a deduplicação diária por usuário e horário.
+- À noite, só entram as pendências de eventos ocorridos no dia; pela manhã, entram as pendências elegíveis acumuladas.
+
+### Push de aniversários e fechamento de presença
+
+- Às 08:15 (America/Sao_Paulo), o resumo diário lista aniversários de hoje e dos próximos sete dias nos grupos que o destinatário pode visualizar. O próprio usuário não aparece na lista; cada pessoa aparece uma vez mesmo que participe de mais de um grupo.
+- A cada 15 minutos, o sistema procura ocorrências sem presença lançada cujo término previsto ocorreu nos últimos 30 minutos. O término usa a duração do evento, depois a duração padrão do modelo e, como fallback, 60 minutos. Pessoas participantes recebem um convite para confirmar a própria presença; responsáveis recebem um atalho para lançar presenças.
+- Ocorrências canceladas, sem cobrança de presença ou com registro de presença não geram cobrança pós-evento. Cada destinatário recebe no máximo um aviso por ocorrência no dia.
+- Resumos com pendências há mais de sete dias usam título urgente, som e canal Android de alta prioridade. Aniversários usam canal informativo; lembretes de presença usam o canal pendências.
+- O cliente solicita atualização EAS ao abrir o app e ao retornar do segundo plano. Um bundle JavaScript compatível é baixado em segundo plano e aplicado somente quando a pessoa toca em **Atualizar agora**. Mudanças nativas (por exemplo, capabilities ou configuração de plugin) ainda exigem nova build das lojas.
+
 ---
 
 ## Flow 1: In-App Notification Center

@@ -43,6 +43,7 @@ export function useAcompanhamento(eventoId: number, day?: string) {
       void client.invalidateQueries({ queryKey: ['meus-eventos'] });
       void client.invalidateQueries({ queryKey: ['jornada'] });
       void client.invalidateQueries({ queryKey: ['frequencia'] });
+      void client.invalidateQueries({ queryKey });
     },
   });
   const editMutation = useMutation({

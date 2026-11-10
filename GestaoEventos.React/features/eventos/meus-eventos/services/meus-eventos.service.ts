@@ -88,18 +88,6 @@ export const meusEventosService = {
     return eventosApi.confirmarResponsavel(ocorrenciaId);
   },
 
-  async cancelarOcorrencia(ocorrenciaId: number, motivo: string): Promise<OcorrenciaDto> {
-    assertOccurrence(ocorrenciaId);
-    const motivoNormalizado = motivo.trim();
-    if (!motivoNormalizado) {
-      throw new Error('Motivo obrigatorio para cancelar ocorrencia.');
-    }
-
-    return eventosApi.atualizarOcorrenciaStatus(ocorrenciaId, {
-      novoStatus: 'Cancelada',
-      motivo: motivoNormalizado,
-    });
-  },
 };
 
 export function mergeMeusEventos(current: MeusEventosListagem, incoming: MeusEventosListagem): MeusEventosListagem {

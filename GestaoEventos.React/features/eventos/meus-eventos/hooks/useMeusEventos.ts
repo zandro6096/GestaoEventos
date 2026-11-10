@@ -181,31 +181,6 @@ export function useMeusEventos() {
     },
   });
 
-  const cancelOccurrenceMutation = useMutation({
-    mutationFn: async ({ item, motivo }: { item: MeusEventoItem; motivo: string }) => {
-      assertOnlineForMutation('cancelar ocorrencia');
-      if (!item.ocorrenciaId) throw new Error('Cancelamento exige ocorrencia materializada.');
-
-      track('simulation', 'meus_eventos:cancelar_ocorrencia_submit', {
-        extra: {
-          evento_id: item.eventoId,
-          ocorrencia_id: item.ocorrenciaId,
-        },
-      });
-
-      return meusEventosService.cancelarOcorrencia(item.ocorrenciaId, motivo);
-    },
-    onSuccess: (_data, variables) => {
-      track('confirmation', 'meus_eventos:cancelar_ocorrencia_sucesso', {
-        extra: {
-          evento_id: variables.item.eventoId,
-          ocorrencia_id: variables.item.ocorrenciaId,
-        },
-      });
-      void queryClient.invalidateQueries({ queryKey });
-    },
-  });
-
   function trackOpenEvent(item: MeusEventoItem) {
     track('entrance', 'btn:meus_eventos_abrir', {
       extra: {
@@ -241,17 +216,15 @@ export function useMeusEventos() {
       ? normalizeApiError(meusEventosQuery.error, 'Nao foi possivel carregar seus eventos.').message
       : null,
     mutationError:
-      confirmVisitMutation.isError || cancelOccurrenceMutation.isError
-        ? normalizeApiError(confirmVisitMutation.error ?? cancelOccurrenceMutation.error, 'Nao foi possivel concluir a acao.').message
+      confirmVisitMutation.isError
+        ? normalizeApiError(confirmVisitMutation.error, 'Nao foi possivel concluir a acao.').message
         : null,
     isConfirmingVisit: confirmVisitMutation.isPending,
-    isCancellingOccurrence: cancelOccurrenceMutation.isPending,
     refetch: occurrenceQueryEnabled ? meusEventosQuery.refetch : gruposQuery.refetch,
     loadMonth,
     loadYear,
     loadingMonth,
     confirmVisit: confirmVisitMutation.mutateAsync,
-    cancelOccurrence: cancelOccurrenceMutation.mutateAsync,
     trackOpenEvent,
   };
 }

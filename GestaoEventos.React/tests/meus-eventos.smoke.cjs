@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const fs = require('node:fs');
@@ -49,11 +50,11 @@ const ocorrenciasJanelaInicial = ocorrencias.filter(item => !item.data_efetiva.s
       });
 
       if (width === 390) {
-        await page.goto('http://localhost:8083/jornada');
+        await page.goto(`${SMOKE_BASE_URL}/jornada`);
         await page.getByRole('tab', { name: 'Eventos', exact: true }).click();
         await page.waitForURL('**/eventos/meus');
       } else {
-        await page.goto('http://localhost:8083/admin/eventos/meus');
+        await page.goto(`${SMOKE_BASE_URL}/admin/eventos/meus`);
       }
       await page.getByText('Encontro do Norte', { exact: true }).waitFor();
       assert.equal(await page.getByText('Meus Eventos', { exact: true }).count(), 1);

@@ -11,12 +11,19 @@ export const pushRegistrationService = {
   async register(): Promise<void> {
     try {
       const result = await registerForPushNotifications();
-      if (result.status !== 'registered') return;
+      if (result.status !== 'registered') {
+        console.info('[push] cadastro nao concluido', { status: result.status, reason: result.status === 'unsupported' ? result.reason : undefined });
+        return;
+      }
 
       await dispositivosPushApi.registrar(result.token, result.platform);
       await secureStorage.setItem(PUSH_TOKEN_STORAGE_KEY, result.token);
-    } catch {
+      console.info('[push] dispositivo cadastrado na API', { platform: result.platform });
+    } catch (error) {
       // Sem rede, sem Firebase/APNs configurado ou permissao negada: tenta de novo na proxima abertura.
+      console.warn('[push] falha no cadastro do dispositivo', {
+        error: error instanceof Error ? error.name : 'UnknownError',
+      });
     }
   },
 

@@ -35,3 +35,7 @@ android/local.properties
 **/*.log
 .codex-web-*.log
 .codex-web-*.err.log
+credentials/
+credentials.json
+store/
+store.config.json

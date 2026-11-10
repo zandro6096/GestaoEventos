@@ -23,7 +23,7 @@
     },
     "production": {
       "channel": "prod",
-      "autoIncrement": true,
+      "autoIncrement": false,
       "environment": "production",
       "android": {
         "image": "ubuntu-26.04-jdk-17-ndk-r27b-sdk-57"
@@ -36,7 +36,17 @@
     }
   },
   "submit": {
+    "internal": {
+      "android": {
+        "track": "internal",
+        "releaseStatus": "completed"
+      }
+    },
     "production": {
+      "android": {
+        "track": "production",
+        "releaseStatus": "completed"
+      },
       "ios": {
         "ascAppId": "6810320235",
         "appleTeamId": "HSBKP8Q82R",

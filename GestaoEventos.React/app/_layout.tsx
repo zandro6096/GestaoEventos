@@ -6,7 +6,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider, focusManager } from '@tanstack/react-query';
 
 import { NetworkStatusProvider } from '../services/network/NetworkStatusProvider';
+import { checkForEasUpdate } from '../services/updates/eas-update.service';
 import { ApiConfigNotice } from '../shared/components/ApiConfigNotice';
+import { EasUpdateNotice } from '../shared/components/EasUpdateNotice';
 import { GestureRoot } from '../shared/components/GestureRoot';
 import { OfflineBanner } from '../shared/components/OfflineBanner';
 import { RouteAnalyticsTracker } from '../shared/components/RouteAnalyticsTracker';
@@ -28,10 +30,14 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   useEffect(() => {
-    focusManager.setFocused(AppState.currentState === 'active');
+    let currentState = AppState.currentState;
+    focusManager.setFocused(currentState === 'active');
+    if (currentState === 'active') void checkForEasUpdate();
 
     const subscription = AppState.addEventListener('change', (state) => {
       focusManager.setFocused(state === 'active');
+      if (state === 'active' && currentState !== 'active') void checkForEasUpdate();
+      currentState = state;
     });
 
     return () => subscription.remove();
@@ -51,6 +57,7 @@ export default function RootLayout() {
               }}
             />
             <OfflineBanner />
+            <EasUpdateNotice />
             <ApiConfigNotice />
           </NetworkStatusProvider>
         </QueryClientProvider>

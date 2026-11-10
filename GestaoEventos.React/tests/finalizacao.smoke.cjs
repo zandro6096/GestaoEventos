@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -33,7 +34,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         }
         await route.fulfill({ json: data });
       });
-      await page.goto('http://localhost:8083/eventos/acompanhar/42?data=2026-09-07');
+      await page.goto(`${SMOKE_BASE_URL}/eventos/acompanhar/42?data=2026-09-07`);
       await page.getByRole('button', { name: 'Finalizar ocorrencia', exact: true }).click();
       await page.getByText('Deixar como pendente', { exact: true }).click();
       await page.getByLabel('Observacoes gerais', { exact: true }).fill('Encerramento validado');

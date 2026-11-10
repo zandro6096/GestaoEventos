@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -35,7 +36,7 @@ async function mockApi(page, writes) {
       page.on('pageerror', (error) => errors.push(error.message));
       await page.addInitScript((value) => sessionStorage.setItem('gestaoeventos.secure.auth_token', value), token);
       await mockApi(page, writes);
-      await page.goto('http://localhost:8083/admin/eventos/modelos');
+      await page.goto(`${SMOKE_BASE_URL}/admin/eventos/modelos`);
       await page.getByText('Modelos de Evento', { exact: true }).first().waitFor();
       await page.getByText('Celula semanal', { exact: true }).waitFor();
       assert.equal(await page.getByRole('button', { name: 'Novo modelo' }).count(), 1);
@@ -46,7 +47,7 @@ async function mockApi(page, writes) {
       await page.getByText('Criar modelo', { exact: true }).click();
       await page.waitForTimeout(150);
       assert.equal(writes.some((write) => write.method === 'POST' && write.path === '/api/evento-templates'), true);
-      await page.goto('http://localhost:8083/admin/eventos/modelos');
+      await page.goto(`${SMOKE_BASE_URL}/admin/eventos/modelos`);
       await page.getByText('Celula semanal', { exact: true }).waitFor();
       await page.getByRole('button', { name: 'Editar Celula semanal' }).click();
       await page.getByText('Editar Modelo de Evento', { exact: true }).waitFor();

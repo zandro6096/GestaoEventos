@@ -1,5 +1,9 @@
-const allowedRoutes = new Set(['/admin/eventos/meus']);
-const routeByType = new Map([['pendencias', '/admin/eventos/meus']]);
+const allowedRoutes = new Set(['/admin/eventos/meus', '/admin/jornada']);
+const routeByType = new Map([
+  ['pendencias', '/admin/eventos/meus'],
+  ['aniversarios', '/admin/jornada'],
+  ['evento-pos', '/admin/jornada'],
+]);
 
 // O payload vem da rede: so aceita rotas conhecidas, nunca um caminho arbitrario.
 export function resolvePushRoute(data: Record<string, unknown>): string | null {

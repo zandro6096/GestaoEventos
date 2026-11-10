@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -29,7 +30,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         if (url.pathname === '/api/participacoes-evento/lote' && request.method() === 'POST') { writes.push({ path: url.pathname, body: request.postDataJSON() }); data = { data: {} }; }
         await route.fulfill({ json: data });
       });
-      await page.goto('http://localhost:8083/eventos/acompanhar/42?data=2026-09-07');
+      await page.goto(`${SMOKE_BASE_URL}/eventos/acompanhar/42?data=2026-09-07`);
       await page.getByText('Participante de teste', { exact: true }).waitFor();
       await page.getByRole('button', { name: 'Marcar Participante de teste como presente', exact: true }).click();
       await page.waitForTimeout(150);

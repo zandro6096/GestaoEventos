@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -28,7 +29,7 @@ function mockApi(page, role, writes) {
       const token = `test.${Buffer.from(JSON.stringify({ sub: '3', exp: 4102444800 })).toString('base64url')}.test`;
       await page.addInitScript((value) => sessionStorage.setItem('gestaoeventos.secure.auth_token', value), token);
       await mockApi(page, 'Owner', writes);
-      await page.goto('http://localhost:8083/configuracoes/membros');
+      await page.goto(`${SMOKE_BASE_URL}/configuracoes/membros`);
       await page.getByText('Membros', { exact: true }).last().waitFor();
       await page.getByText('Pessoa ativa', { exact: true }).waitFor();
       await page.getByText('Pessoa inativa', { exact: true }).waitFor();
@@ -37,7 +38,7 @@ function mockApi(page, role, writes) {
       await page.getByText('Reativar', { exact: true }).click();
       await page.waitForTimeout(150);
       assert.equal(writes.some((write) => write.method === 'POST' && write.path === '/api/usuarios-estrutura/102/reativar'), true);
-      await page.goto('http://localhost:8083/configuracoes/papeis');
+      await page.goto(`${SMOKE_BASE_URL}/configuracoes/papeis`);
       await page.getByText('Papeis e permissoes', { exact: true }).waitFor();
       await page.getByText('Coordenacao', { exact: true }).waitFor();
       await page.getByText('Eventos', { exact: true }).last().waitFor();
@@ -51,7 +52,7 @@ function mockApi(page, role, writes) {
       blocked.on('pageerror', (error) => blockedErrors.push(error.message));
       await blocked.addInitScript((value) => sessionStorage.setItem('gestaoeventos.secure.auth_token', value), token);
       await mockApi(blocked, 'Membro', []);
-      await blocked.goto('http://localhost:8083/configuracoes/membros');
+      await blocked.goto(`${SMOKE_BASE_URL}/configuracoes/membros`);
       await blocked.getByText('Acesso negado', { exact: true }).waitFor();
       assert.deepEqual(blockedErrors, []);
       console.log(`PASS ${width}px admin bloqueado`);

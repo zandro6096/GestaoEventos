@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -24,7 +25,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         }
         await route.fulfill({ json: data });
       });
-      await page.goto('http://localhost:8083/relatorios/frequencia');
+      await page.goto(`${SMOKE_BASE_URL}/relatorios/frequencia`);
       await page.getByText('Relatorio de Frequencia', { exact: true }).waitFor();
       await page.getByText('Pessoa acompanhada', { exact: true }).waitFor();
       await page.getByRole('button', { name: 'Equipe Norte' }).click({ force: true });

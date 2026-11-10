@@ -53,6 +53,7 @@ type Draft = {
   permitirAddResponsaveis: boolean;
   permitirRemoverResponsaveis: boolean;
   permitirAddParticipantes: boolean;
+  adicionarNovosParticipantesEmTodosEventos: boolean;
   permitirRemoverParticipantes: boolean;
   requerJustificativaRemocao: boolean;
   requerJustificativaAusencia: boolean;
@@ -108,6 +109,7 @@ const emptyDraft: Draft = {
   permitirAddResponsaveis: false,
   permitirRemoverResponsaveis: false,
   permitirAddParticipantes: true,
+  adicionarNovosParticipantesEmTodosEventos: false,
   permitirRemoverParticipantes: false,
   requerJustificativaRemocao: false,
   requerJustificativaAusencia: false,
@@ -192,6 +194,7 @@ export function EventoTemplateFormScreen() {
         permitirAddResponsaveis: draft.permitirAddResponsaveis,
         permitirRemoverResponsaveis: draft.permitirRemoverResponsaveis,
         permitirAddParticipantes: draft.permitirAddParticipantes,
+        adicionarNovosParticipantesEmTodosEventos: draft.adicionarNovosParticipantesEmTodosEventos,
         permitirRemoverParticipantes: draft.permitirRemoverParticipantes,
         requerJustificativaRemocao: draft.requerJustificativaRemocao,
         requerJustificativaAusencia: draft.requerJustificativaAusencia,
@@ -597,6 +600,12 @@ export function EventoTemplateFormScreen() {
           onChange={(value) => update("permitirAddParticipantes", value)}
         />
         <Toggle
+          label="Vincular novos participantes a todos os eventos do grupo"
+          description="Quando ativo, novos cadastros ja ficam selecionados nos demais eventos deste grupo."
+          value={draft.adicionarNovosParticipantesEmTodosEventos}
+          onChange={(value) => update("adicionarNovosParticipantesEmTodosEventos", value)}
+        />
+        <Toggle
           label="Permitir remover participantes"
           value={draft.permitirRemoverParticipantes}
           onChange={(value) => update("permitirRemoverParticipantes", value)}
@@ -855,10 +864,12 @@ function Choice({
 }
 function Toggle({
   label,
+  description,
   value,
   onChange,
 }: {
   label: string;
+  description?: string;
   value: boolean;
   onChange: (value: boolean) => void;
 }) {
@@ -866,7 +877,7 @@ function Toggle({
     <View style={styles.toggle}>
       <View style={styles.toggleText}>
         <Text style={styles.toggleLabel}>{label}</Text>
-        <Text style={styles.toggleHint}>{value ? "Ativo" : "Desativado"}</Text>
+        <Text style={styles.toggleHint}>{description ?? (value ? "Ativo" : "Desativado")}</Text>
       </View>
       <Switch
         accessibilityLabel={label}
@@ -931,6 +942,8 @@ function templateToDraft(template: EventoTemplate): Draft {
     permitirAddResponsaveis: template.permitirAddResponsaveis ?? false,
     permitirRemoverResponsaveis: template.permitirRemoverResponsaveis ?? false,
     permitirAddParticipantes: template.permitirAddParticipantes ?? true,
+    adicionarNovosParticipantesEmTodosEventos:
+      template.adicionarNovosParticipantesEmTodosEventos ?? false,
     permitirRemoverParticipantes:
       template.permitirRemoverParticipantes ?? false,
     requerJustificativaRemocao: template.requerJustificativaRemocao ?? false,

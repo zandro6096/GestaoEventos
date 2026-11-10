@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require("node:assert/strict");
 const { Buffer } = require("node:buffer");
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
@@ -86,7 +87,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
           data = { data: { id: 88 } };
         await route.fulfill({ json: data });
       });
-      await page.goto("http://localhost:8083/admin/eventos/criar");
+      await page.goto(`${SMOKE_BASE_URL}/admin/eventos/criar`);
       await page.getByText("Criar Evento", { exact: true }).first().waitFor();
       await page.getByLabel("Nome base").fill("Reuniao de equipe");
       await page.getByText("Continuar", { exact: true }).click();

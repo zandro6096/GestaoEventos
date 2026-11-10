@@ -58,6 +58,12 @@ Parameters:
     Type: String
     NoEcho: true
     MinLength: 32
+    Description: Chave HMAC de assinatura do JWT, necessária para a API iniciar.
+
+  JwtSigningKey:
+    Type: String
+    NoEcho: true
+    MinLength: 32
     Description: Chave HMAC de assinatura do JWT. Sem default de proposito — a API nao sobe sem ela.
 
   SesAccessKey:
@@ -94,10 +100,6 @@ Parameters:
   StripeWebhookSecret:
     Type: String
     Default: ""
-    NoEcho: true
-
-  JwtSigningKey:
-    Type: String
     NoEcho: true
 
   JwtIssuer:
@@ -194,8 +196,8 @@ Resources:
           ASPNETCORE_ENVIRONMENT: Production
           ConnectionStrings__Mysql: !Ref MysqlConnectionString
           Jwt__SigningKey: !Ref JwtSigningKey
-          Jwt__Issuer: gestao-eventos-api
-          Jwt__Audience: gestao-eventos-app
+          Jwt__Issuer: !Ref JwtIssuer
+          Jwt__Audience: !Ref JwtAudience
           App__Url: !Ref AppUrl
           Ses__AccessKey: !Ref SesAccessKey
           Ses__SecretKey: !Ref SesSecretKey
@@ -259,6 +261,21 @@ Resources:
             State: !If [HasPushJobKey, ENABLED, DISABLED]
             Input: !Sub |
               {"version":"2.0","routeKey":"POST /api/interno/push/pendencias","rawPath":"/api/interno/push/pendencias","rawQueryString":"tipo=noite","queryStringParameters":{"tipo":"noite"},"headers":{"x-job-key":"${PushJobKey}","content-type":"application/json","host":"scheduler.internal"},"requestContext":{"http":{"method":"POST","path":"/api/interno/push/pendencias","protocol":"HTTP/1.1","sourceIp":"127.0.0.1","userAgent":"eventbridge-scheduler"},"stage":"$default","requestId":"push-noite","domainName":"scheduler.internal"},"isBase64Encoded":false}
+        PushAniversarios:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(15 8 * * ? *)
+            ScheduleExpressionTimezone: America/Sao_Paulo
+            State: !If [HasPushJobKey, ENABLED, DISABLED]
+            Input: !Sub |
+              {"version":"2.0","routeKey":"POST /api/interno/push/pendencias","rawPath":"/api/interno/push/pendencias","rawQueryString":"tipo=aniversarios","queryStringParameters":{"tipo":"aniversarios"},"headers":{"x-job-key":"${PushJobKey}","content-type":"application/json","host":"scheduler.internal"},"requestContext":{"http":{"method":"POST","path":"/api/interno/push/pendencias","protocol":"HTTP/1.1","sourceIp":"127.0.0.1","userAgent":"eventbridge-scheduler"},"stage":"$default","requestId":"push-aniversarios","domainName":"scheduler.internal"},"isBase64Encoded":false}
+        PushPosEvento:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: rate(15 minutes)
+            State: !If [HasPushJobKey, ENABLED, DISABLED]
+            Input: !Sub |
+              {"version":"2.0","routeKey":"POST /api/interno/push/pendencias","rawPath":"/api/interno/push/pendencias","rawQueryString":"tipo=pos-evento","queryStringParameters":{"tipo":"pos-evento"},"headers":{"x-job-key":"${PushJobKey}","content-type":"application/json","host":"scheduler.internal"},"requestContext":{"http":{"method":"POST","path":"/api/interno/push/pendencias","protocol":"HTTP/1.1","sourceIp":"127.0.0.1","userAgent":"eventbridge-scheduler"},"stage":"$default","requestId":"push-pos-evento","domainName":"scheduler.internal"},"isBase64Encoded":false}
 
   GestaoEventosApiLogGroup:
     Type: AWS::Logs::LogGroup

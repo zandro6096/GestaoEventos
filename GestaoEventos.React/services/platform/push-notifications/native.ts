@@ -6,6 +6,8 @@ import type { PushPlatform, PushRegistrationResult, PushTapListener, PushUnsubsc
 
 // Mesmo id usado pelo backend no campo channelId do push (Android).
 export const PUSH_CHANNEL_ID = 'pendencias';
+export const PUSH_CHANNEL_URGENT_ID = 'atrasos';
+export const PUSH_CHANNEL_INFO_ID = 'informativos';
 
 let foregroundConfigured = false;
 
@@ -19,12 +21,15 @@ export function configureNativeForegroundNotifications() {
   foregroundConfigured = true;
 
   Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
+    handleNotification: async (notification) => {
+      const urgente = notification.request.content.data?.urgencia === 'alta';
+      return {
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: urgente,
+        shouldSetBadge: false,
+      };
+    },
   });
 }
 
@@ -37,6 +42,17 @@ export async function registerNativePush(platform: PushPlatform): Promise<PushRe
     await Notifications.setNotificationChannelAsync(PUSH_CHANNEL_ID, {
       name: 'Pendencias de presenca',
       importance: Notifications.AndroidImportance.HIGH,
+      lightColor: '#0066FF',
+    });
+    await Notifications.setNotificationChannelAsync(PUSH_CHANNEL_URGENT_ID, {
+      name: 'Presencas atrasadas',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 350, 180, 350],
+      lightColor: '#DC2626',
+    });
+    await Notifications.setNotificationChannelAsync(PUSH_CHANNEL_INFO_ID, {
+      name: 'Avisos e aniversarios',
+      importance: Notifications.AndroidImportance.DEFAULT,
       lightColor: '#0066FF',
     });
   }

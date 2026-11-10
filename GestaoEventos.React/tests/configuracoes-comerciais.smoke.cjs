@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -26,12 +27,12 @@ async function mockApi(page, role) {
       page.on('pageerror', (error) => errors.push(error.message));
       await page.addInitScript((value) => sessionStorage.setItem('gestaoeventos.secure.auth_token', value), token);
       await mockApi(page, 'Owner');
-      await page.goto('http://localhost:8083/configuracoes/tipos');
+      await page.goto(`${SMOKE_BASE_URL}/configuracoes/tipos`);
       await page.getByText('Tipos de grupo', { exact: true }).last().waitFor();
       await page.getByText('Nucleo', { exact: true }).waitFor();
       await page.getByText('Tipos de evento', { exact: true }).click();
       await page.getByText('Encontro', { exact: true }).waitFor();
-      await page.goto('http://localhost:8083/configuracoes/assinatura');
+      await page.goto(`${SMOKE_BASE_URL}/configuracoes/assinatura`);
       await page.getByText('Minha assinatura', { exact: true }).waitFor();
       await page.getByText('Profissional', { exact: true }).waitFor();
       assert.deepEqual(errors, []);
@@ -42,7 +43,7 @@ async function mockApi(page, role) {
       const blocked = await browser.newPage({ viewport: { width, height: 900 } });
       await blocked.addInitScript((value) => sessionStorage.setItem('gestaoeventos.secure.auth_token', value), token);
       await mockApi(blocked, 'Membro');
-      await blocked.goto('http://localhost:8083/configuracoes/tipos');
+      await blocked.goto(`${SMOKE_BASE_URL}/configuracoes/tipos`);
       await blocked.getByText('Acesso negado', { exact: true }).waitFor();
       console.log(`PASS ${width}px configuracoes comerciais bloqueado`);
       await blocked.close();

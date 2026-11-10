@@ -35,6 +35,7 @@ export const acompanhamentoService = {
     const permissionKey = action.kind === 'adicionar' || action.kind === 'adicionar_virtual' || action.kind === 'remover' ? 'participantes' : action.kind;
     if (!available[permissionKey]) throw new Error('Acao indisponivel para o estado atual da ocorrencia.');
     if ('motivo' in action && action.kind !== 'iniciar' && action.kind !== 'confirmar' && !action.motivo.trim()) throw new Error('Informe o motivo.');
+    if (action.kind === 'cancelar' && action.motivo.trim().length < 5) throw new Error('Informe o motivo do cancelamento com pelo menos 5 caracteres.');
     let ocorrenciaId = data.ocorrencia.id > 0 ? data.ocorrencia.id : null;
     if (!ocorrenciaId) {
       ocorrenciaId = await eventosApi.materializar(data.evento.id, data.ocorrencia.dataHora);
