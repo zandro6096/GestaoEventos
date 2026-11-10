@@ -21,6 +21,8 @@ import {
   type EventoTemplatePayload,
 } from "../../../services/api/evento-templates-api";
 import { track } from "../../../services/analytics/analytics.service";
+import { fasesApi } from "../../../services/api/fases-api";
+import { FasesModeloEditor } from "./FasesModeloEditor";
 import { assertOnlineForMutation } from "../../../services/offline/mutation-guard";
 import { can } from "../../../services/permissions/permission.facade";
 import { useAuthStore } from "../../../stores/auth.store";
@@ -145,6 +147,9 @@ export function EventoTemplateFormScreen() {
   const client = useQueryClient();
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [errors, setErrors] = useState<string[]>([]);
+  // Fases do evento (ex.: Evangelismo, Comunhão...), na ordem em que o grupo avança; gravadas em endpoint próprio.
+  const [fases, setFases] = useState<string[]>([]);
+  const [fasesOriginais, setFasesOriginais] = useState<string[]>([]);
   const allowed = Boolean(
     estruturaId && can("criar", "eventos", { estruturaId }),
   );
@@ -160,6 +165,17 @@ export function EventoTemplateFormScreen() {
     enabled: editing && allowed,
     retry: false,
   });
+  const fasesQuery = useQuery({
+    queryKey: ["evento-template-fases", templateId],
+    queryFn: () => fasesApi.listarDoModelo(templateId),
+    enabled: editing && allowed,
+    retry: false,
+  });
+  useEffect(() => {
+    if (!fasesQuery.data) return;
+    setFases(fasesQuery.data.fases);
+    setFasesOriginais(fasesQuery.data.fases);
+  }, [fasesQuery.data]);
   const save = useMutation({
     mutationFn: async () => {
       const validation = validateDraft(draft);
@@ -213,9 +229,15 @@ export function EventoTemplateFormScreen() {
         repetirCobrancaQuantidade: nonNegativeNumber(draft.repetirCobrancaQuantidade, 7),
         repetirCobrancaUnidade: draft.repetirCobrancaUnidade,
       };
-      return editing
-        ? eventoTemplatesApi.update(templateId, payload)
-        : eventoTemplatesApi.create(payload);
+      const result = editing
+        ? await eventoTemplatesApi.update(templateId, payload)
+        : await eventoTemplatesApi.create(payload);
+      const idSalvo = editing ? templateId : Number(result?.data?.id ?? 0);
+      if (idSalvo > 0 && fases.join("|") !== fasesOriginais.join("|")) {
+        await fasesApi.definirDoModelo(idSalvo, fases);
+        void client.invalidateQueries({ queryKey: ["evento-template-fases", idSalvo] });
+      }
+      return result;
     },
     onSuccess: () => {
       track(
@@ -625,6 +647,13 @@ export function EventoTemplateFormScreen() {
           value={draft.permitirReatribuicaoResponsavel}
           onChange={(value) => update("permitirReatribuicaoResponsavel", value)}
         />
+      </Section>
+      <Section
+        icon="flag-outline"
+        title="Fases do evento"
+        description="Opcional. Coloque na ordem em que o grupo avança: a próxima fase é sugerida na hora de trocar. Cada evento deste modelo registra sua fase e quando mudou."
+      >
+        <FasesModeloEditor value={fases} onChange={setFases} uso={fasesQuery.data?.uso ?? []} />
       </Section>
       <Section
         icon="grid-outline"

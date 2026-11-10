@@ -6,7 +6,8 @@ stepsCompleted:
 extractionStatus: confirmed
 epicsStatus: approved
 storiesStatus: complete
-updated: 2026-10-25
+updated: 2026-11-10
+revision: "2026-11-10 — modelo sob encomenda: Epic 1 vira trabalho interno da equipe da plataforma; telas de configuração do cliente removidas"
 inputDocuments:
   - _bmad-output/planning-artifacts/prds/prd-exportacao-excel-configuravel-2026-10-25/prd.md
   - _bmad-output/planning-artifacts/prds/prd-exportacao-excel-configuravel-2026-10-25/addendum.md
@@ -20,31 +21,43 @@ inputDocuments:
 
 ## Overview
 
-Requisitos extraídos para a feature de configuração e exportação de modelos Excel por Estrutura. Esta decomposição de feature é separada do `epics.md` já concluído para a iniciativa geral GestaoEventos, evitando sobrescrever o planejamento anterior.
+Requisitos extraídos para a feature de exportação de modelos Excel por Estrutura. Esta decomposição de feature é separada do `epics.md` já concluído para a iniciativa geral GestaoEventos, evitando sobrescrever o planejamento anterior.
+
+**Revisão 2026-11-10:** os modelos passam a ser preparados sob encomenda pela equipe da plataforma. O cliente não tem tela de configuração; pede o modelo fora do app (Dono da Estrutura) e apenas exporta. No piloto, a publicação é feita por script/SQL.
 
 ## Requirements Inventory
 
 ### Functional Requirements
 
-FR1: Usuários com permissão dinâmica podem listar, criar, editar, pré-visualizar, publicar, substituir e desativar modelos somente na Estrutura ativa; o servidor autoriza cada operação e não revela modelos de outras Estruturas.
+FR1: Somente administradores da plataforma (`PlatformAdmins:UsuarioIds`) criam, alteram, validam, publicam e desativam modelos, sempre vinculados a exatamente uma Estrutura; verificação no servidor. No piloto, a operação pode ser script/SQL com as mesmas regras.
 
-FR2: Usuário autorizado pode cadastrar modelo `.xlsx` ou `.xlsm`, informar nome/finalidade, inspecionar abas/recursos e receber limites e erros acionáveis. A saída mantém a extensão; VBA embutido é preservado e nunca executado; avisar antes da publicação e identificar saída habilitada para macros antes de download/compartilhamento.
+FR2: A equipe registra modelo `.xlsx` ou `.xlsm` com nome/finalidade visíveis ao líder; validação de integridade, tamanho, abas e recursos. A saída mantém a extensão; VBA embutido é preservado e nunca executado; saída habilitada para macros é identificada antes de download/compartilhamento.
 
-FR3: Usuário autorizado mapeia somente campos existentes no catálogo permitido para cabeçalhos, células, colunas e regiões repetíveis; pode ordenar/rotular colunas. Identificar campos indisponíveis, vazios, obrigatórios ausentes, destinos duplicados ou incompatíveis. Campos pessoais só aparecem com acesso atual; não há SQL, consulta arbitrária ou código configurável.
+FR3: A equipe mapeia por Configuração de mapeamento declarativa e versionada somente campos do catálogo para cabeçalhos, células, colunas e regiões repetíveis. Validação aponta campos inexistentes, destinos duplicados/incompatíveis e destinos sobre fórmulas. Campos pessoais só são preenchidos se o líder que exporta tem acesso. Sem SQL, consulta arbitrária ou código. Formato estável para um editor futuro.
 
-FR4: Modelo pode repetir linhas por pessoa e, quando configurado, abas/regiões por Grupo. Preservar fórmulas/referências internas, fórmulas de linhas repetidas, abas ocultas de apoio e estilos suportados; nunca sobrescrever células calculadas. Detectar referências quebradas/links externos não aprovados. Solicitar recálculo ao abrir; a prévia não calcula resultados.
+FR4: Modelo pode repetir linhas por pessoa e, quando configurado, abas por Grupo. Preservar fórmulas/referências internas, fórmulas de linhas repetidas, abas ocultas de apoio e estilos suportados; nunca sobrescrever células calculadas. Referências quebradas/links externos bloqueiam publicação. Solicitar recálculo ao abrir.
 
-FR5: Antes de publicar, validar o rascunho com amostra autorizada, mostrando mapeamento, expansão, campos vazios/indisponíveis e incompatibilidades. A prévia não publica, não executa fórmulas/macros/conexões/código e pode ser refeita após correções; erros bloqueantes impedem publicação.
+FR5: Antes de publicar, a equipe gera arquivo de teste com dados reais restritos ao escopo do líder de referência indicado no pedido (ex.: Daniel), compara com a planilha atual dele e pode enviá-lo a ele para conferência; auditado e apagado após publicação/abandono; conferindo mapeamento, expansão, campos vazios/indisponíveis e alertas; o teste não fica disponível aos líderes nem é registrado como exportação; erros bloqueantes impedem publicação.
 
-FR6: Publicar versões imutáveis com estados de rascunho/publicado/desativado e histórico. Cada modelo tem no máximo uma versão publicada ativa; Estruturas podem ter vários modelos ativos. Substituição cria nova versão e não altera arquivos ou exportações anteriores; exportação registra modelo/versão usados.
+FR6: Publicar versões imutáveis com estados de rascunho/publicado/desativado e histórico. Cada modelo tem no máximo uma versão publicada ativa; Estruturas podem ter vários modelos ativos. Ajuste cria nova versão e não altera arquivos anteriores; exportação registra modelo/versão usados.
 
-FR7: Líder escolhe modelo publicado, período e Grupos dentro do escopo autorizado da Estrutura ativa. O servidor recalcula o escopo e rejeita IDs não autorizados. Se a versão ativa for substituída/desativada após a prévia e antes da confirmação, exigir nova prévia; job confirmado fixa a versão usada.
+FR11: Estrutura sem modelo publicado continua com CSV; Dono vê orientação para enviar sua planilha por e-mail (mailto) ou WhatsApp da plataforma indicando o líder de referência, sem promessa de prazo; líderes não veem erro ou tela vazia sem explicação.
+
+FR7: Líder com permissão dinâmica de exportação (ou Dono) escolhe modelo publicado, período e Grupos dentro do escopo autorizado da Estrutura ativa. O servidor recalcula o escopo e rejeita IDs não autorizados. Se a versão ativa for substituída/desativada após a prévia e antes da confirmação, exigir nova prévia; job confirmado fixa a versão usada.
 
 FR8: Mostrar amostra, filtros, contagem e avisos antes da geração. Prévia e arquivo usam os mesmos dados projetados. Distinguir ausência de dados de falta de autorização; período inválido, ausência de resultados ou mudança de permissão interrompe o fluxo com orientação acionável.
 
 FR9: Gerar cópia preenchida sem alterar dados de origem; preservar fórmulas e formatação suportadas. Nome do arquivo identifica relatório/data sem dados pessoais desnecessários. Web baixa; iOS/Android permitem baixar/compartilhar por recursos da plataforma. Operações pesadas são assíncronas, com estado e retry de falhas operacionais; nunca confirmar sucesso falso. Manter CSV atual.
 
 FR10: Auditar configuração e exportação com ator, Estrutura, modelo/versão, filtros, resultado e horário, sem linhas pessoais nem conteúdo integral do arquivo. Instrumentar visualization, entrance, simulation e confirmation via serviço aprovado; analytics não inclui dados pessoais, labels sensíveis, URLs assinadas ou conteúdo de arquivo.
+
+FR12: Tipos de acompanhamento da Estrutura: Encontro com Deus (IE), Consolidação 5 lições (Co), Batismo (B) e Curso de Ceifeiros (Ceif), por configuração, sem schema novo; exportação usa o estado vigente no fim do período.
+
+FR13: Fase da célula (Evangelismo, Comunhão, Edificação, Multiplicação) configurada no modelo de evento Célula, copiada aos eventos, com histórico datado; exportação usa a fase vigente no fim do mês; "Data Comunhão" = entrada na fase Comunhão.
+
+FR14: Anjo da Guarda (consolidador): vínculo cuidador → cuidado com início/fim, no máximo um cuidador vigente, histórico preservado; exportação mostra o cuidador vigente e a contagem.
+
+FR15: Evento Célula registra data prevista de multiplicação, data do evento ponte, visitantes no evento ponte e número de visitas.
 
 ### NonFunctional Requirements
 
@@ -62,7 +75,8 @@ NFR6: Compatibilidade/acessibilidade: fluxo completo em web, iOS e Android; inte
 
 ### Additional Requirements
 
-- Entradas: **Mais > Configurações da estrutura** para administrar modelos; **Relatórios > Frequência** para exportar. Fluxos permanecem no mesmo Expo Router tree e CSV segue disponível.
+- Entrada do cliente: **Relatórios > Frequência** para exportar. Não existe entrada de administração de modelos no app do cliente (revisão 2026-11-10).
+- Nova permissão dinâmica de exportação Excel, atribuível a papéis; Dono da Estrutura tem bypass. Fluxos permanecem no mesmo Expo Router tree e CSV segue disponível.
 - React segue feature-sliced layered client: componentes → hooks/serviço de negócio → API service; React Query controla estado remoto e chaves incluem Estrutura/Grupo. Seleção/upload/download/share usam adapter web/native.
 - Backend segue Clean Architecture/CQRS: FastEndpoints HTTP → command/query/handler → Core policies/ports → Infrastructure. Endpoints não implementam regra de negócio principal. Novos contratos `/api` são aditivos e compatíveis com Angular durante coexistência.
 - Catálogo inicial inclui pessoa, Grupo, presenças, faltas, total de eventos e percentual, além de campos existentes que o solicitante pode acessar.
@@ -83,6 +97,8 @@ NFR6: Compatibilidade/acessibilidade: fluxo completo em web, iOS e Android; inte
 UX-DR1: Reutilizar design system/tokens GestaoEventos; não criar identidade visual própria para a feature nem copiar cores do arquivo Excel para o produto.
 
 UX-DR2: Garantir cores semânticas com foreground/background aprovados, texto normal com contraste mínimo 4.5:1, texto grande 3:1 e controles/ícones/limites de estado 3:1; nunca comunicar estado somente por cor.
+
+> **Revisão 2026-11-10:** UX-DR3 a UX-DR11 e UX-DR16 descrevem a configuração de modelos pelo cliente e ficam **suspensos** (fora do MVP). Servem de referência para a ferramenta interna ou um editor futuro. Continuam válidos UX-DR1, UX-DR2, UX-DR12 a UX-DR15 e UX-DR17 a UX-DR19.
 
 UX-DR3: Model list mostra nome, finalidade, extensão, estado de versão, última publicação e ações permitidas; vazio não revela modelos ou ações sem permissão.
 
@@ -120,182 +136,115 @@ UX-DR19: Analytics usa os quatro pontos do contrato (`visualization`, `entrance`
 
 ### FR Coverage Map
 
-FR1: Epic 1 — listar e administrar modelos dentro da Estrutura ativa, respeitando permissões.
-FR2: Epic 1 — cadastrar e validar modelos XLSX/XLSM com avisos e limites claros.
-FR3: Epic 1 — mapear somente campos autorizados em destinos suportados.
-FR4: Epic 1 — configurar regiões repetíveis e preservar fórmulas/recursos suportados.
-FR5: Epic 1 — pré-visualizar e validar o rascunho antes da publicação.
-FR6: Epic 1 — publicar versões imutáveis e manter o histórico dos modelos.
-FR7: Epic 2 — selecionar modelo, período e Grupos no escopo autorizado.
+FR1: Epic 1 (Story 1.3) — administração restrita à equipe da plataforma, modelo vinculado a uma Estrutura.
+FR2: Epic 1 (Stories 1.1, 1.3) — registrar e validar modelos XLSX/XLSM preservando VBA.
+FR3: Epic 1 (Story 1.2) — Configuração de mapeamento declarativa sobre o catálogo.
+FR4: Epic 1 (Stories 1.1, 1.2) — regiões repetíveis e preservação de fórmulas/recursos.
+FR5: Epic 1 (Story 1.3) — validar com dados reais da Estrutura antes de publicar.
+FR6: Epic 1 (Story 1.3) — publicar versões imutáveis e manter histórico.
+FR7: Epic 2 — selecionar modelo, período e Grupos no escopo autorizado, com permissão de exportação.
 FR8: Epic 2 — revisar filtros, amostra e contagem sobre o snapshot exato da exportação.
 FR9: Epic 2 — gerar e entregar arquivo assíncrono sem alterar dados de origem, mantendo CSV.
-FR10: Epic 1 e Epic 2 — auditar mudanças de configuração e exportações, e registrar analytics permitido.
+FR10: Epic 1 e Epic 2 — auditar publicações e exportações, e registrar analytics permitido.
+FR11: Epic 2 (Story 2.1) — estado sem modelo publicado.
+FR12: Epic 3 (Story 3.1). FR13: Epic 3 (Story 3.2). FR14: Epic 3 (Story 3.3). FR15: Epic 3 (Story 3.4).
 
 ## Epic List
 
-### Epic 1: Cadastrar e publicar modelos de planilha
+### Epic 1: Preparar e publicar modelos sob encomenda (equipe da plataforma)
 
-O líder autorizado configura um modelo Excel para sua Estrutura, mapeia os campos disponíveis, revisa uma prévia e publica versões que podem ser reutilizadas.
-**FRs covered:** FR1, FR2, FR3, FR4, FR5, FR6, FR10 (auditoria das configurações)
+A equipe da plataforma comprova o round-trip do modelo de referência, define catálogo e Configuração de mapeamento declarativa e publica o modelo do piloto por script/SQL para a Estrutura de Daniel. Sem tela de configuração para o cliente.
+**FRs covered:** FR1, FR2, FR3, FR4, FR5, FR6, FR10 (auditoria das publicações)
 
 ### Epic 2: Exportar relatórios usando modelos publicados
 
 O líder autorizado escolhe um modelo, período e Grupos; revisa a prévia; gera e baixa ou compartilha o arquivo. O sistema mantém os dados da exportação iguais aos da prévia, registra qual versão foi usada e informa o estado de operações assíncronas.
-**FRs covered:** FR7, FR8, FR9, FR10 (auditoria e analytics das exportações)
+**FRs covered:** FR7, FR8, FR9, FR10 (auditoria e analytics das exportações), FR11
 
-## Epic 1: Cadastrar e publicar modelos de planilha
+### Epic 3: Registrar os dados de acompanhamento que os modelos pedem
 
-O líder autorizado configura um modelo Excel para sua Estrutura, mapeia os campos disponíveis, revisa uma prévia e publica versões que podem ser reutilizadas.
-**FRs covered:** FR1, FR2, FR3, FR4, FR5, FR6, FR10 (auditoria das configurações)
+Líderes registram no produto o que hoje só existe na planilha: acompanhamentos (Encontro com Deus, Consolidação, Batismo, Ceifeiros), fase da célula, Anjo da Guarda e dados de multiplicação/evento ponte.
+**FRs covered:** FR12, FR13, FR14, FR15
 
-### Story 1.1: Criar rascunho e enviar modelo Excel
+## Epic 1: Preparar e publicar modelos sob encomenda (equipe da plataforma)
 
-Como líder com permissão para administrar modelos na Estrutura ativa,
-Quero criar um rascunho e enviar um arquivo `.xlsx` ou `.xlsm`,
-Para preparar um modelo de exportação sem disponibilizá-lo antes da revisão.
+A equipe da plataforma transforma a planilha enviada por uma Estrutura em um modelo publicado: escreve a Configuração de mapeamento, valida com dados reais da Estrutura e publica a versão somente para ela. Não há tela de configuração para o cliente. No piloto (Daniel), a publicação é feita por script/SQL.
+**FRs covered:** FR1, FR2, FR3, FR4, FR5, FR6, FR10 (auditoria das publicações)
 
-**Acceptance Criteria:**
+### Story 1.1: Comprovar o round-trip do modelo de referência
 
-**Given** que o usuário está na Estrutura ativa e possui a permissão dinâmica necessária  
-**When** acessa Mais > Configurações da estrutura  
-**Then** vê somente modelos dessa Estrutura e somente as ações permitidas para sua autorização  
-**And** acesso sem permissão é negado no servidor sem revelar metadados de outra Estrutura (FR1, NFR1, UX-DR3)
-
-**Given** que o usuário pode administrar modelos  
-**When** informa nome e finalidade e envia um arquivo suportado  
-**Then** o sistema cria um rascunho privado associado à Estrutura ativa e apresenta formato detectado, abas, recursos e limites  
-**And** o servidor valida extensão, MIME, integridade OOXML e limites de tamanho e descompactação, rejeitando arquivos inválidos com orientação de correção (FR2, NFR3, UX-DR4, UX-DR5)
-
-**Given** que o arquivo é `.xlsm` ou contém VBA, vínculos ou conexões externas  
-**When** o sistema inspeciona o arquivo ou prepara sua publicação  
-**Then** informa os recursos detectados, avisa que o VBA será preservado quando suportado e nunca será executado  
-**And** nunca executa macros, conexões ou links externos, e mantém o arquivo em armazenamento privado cifrado (FR2, NFR3, UX-DR4)
-
-**Given** um upload pré-assinado ou reenvio de arquivo  
-**When** o serviço finaliza o recebimento  
-**Then** fixa um `versionId` exato do objeto, valida esse objeto e só publica uma cópia imutável após a validação  
-**And** ignora keys fornecidas pelo cliente e não permite que uma URL reutilizável altere a versão já aceita (Additional Requirements)
-
-**Given** as telas de configuração em web ou dispositivo móvel  
-**When** o usuário navega, lê estados ou corrige erros  
-**Then** os fluxos reutilizam os tokens do design system, mantêm contraste mínimo de 4.5:1 para texto normal, 3:1 para texto grande e 3:1 para controles/ícones, sem comunicar estado somente por cor  
-**And** suportam teclado e foco visível na web, leitores de tela, ampliação de fonte e alvos de toque de pelo menos 44x44 pt no iOS e 48x48 dp no Android (UX-DR1, UX-DR2, UX-DR15)
-
-### Story 1.2: Mapear campos permitidos para o modelo
-
-Como líder autorizado a configurar um modelo,
-Quero associar campos do catálogo a destinos na planilha,
-Para definir quais informações aparecem no relatório sem expor dados que não posso acessar.
+Como equipe da plataforma,
+Quero preencher o `Discipulado - DANIEL.xlsm` com dados de teste por meio do motor de exportação,
+Para confirmar que fórmulas, abas ocultas, estilos e VBA sobrevivem antes de investir no restante da feature.
 
 **Acceptance Criteria:**
 
-**Given** um rascunho válido e um usuário com acesso ao catálogo correspondente  
-**When** abre o mapeamento  
-**Then** vê somente campos disponíveis para sua autorização, com origem, tipo e disponibilidade, sem valores pessoais de exemplo  
-**And** campos sem acesso não são oferecidos nem revelados por mensagens ou estados acessíveis (FR3, NFR1, NFR2, UX-DR6, UX-DR18)
+**Given** uma cópia sanitizada de `prompt/10.11.26/Discipulado - DANIEL.xlsm`  
+**When** o protótipo preenche linhas por pessoa e abas por Grupo  
+**Then** o arquivo gerado abre em Excel e LibreOffice com fórmulas, abas ocultas, estilos e VBA preservados e solicita recálculo ao abrir  
+**And** nenhum VBA, link ou conexão externa é executado (FR2, FR4, NFR3)
 
-**Given** um campo permitido e um destino compatível  
-**When** o usuário associa o campo a cabeçalho, célula, coluna ou região suportada  
-**Then** o rascunho registra o mapeamento e permite ordenar ou rotular colunas  
-**And** identifica campos obrigatórios ausentes, destinos duplicados ou incompatíveis e células que contêm fórmula, sem permitir sobrescrevê-las (FR3, FR4, UX-DR7)
+**Given** a escolha da biblioteca de processamento  
+**When** o protótipo é avaliado  
+**Then** prioriza licença aberta; DocumentFormat.OpenXml 3.5.1 é o candidato inicial  
+**And** o resultado (suportado / não suportado por recurso) fica registrado como fixture e decisão de arquitetura (Additional Requirements)
 
-**Given** qualquer tentativa de definir SQL, consulta arbitrária ou código  
-**When** o usuário configura um mapeamento  
-**Then** a configuração é recusada e somente opções do catálogo e do editor suportado podem ser salvas (FR3, NFR3)
+### Story 1.2: Definir catálogo de campos e Configuração de mapeamento declarativa
 
-**Given** um novo contrato ou tela da feature  
-**When** o fluxo é instrumentado e integrado ao produto  
-**Then** frontend usa o cliente API/estado remoto previsto e backend mantém regra de negócio em handlers/policies, com endpoint HTTP fino  
-**And** contratos `/api` são aditivos para coexistir com Angular, e rotas, permissões, endpoints, analytics e gaps são registrados no parity-manifest (Additional Requirements)
-
-### Story 1.3: Configurar regiões repetíveis e preservar fórmulas suportadas
-
-Como líder que configura um modelo para vários participantes ou Grupos,
-Quero definir regiões repetíveis por pessoa e por Grupo,
-Para organizar os dados em linhas, abas ou áreas adequadas ao relatório.
+Como equipe da plataforma,
+Quero descrever em um documento declarativo quais campos do catálogo vão para quais células, colunas e regiões repetíveis,
+Para mapear qualquer planilha de cliente sem alterar código e com validação automática.
 
 **Acceptance Criteria:**
 
-**Given** um rascunho com abas e regiões inspecionadas  
-**When** o usuário configura uma região repetível  
-**Then** pode definir repetição de linhas por pessoa e, quando suportado, abas ou regiões por Grupo  
-**And** a interface identifica aba e região por nome/visualização, sem depender exclusivamente de coordenadas de célula como modelo mental (FR4, UX-DR8, UX-DR16)
+**Given** o catálogo inicial (pessoa, Grupo, presenças, faltas, total de eventos, percentual e campos autorizados existentes)  
+**When** a equipe escreve uma Configuração de mapeamento  
+**Then** ela referencia somente campos do catálogo e destinos (célula, coluna, região repetível por pessoa, aba repetível por Grupo com nomeação sem colisão)  
+**And** não aceita SQL, consulta arbitrária nem código (FR3, NFR3)
 
-**Given** que a região contém fórmulas, estilos ou abas ocultas de apoio  
-**When** o sistema valida ou prepara a cópia preenchida  
-**Then** mantém referências internas, estilos e fórmulas suportadas sem substituir células calculadas  
-**And** propaga fórmulas de linhas repetidas conforme a regra validada e solicita recálculo ao abrir, sem afirmar que calculou resultados na prévia (FR4, UX-DR9)
+**Given** uma Configuração e o arquivo-modelo  
+**When** a validação roda  
+**Then** aponta campos inexistentes, destinos duplicados ou incompatíveis, destinos sobre células de fórmula, referências quebradas e links externos  
+**And** erros bloqueantes impedem publicação (FR3, FR4, FR5)
 
-**Given** que o arquivo contém referências quebradas, vínculos externos não aprovados ou recursos não suportados  
-**When** a configuração é validada  
-**Then** apresenta a aba/região afetada e uma ação possível  
-**And** bloqueia publicação quando não for possível preservar com segurança o arquivo (FR4, NFR3, UX-DR10)
+**Given** que um editor visual futuro pode gerar a mesma configuração  
+**When** o formato é definido  
+**Then** ele tem schema versionado e documentado no repositório (FR3)
 
-**Given** a escolha de célula, fórmula ou região repetível  
-**When** a pessoa navega com teclado, toque ou leitor de tela  
-**Then** a interface mantém foco visível e anuncia aba, célula/intervalo, fórmula existente, mapeamento e estado de repetição, com ação de confirmar ou cancelar  
-**And** em telas pequenas mantém a sequência linear, sem truncar conteúdo ao ampliar texto (UX-DR15, UX-DR16)
+### Story 1.3: Publicar o modelo do piloto para a Estrutura de Daniel
 
-**Given** o processador de planilha ainda não foi comprovado com o arquivo de referência sanitizado  
-**When** a equipe seleciona ou atualiza a biblioteca de processamento  
-**Then** prioriza licença aberta e exige protótipo de round-trip XLSX/XLSM com fórmulas, VBA, estilos e abas de apoio antes de habilitar produção  
-**And** DocumentFormat.OpenXml 3.5.1 permanece candidato de protótipo, sem presumir suporte integral nem executar VBA (Additional Requirements)
-
-### Story 1.4: Revisar prévia e corrigir validações do rascunho
-
-Como líder que está preparando um modelo,
-Quero ver uma prévia baseada em uma amostra autorizada,
-Para corrigir mapeamentos e recursos incompatíveis antes de publicar.
+Como equipe da plataforma,
+Quero validar o modelo com dados reais da Estrutura de Daniel e publicá-lo somente para ela,
+Para que os líderes dessa Estrutura passem a exportar no formato que já usam.
 
 **Acceptance Criteria:**
 
-**Given** um rascunho e autorização para visualizar os campos amostrados  
-**When** solicita a prévia  
-**Then** o sistema mostra o mapeamento, a expansão das regiões repetíveis, campos vazios ou indisponíveis, fórmulas e recursos incompatíveis  
-**And** limita a amostra aos dados autorizados e não expõe valores fora do contexto ativo (FR5, NFR1, NFR2, UX-DR9)
+**Given** o arquivo-modelo e a Configuração validados  
+**When** a equipe gera um arquivo de teste com o Escopo de exportação de Daniel (líder de referência)  
+**Then** confere campos mapeados, vazios e indisponíveis e a expansão de linhas e abas, comparando com a planilha que Daniel preenche hoje, e pode enviar o teste a Daniel para conferência  
+**And** o teste não inclui Grupos fora do escopo de Daniel, não fica disponível a outros líderes no app, não é registrado como exportação, é auditado (admin, Estrutura, líder de referência) e é apagado após a publicação (FR5, NFR2)
 
-**Given** que o modelo tem erros bloqueantes ou avisos não bloqueantes  
-**When** a validação termina  
-**Then** cada alerta identifica campo/destino, causa e correção; erro bloqueante impede publicação e aviso pode prosseguir somente após confirmação  
-**And** a prévia não executa fórmulas, macros, conexões ou código e não apresenta resultados calculados pelo produto (FR5, NFR3, UX-DR10)
+**Given** a publicação  
+**When** a equipe executa o script/SQL idempotente de publicação  
+**Then** cria modelo e versão vinculados a exatamente uma Estrutura, com estado publicado, no máximo uma versão ativa por modelo e registro de ator, Estrutura, modelo, versão e horário  
+**And** somente administradores da plataforma (`PlatformAdmins:UsuarioIds`) executam ou disparam a operação; nenhum endpoint do cliente cria, altera ou publica modelos (FR1, FR6, FR10, NFR1)
 
-**Given** que o líder alterou o rascunho após uma prévia  
-**When** solicita publicação ou uma nova prévia  
-**Then** a revisão apresentada corresponde ao estado atual do rascunho  
-**And** erros operacionais têm estado e opção de tentar novamente sem criar submissões duplicadas (FR5, NFR4, UX-DR17)
+**Given** um ajuste pedido pela Estrutura  
+**When** a equipe publica nova versão  
+**Then** a anterior é desativada sem alterar arquivos já gerados, e exportações seguintes usam a nova versão (FR6)
 
-### Story 1.5: Publicar e administrar versões imutáveis
+**Given** alteração de schema para modelos, versões e auditoria  
+**When** a história introduz a mudança  
+**Then** fornece SQL idempotente conforme o padrão do projeto, sem migration EF Core (Additional Requirements)
 
-Como líder autorizado,
-Quero publicar uma versão validada e consultar seu histórico,
-Para disponibilizar um modelo estável sem alterar exportações anteriores.
+### Futuro (fora do MVP): ferramenta interna de publicação
 
-**Acceptance Criteria:**
-
-**Given** um rascunho com prévia válida, sem erros bloqueantes, e permissão confirmada pelo servidor  
-**When** o líder confirma a publicação  
-**Then** o sistema publica uma nova versão imutável e a identifica por versão e estado  
-**And** mantém no máximo uma versão ativa por modelo, permite vários modelos ativos na mesma Estrutura e registra ator, Estrutura, modelo, versão e horário da alteração (FR6, FR10, NFR1, UX-DR11)
-
-**Given** uma versão ativa existente  
-**When** o líder a substitui ou desativa  
-**Then** a operação cria ou altera o estado conforme o histórico, sem modificar arquivos ou exportações já produzidos  
-**And** a tela resume nome, extensão, versão e estado usando texto além de cor (FR6, UX-DR3, UX-DR11)
-
-**Given** que a publicação falha ou a permissão muda antes da confirmação  
-**When** o sistema tenta finalizar a operação  
-**Then** não troca o ponteiro da versão ativa nem informa sucesso  
-**And** apresenta estado de falha acionável e permite retry idempotente (FR1, FR6, NFR1, NFR4, UX-DR17)
-
-**Given** alteração de schema necessária para persistir versões e auditoria  
-**When** a história introduz a mudança no banco  
-**Then** fornece SQL idempotente conforme o padrão do projeto  
-**And** não depende de gerar migration EF Core como fluxo de mudança (Additional Requirements)
+Quando houver demanda de outras Estruturas, criar tela web restrita a administradores da plataforma para registrar arquivo e Configuração, validar com dados reais e publicar, substituindo o script/SQL da Story 1.3. Os jobs `template-validation` e `model-preview` passam a ser disparados por essa tela.
 
 ## Epic 2: Exportar relatórios usando modelos publicados
 
 O líder autorizado escolhe um modelo, período e Grupos; revisa a prévia; gera e baixa ou compartilha o arquivo. O sistema mantém os dados da exportação iguais aos da prévia, registra qual versão foi usada e informa o estado de operações assíncronas.
-**FRs covered:** FR7, FR8, FR9, FR10 (auditoria e analytics das exportações)
+**FRs covered:** FR7, FR8, FR9, FR10 (auditoria e analytics das exportações), FR11
 
 ### Story 2.1: Selecionar modelo, período e Grupos autorizados
 
@@ -315,7 +264,19 @@ Para iniciar um relatório dentro do meu escopo de acesso.
 **Then** recalcula o escopo com a Estrutura e permissões atuais e rejeita IDs fora do escopo  
 **And** se a autorização mudou, remove os Grupos afetados e exige que o usuário revise a seleção (FR7, NFR1, UX-DR18)
 
-**Given** que não há modelo publicado elegível ou o período não é válido  
+**Given** um usuário sem a permissão dinâmica de exportação Excel e que não é Dono  
+**When** acessa Relatórios > Frequência  
+**Then** não vê a opção Excel e o servidor rejeita chamadas de exportação Excel (FR7, NFR1)
+
+**Given** um único modelo publicado ou uma exportação anterior do mesmo usuário  
+**When** o usuário abre a exportação Excel  
+**Then** o modelo vem selecionado e o último período e Grupos usados (ainda autorizados) são sugeridos (FR7, NFR Fluidez)
+
+**Given** que a Estrutura ativa não tem modelo publicado  
+**When** o Dono acessa o relatório  
+**Then** vê orientação para enviar sua planilha por e-mail (mailto) ou WhatsApp da plataforma, indicando o líder de referência, sem promessa de prazo; líderes seguem com CSV sem mensagem de erro (FR11)
+
+**Given** que o período não é válido  
 **When** o usuário tenta continuar  
 **Then** recebe uma explicação e uma ação possível sem revelar modelos ou Grupos não autorizados (FR7, NFR1, UX-DR12)
 
@@ -412,3 +373,68 @@ Para usar o relatório e saber qual modelo e filtros foram aplicados.
 **When** solicita frequência  
 **Then** pode seguir pelo fluxo CSV existente com as permissões e filtros atuais  
 **And** a inclusão do Excel não remove nem altera a opção CSV (FR9, UX-DR12)
+
+## Epic 3: Registrar os dados de acompanhamento que os modelos pedem
+
+Sem estes dados, as colunas correspondentes saem vazias no Excel. Ordem por impacto/esforço: 3.1 (só configuração) → 3.2 → 3.3 → 3.4. Siglas conforme comentários do modelo `Sandro e Gabriela.xlsx`.
+**FRs covered:** FR12, FR13, FR14, FR15
+
+### Story 3.1: Cadastrar tipos de acompanhamento da Estrutura piloto
+
+Como equipe da plataforma,
+Quero cadastrar Encontro com Deus, Consolidação (5 lições), Batismo e Curso de Ceifeiros como tipos de acompanhamento da estrutura 6,
+Para que líderes registrem esses dados e a exportação preencha IE, Co, B e Ceif.
+
+**Acceptance Criteria:**
+
+**Given** a tabela de tipos de acompanhamento configurável por Estrutura  
+**When** a equipe executa SQL idempotente para a estrutura 6  
+**Then** os 4 tipos existem com natureza correta (Batismo como indicador; Encontro com Deus, Consolidação e Ceifeiros como curso, pois os modelos usam "A" = em andamento) e aparecem onde os acompanhamentos já são registrados  
+**And** a exportação mapeia DZ, ME, CTL, IE, Co, B e Ceif pelo estado vigente no fim do período (FR12)
+
+### Story 3.2: Fase da célula com histórico
+
+Como líder de célula,
+Quero registrar a fase da minha célula e quando ela mudou,
+Para que o relatório mensal mostre a fase daquele mês e a data em que entramos em Comunhão.
+
+**Acceptance Criteria:**
+
+**Given** o modelo de evento Célula  
+**When** a Estrutura configura as fases (Evangelismo, Comunhão, Edificação, Multiplicação)  
+**Then** eventos criados a partir do modelo herdam a lista e cada evento tem uma fase atual (FR13)
+
+**Given** um evento Célula  
+**When** quem pode editar o evento troca a fase  
+**Then** o sistema grava fase, data de início e autor sem sobrescrever o histórico  
+**And** a exportação de um mês usa a fase vigente no fim do mês e a data de entrada em Comunhão (FR13)
+
+### Story 3.3: Anjo da Guarda (consolidador)
+
+Como líder de célula,
+Quero indicar quem está consolidando cada pessoa,
+Para acompanhar quem cuida de quem e exportar a coluna Aj/Anjo G.
+
+**Acceptance Criteria:**
+
+**Given** duas pessoas do mesmo Grupo  
+**When** o líder designa uma como cuidadora da outra  
+**Then** o vínculo registra início (e fim opcional) e a pessoa cuidada tem no máximo um cuidador vigente  
+**And** trocar ou encerrar preserva o histórico e respeita Estrutura ativa e permissões do Grupo (FR14)
+
+**Given** uma exportação  
+**When** o modelo pede Aj (nº do consolidador) ou Anjo G (S/N)  
+**Then** o arquivo mostra o cuidador vigente no fim do período e a contagem de pessoas com cuidador (FR14)
+
+### Story 3.4: Dados de multiplicação e evento ponte
+
+Como líder de célula,
+Quero registrar a data prevista de multiplicação, a data do evento ponte, os visitantes do evento ponte e o número de visitas,
+Para que o cabeçalho do relatório saia completo.
+
+**Acceptance Criteria:**
+
+**Given** um evento Célula  
+**When** quem pode editar o evento preenche esses campos opcionais  
+**Then** os valores ficam disponíveis para a exportação do período; sem valor, a célula do modelo sai vazia (FR15)
+

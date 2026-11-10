@@ -18,6 +18,7 @@ import { gruposApi } from '../../../services/api/grupos-api';
 import { EventoEditModal, type EventoEditValues } from './EventoEditModal';
 import { AdicionarParticipantePanel } from './AdicionarParticipantePanel';
 import { EditarParticipantePanel } from './EditarParticipantePanel';
+import { FaseAtualNota, FaseChip } from './FaseEventoCard';
 
 type PanelAction = AcompanhamentoAction['kind'] | 'attendance';
 const actionLabels: Record<PanelAction, string> = { iniciar: 'Iniciar ocorrencia', cancelar: 'Cancelar evento', reabrir: 'Reabrir ocorrencia', descancelar: 'Restaurar ocorrencia', confirmar: 'Confirmar responsavel', finalizar: 'Finalizar ocorrencia', adicionar: 'Adicionar participante', adicionar_virtual: 'Adicionar participante', remover: 'Remover participante', attendance: 'Salvar presenca' };
@@ -277,8 +278,10 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
           <InfoChip icon="calendar-outline" label={dateLabel} tone="neutral" />
           <InfoChip icon="location-outline" label={data.evento.local || data.ocorrencia.local || 'Local nao informado'} tone="green" />
           {data.evento.recorrente && <InfoChip icon="repeat-outline" label="Recorrente" tone="blue" />}
+          <FaseChip eventoId={data.evento.id} dataReferencia={data.ocorrencia.dataHora} />
         </View>
         <Text style={styles.responsible}>Responsavel: {data.ocorrencia.responsavelNome || data.evento.responsavelAtualNome || data.evento.responsavelPrincipalNome || 'Nao informado'}</Text>
+        <FaseAtualNota eventoId={data.evento.id} dataReferencia={data.ocorrencia.dataHora} />
         {!!data.ocorrencia.motivoCancelamento && <Text style={styles.cancelReason}>Motivo: {data.ocorrencia.motivoCancelamento}</Text>}
       </View>
 
@@ -419,7 +422,7 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
       </KeyboardAvoidingView>
     </Modal>
     <EventoEditModal key={editingEvento ? `evento:${data?.evento.id}:${data?.evento.inicioEm}` : 'evento-closed'} evento={editingEvento ? data?.evento ?? null : null} grupos={grupos.data ?? []} pending={state.editMutation.isPending} error={state.editMutation.isError ? normalizeApiError(state.editMutation.error, 'Nao foi possivel editar o evento.').message : null} onClose={() => { if (!state.editMutation.isPending) setEditingEvento(false); }} onSave={saveEvento} />
-    <EditarParticipantePanel key={editingParticipant ? `participante:${editingParticipant.id}:${editingParticipant.nomeExibicao || editingParticipant.nome}` : 'participante-closed'} participante={editingParticipant} estruturaId={state.scope.estruturaId} pending={participantEditPending} error={participantEditError} onClose={() => { if (!participantEditPending) { setEditingParticipant(null); setParticipantEditError(null); } }} onSave={(values) => { if (editingParticipant) void saveParticipant(editingParticipant, values); }} />
+    <EditarParticipantePanel key={editingParticipant ? `participante:${editingParticipant.id}:${editingParticipant.nomeExibicao || editingParticipant.nome}` : 'participante-closed'} participante={editingParticipant} estruturaId={state.scope.estruturaId} candidatos={data?.participantes ?? []} pending={participantEditPending} error={participantEditError} onClose={() => { if (!participantEditPending) { setEditingParticipant(null); setParticipantEditError(null); } }} onSave={(values) => { if (editingParticipant) void saveParticipant(editingParticipant, values); }} />
   </ScrollView>;
 }
 

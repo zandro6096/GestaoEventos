@@ -20,9 +20,22 @@ O arquivo também contém VBA. A decisão confirmada é preservar fórmulas e o 
 - Usar um catálogo explícito de Campos de exportação e permissões atuais; não permitir SQL nem código arbitrário.
 - Isolar cada Modelo pela Estrutura e registrar qual versão foi usada, sem guardar o conteúdo pessoal exportado no histórico.
 
+## Mudança de direção (2026-11-10): modelo sob encomenda
+
+Alternativa rejeitada: autosserviço de mapeamento pela Estrutura (versão de 2026-10-25). Motivo: mapear células, colunas e regiões repetíveis exige conhecimento técnico da planilha; a experiência não seria fluida para o cliente e o custo de UX/implementação do editor era a maior parte do Épico 1.
+
+Consequências técnicas para arquitetura:
+
+- A Configuração de mapeamento é um documento declarativo (ex.: JSON) versionado junto ao arquivo-modelo. Ela é a mesma fronteira que um editor visual futuro produziria, então o motor de exportação não depende de como a configuração foi escrita.
+- Piloto: o arquivo-modelo e a configuração são publicados pela equipe via script/SQL. Isso é coerente com a prática atual do projeto de aplicar schema e dados em produção por SQL direto (o app usa `EnsureCreated`, não migrations).
+- Administradores da plataforma já existem como configuração `PlatformAdmins:UsuarioIds` (ver `AutorizacaoPorRotaMiddleware.cs`); a ferramenta interna da Fase 2 deve reutilizar essa verificação.
+- Para validar com dados reais (FR-5), a equipe precisa gerar o arquivo de teste no contexto da Estrutura de destino sem registrar a operação como exportação da Estrutura.
+- Pedidos de modelo não passam pelo sistema; não há entidade de "solicitação".
+
 ## Pontos para UX e arquitetura
 
-- Como o responsável identifica regiões de cabeçalho, áreas repetíveis e células que contêm fórmulas sem precisar conhecer coordenadas ou XML.
-- Como o sistema informa fórmulas quebradas, links externos, recursos não suportados ou campos sem dados antes da publicação.
-- Como limitar tamanho/linhas/abas e nomear abas repetidas sem colisão.
+- Formato concreto da Configuração de mapeamento: destinos (célula, coluna, região), regras de repetição por pessoa/Grupo, nomeação de abas repetidas sem colisão.
+- Como a validação aponta fórmulas quebradas, links externos, recursos não suportados ou campos sem dados para a equipe.
+- Limites de tamanho/linhas/abas.
 - Quais dados do modelo de Daniel têm correspondência no catálogo atual e quais exigem um requisito de produto separado.
+- Estado sem modelo publicado (FR-11) no relatório de frequência, para Dono e para líderes.

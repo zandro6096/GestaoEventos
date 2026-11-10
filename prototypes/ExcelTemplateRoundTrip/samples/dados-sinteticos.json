@@ -1,0 +1,1539 @@
+{
+ "discipulador": {
+  "nome": "DISCIPULADOR TESTE"
+ },
+ "periodo": {
+  "mes_nome": "Outubro"
+ },
+ "grupos": [
+  {
+   "nome": "Grupo Teste 1",
+   "lider": "Líder 1",
+   "anfitriao": "Anfitrião 1",
+   "inicio": "2025-08-01",
+   "multiplicacao": null,
+   "dia_semana": "Sábado",
+   "horario": "16:30",
+   "fase": "Evangelismo",
+   "cultos_no_mes": 4,
+   "reunioes_no_mes": 4,
+   "pessoas": [
+    {
+     "nome": "Sérgio Teste 0",
+     "categoria": "membro",
+     "funcao": "L",
+     "nascimento": "2011-01-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Wagner Teste 1",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2011-04-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "FJ",
+      "s3_culto": "FJ",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Gabi Teste 2",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2010-02-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Rita Teste 3",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-07-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Vera Teste 4",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2008-05-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "FJ",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Gabi Teste 100",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2009-02-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Vera Teste 200",
+     "categoria": "visitante",
+     "funcao": "V",
+     "nascimento": "2010-01-13",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    }
+   ]
+  },
+  {
+   "nome": "Grupo Teste 2",
+   "lider": "Líder 2",
+   "anfitriao": "Anfitrião 2",
+   "inicio": "2025-08-01",
+   "multiplicacao": null,
+   "dia_semana": "Sábado",
+   "horario": "16:30",
+   "fase": "Evangelismo",
+   "cultos_no_mes": 4,
+   "reunioes_no_mes": 4,
+   "pessoas": [
+    {
+     "nome": "Gabi Teste 0",
+     "categoria": "membro",
+     "funcao": "L",
+     "nascimento": "2012-07-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Nina Teste 1",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2011-06-13",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Zeca Teste 2",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2011-02-16",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "FJ",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Vera Teste 3",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2009-06-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "FJ",
+      "s2_culto": "F",
+      "s2_celula": "FJ",
+      "s3_culto": "P",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Quim Teste 4",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-05-18",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Talita Teste 5",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2010-08-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "FJ",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Carla Teste 6",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2012-02-18",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Nina Teste 7",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2008-09-13",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "F",
+      "s2_celula": "FJ",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Hugo Teste 8",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-06-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "FJ",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Hugo Teste 9",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-01-15",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "FJ",
+      "s2_culto": "P",
+      "s2_celula": "FJ",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Xênia Teste 10",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2012-04-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "FJ",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Otávio Teste 11",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2005-02-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "F",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Elisa Teste 12",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2011-03-14",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Ana Teste 13",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-04-12",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "FJ",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Ana Teste 14",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2011-05-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "F",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Bruno Teste 15",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2005-06-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "F",
+      "s2_culto": "FJ",
+      "s2_celula": "F",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Carla Teste 16",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2007-02-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "FJ",
+      "s2_culto": "F",
+      "s2_celula": "FJ",
+      "s3_culto": "FJ",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Bruno Teste 17",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-07-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Mara Teste 18",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2007-05-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "FJ",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Rita Teste 19",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2008-09-14",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "FJ",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Rita Teste 20",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2009-09-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Elisa Teste 21",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2009-05-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Carla Teste 22",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2011-05-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Rita Teste 23",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2005-02-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "F",
+      "s4_culto": "FJ",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Elisa Teste 24",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2005-05-15",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "FJ",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Talita Teste 25",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2007-04-12",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Fábio Teste 26",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-07-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Ana Teste 27",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2008-07-15",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Ana Teste 28",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-05-12",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "F",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Nina Teste 29",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-07-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Lucas Teste 30",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2011-02-15",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "P",
+      "s3_celula": "FJ",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Mara Teste 31",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2009-09-12",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "P",
+      "s4_culto": "F",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Ana Teste 100",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2009-05-13",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "FJ",
+      "s3_culto": "FJ",
+      "s3_celula": "P",
+      "s4_culto": "F",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Paula Teste 200",
+     "categoria": "visitante",
+     "funcao": "V",
+     "nascimento": "2007-02-14",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "FJ",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "F",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Elisa Teste 201",
+     "categoria": "visitante",
+     "funcao": "V",
+     "nascimento": "2005-01-13",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "FJ",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Paula Teste 202",
+     "categoria": "visitante",
+     "funcao": "V",
+     "nascimento": "2011-04-12",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "FJ",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "F",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "F"
+     }
+    }
+   ]
+  },
+  {
+   "nome": "Grupo Teste 3",
+   "lider": "Líder 3",
+   "anfitriao": "Anfitrião 3",
+   "inicio": "2025-08-01",
+   "multiplicacao": null,
+   "dia_semana": "Sábado",
+   "horario": "16:30",
+   "fase": "Evangelismo",
+   "cultos_no_mes": 4,
+   "reunioes_no_mes": 4,
+   "pessoas": [
+    {
+     "nome": "Hugo Teste 0",
+     "categoria": "membro",
+     "funcao": "L",
+     "nascimento": "2006-08-12",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Nina Teste 1",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2012-03-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "FJ",
+      "s2_culto": "FJ",
+      "s2_celula": "FJ",
+      "s3_culto": "P",
+      "s3_celula": "F",
+      "s4_culto": "FJ",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Otávio Teste 2",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-05-13",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Mara Teste 3",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2007-04-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "FJ",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Mara Teste 100",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2005-07-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "FJ",
+      "s2_celula": "F",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Hugo Teste 101",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2012-04-14",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "F",
+      "s3_celula": "FJ",
+      "s4_culto": "FJ",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Elisa Teste 102",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2005-07-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "F",
+      "s3_culto": "P",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "F"
+     }
+    }
+   ]
+  },
+  {
+   "nome": "Célula d'Oeste: Jovens/Teen",
+   "lider": "Líder 4",
+   "anfitriao": "Anfitrião 4",
+   "inicio": "2025-08-01",
+   "multiplicacao": null,
+   "dia_semana": "Sábado",
+   "horario": "16:30",
+   "fase": "Evangelismo",
+   "cultos_no_mes": 4,
+   "reunioes_no_mes": 4,
+   "pessoas": [
+    {
+     "nome": "Gabi Teste 0",
+     "categoria": "membro",
+     "funcao": "L",
+     "nascimento": "2012-06-15",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "F",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Bruno Teste 1",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2010-04-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Elisa Teste 2",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2012-02-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Yuri Teste 3",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2007-05-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "FJ",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Sérgio Teste 4",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2008-02-14",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "FJ",
+      "s3_culto": "F",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Quim Teste 100",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2010-01-16",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "FJ",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Xênia Teste 101",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2009-09-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "F",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Otávio Teste 102",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2008-08-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "F",
+      "s2_culto": "FJ",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Gabi Teste 103",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2010-05-15",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Xênia Teste 200",
+     "categoria": "visitante",
+     "funcao": "V",
+     "nascimento": "2011-08-18",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "FJ",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Mara Teste 201",
+     "categoria": "visitante",
+     "funcao": "V",
+     "nascimento": "2008-05-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "F",
+      "s2_culto": "F",
+      "s2_celula": "F",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    }
+   ]
+  },
+  {
+   "nome": "Grupo Teste 5",
+   "lider": "Líder 5",
+   "anfitriao": "Anfitrião 5",
+   "inicio": "2025-08-01",
+   "multiplicacao": null,
+   "dia_semana": "Sábado",
+   "horario": "16:30",
+   "fase": "Evangelismo",
+   "cultos_no_mes": 4,
+   "reunioes_no_mes": 4,
+   "pessoas": [
+    {
+     "nome": "Wagner Teste 0",
+     "categoria": "membro",
+     "funcao": "L",
+     "nascimento": "2012-05-14",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "FJ",
+      "s2_culto": "FJ",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Gabi Teste 1",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2008-08-14",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Lucas Teste 2",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2007-05-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "FJ",
+      "s2_culto": "FJ",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Ugo Teste 3",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2012-02-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Iris Teste 4",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2012-02-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "F",
+      "s2_celula": "F",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Júlio Teste 5",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2006-04-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "FJ",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Otávio Teste 6",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2012-05-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "F",
+      "s2_culto": "FJ",
+      "s2_celula": "FJ",
+      "s3_culto": "FJ",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Ugo Teste 7",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2008-05-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "FJ",
+      "s2_celula": "FJ",
+      "s3_culto": "P",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Otávio Teste 8",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2012-05-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "FJ",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Nina Teste 100",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2006-09-13",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Júlio Teste 200",
+     "categoria": "visitante",
+     "funcao": "V",
+     "nascimento": "2012-02-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "FJ"
+     }
+    }
+   ]
+  },
+  {
+   "nome": "Grupo Teste 6",
+   "lider": "Líder 6",
+   "anfitriao": "Anfitrião 6",
+   "inicio": "2025-08-01",
+   "multiplicacao": null,
+   "dia_semana": "Sábado",
+   "horario": "16:30",
+   "fase": "Evangelismo",
+   "cultos_no_mes": 4,
+   "reunioes_no_mes": 4,
+   "pessoas": [
+    {
+     "nome": "Bruno Teste 0",
+     "categoria": "membro",
+     "funcao": "L",
+     "nascimento": "2011-06-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "FJ",
+      "s2_celula": "FJ",
+      "s3_culto": "F",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Sérgio Teste 1",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2005-03-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Paula Teste 2",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2010-07-15",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "F",
+      "s4_culto": "F",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Yuri Teste 3",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2005-08-11",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "F"
+     }
+    },
+    {
+     "nome": "Otávio Teste 4",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2011-01-13",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Rita Teste 5",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2007-05-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "FJ",
+      "s2_celula": "F",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Ana Teste 6",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2011-02-13",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "FJ",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Nina Teste 7",
+     "categoria": "membro",
+     "funcao": "M",
+     "nascimento": "2012-08-13",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "F",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "FJ",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Iris Teste 100",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2011-06-18",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "P",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "FJ",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Otávio Teste 101",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2012-06-15",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "P",
+      "s2_culto": "P",
+      "s2_celula": "P",
+      "s3_culto": "FJ",
+      "s3_celula": "FJ",
+      "s4_culto": "F",
+      "s4_celula": "P"
+     }
+    },
+    {
+     "nome": "Mara Teste 102",
+     "categoria": "frequentador",
+     "funcao": "FA",
+     "nascimento": "2008-07-10",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "FJ",
+      "s1_celula": "FJ",
+      "s2_culto": "F",
+      "s2_celula": "F",
+      "s3_culto": "P",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Sérgio Teste 200",
+     "categoria": "visitante",
+     "funcao": "V",
+     "nascimento": "2010-02-17",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "F",
+      "s1_celula": "F",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "F",
+      "s3_celula": "P",
+      "s4_culto": "P",
+      "s4_celula": "FJ"
+     }
+    },
+    {
+     "nome": "Paula Teste 201",
+     "categoria": "visitante",
+     "funcao": "V",
+     "nascimento": "2009-06-19",
+     "celular": "11 90000-0000",
+     "presencas": {
+      "s1_culto": "P",
+      "s1_celula": "FJ",
+      "s2_culto": "F",
+      "s2_celula": "P",
+      "s3_culto": "P",
+      "s3_celula": "F",
+      "s4_culto": "P",
+      "s4_celula": "P"
+     }
+    }
+   ]
+  }
+ ]
+}

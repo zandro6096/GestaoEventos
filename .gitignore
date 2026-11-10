@@ -1,3 +1,16 @@
 .aws-sam/
 tmp/
 .credencial/
+
+# Artefatos temporários de agentes (builds, binários e segredos locais)
+.codex-tmp/
+**/.codex-tmp/
+
+# Credenciais de assinatura do app (senhas do keystore Android)
+GestaoEventos.React/credentials.json
+
+# Planilhas de clientes com dados pessoais (modelos de exportação ficam fora do git)
+prompt/**/*.xlsx
+prompt/**/*.xlsm
+/*.xlsx
+/*.xlsm
