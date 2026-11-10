@@ -344,7 +344,7 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
               <View style={styles.avatar}><Text style={styles.avatarText}>{(p.nomeExibicao || p.nome).charAt(0).toUpperCase()}</Text></View>
               <View style={styles.personInfo}><Text numberOfLines={1} ellipsizeMode="tail" style={styles.personName}>{p.nomeExibicao || p.nome}</Text><View style={styles.personMeta}><Text numberOfLines={1} ellipsizeMode="tail" style={styles.roleText}>{p.funcao || 'Participante'}</Text><Text style={styles.dot}>·</Text><Text numberOfLines={1} ellipsizeMode="tail" style={statusToneStyle(p.status)}>{statusLabel(p.status)}</Text></View>{p.email ? <Text numberOfLines={1} ellipsizeMode="tail" style={styles.email}>{p.email}</Text> : null}</View>
             </Pressable>
-            {state.actions?.participantes && compactParticipantRows ? <View style={[styles.participantActions, styles.participantActionsCompact]}>
+            {state.actions?.participantes ? <View style={[styles.participantActions, compactParticipantRows && styles.participantActionsCompact]}>
               <View style={styles.participantMenuWrap}>
                 <Pressable accessibilityRole="button" accessibilityLabel={`Mais acoes de ${p.nomeExibicao || p.nome}`} accessibilityState={{ expanded: openParticipantMenuId === p.id }} disabled={savingObservationId === p.id} style={[styles.mobileIconButton, openParticipantMenuId === p.id && styles.mobileIconButtonActive]} onPress={() => { setOpenObservationId(null); setOpenParticipantMenuId((current) => current === p.id ? null : p.id); }}>
                   <Ionicons name="add-outline" size={21} color={colors.brandBlue} />
@@ -355,8 +355,6 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
                   <Pressable style={[styles.participantMenuItem, styles.participantMenuItemDanger]} onPress={() => { setOpenParticipantMenuId(null); openPanel('remover', p); }}><Ionicons name="person-remove-outline" size={16} color={colors.error} /><Text style={styles.participantMenuDangerText}>Remover participante</Text></Pressable>
                 </View> : null}
               </View>
-              {renderAttendanceActions(p)}
-            </View> : state.actions?.participantes ? <View style={styles.participantActions}>
               {renderAttendanceActions(p)}
             </View> : null}
           </View>

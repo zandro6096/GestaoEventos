@@ -27,7 +27,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       await page.goto(`${SMOKE_BASE_URL}/jornada`);
       await page.getByText('Eventos de hoje', { exact: true }).waitFor();
       if (width === 390) {
-        await page.getByLabel('Abrir pendencias de Grupo teste').click();
+        // No celular o primeiro grupo com pendência já abre expandido.
+        await page.getByLabel('Recolher pendencias de Grupo teste').waitFor();
         await page.getByText('Encontro teste', { exact: true }).waitFor();
         assert.equal(await page.getByText('Resolver pendencia', { exact: true }).count(), 0);
       }

@@ -56,14 +56,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
           await page.screenshot({ path: `tests/artifacts/acompanhamento/${scenario}-${width}.png`, fullPage: true });
           if (scenario === 'success') {
-            if (width === 390) {
-              const participantMenu = page.getByRole('button', { name: 'Mais acoes de Participante de teste', exact: true });
-              await participantMenu.evaluate((element) => element.scrollIntoView({ block: 'center' }));
-              await participantMenu.click();
-              await page.getByText('Remover participante', { exact: true }).click();
-            } else {
-              await page.getByRole('button', { name: 'Remover Participante de teste', exact: true }).click();
-            }
+            // Editar/Remover ficam no menu "Mais acoes" da linha, no celular e no desktop.
+            const participantMenu = page.getByRole('button', { name: 'Mais acoes de Participante de teste', exact: true });
+            await participantMenu.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+            await participantMenu.click();
+            await page.getByText('Remover participante', { exact: true }).click();
             await page.getByLabel('Motivo', { exact: true }).fill('Mudanca de grupo');
             await page.getByRole('button', { name: 'Confirmar', exact: true }).click();
             await page.getByText('Nenhum participante nesta ocorrencia.', { exact: true }).waitFor();
@@ -76,13 +73,14 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
             await page.getByText('Participante de teste', { exact: true }).click();
             await page.getByText('Esta e as proximas ocorrencias', { exact: true }).click();
             await page.getByText('Adicionar participante', { exact: true }).last().click();
-            if (width === 390) {
+            // O painel fica aberto para adicionar mais pessoas; confirma o sucesso e fecha.
+            await page.getByText('Pessoa adicionada aos encontros selecionados.', { exact: true }).waitFor();
+            await page.getByText('Cancelar', { exact: true }).last().click();
+            {
               const participantMenu = page.getByRole('button', { name: 'Mais acoes de Participante de teste', exact: true });
               await participantMenu.evaluate((element) => element.scrollIntoView({ block: 'center' }));
               await participantMenu.click();
               await page.getByText('Remover participante', { exact: true }).waitFor();
-            } else {
-              await page.getByRole('button', { name: 'Remover Participante de teste', exact: true }).waitFor();
             }
             assert.equal(participantWrites[1].usuario_id, 8);
             assert.equal(participantWrites[1].escopo, 'futuros');
@@ -92,7 +90,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
             await page.getByRole('button', { name: 'Restaurar ocorrencia', exact: true }).click();
           } else await page.getByRole('button', { name: 'Cancelar evento', exact: true }).click();
           assert.equal(await page.getByRole('button', { name: 'Confirmar', exact: true }).isDisabled(), true);
-          await page.getByLabel('Motivo do cancelamento', { exact: true }).fill('Mudanca de agenda');
+          // Restaurar (descancelar) também pede motivo, no campo "Motivo".
+          await page.getByLabel(scenario === 'cancelled' ? 'Motivo' : 'Motivo do cancelamento', { exact: true }).fill('Mudanca de agenda');
           await page.getByRole('button', { name: 'Confirmar', exact: true }).scrollIntoViewIfNeeded();
           await page.waitForTimeout(400); // Allow the native modal slide animation to settle before capturing.
           await page.screenshot({ path: `tests/artifacts/acompanhamento/dialog-${scenario}-${width}.png`, fullPage: true });

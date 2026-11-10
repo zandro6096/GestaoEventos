@@ -47,27 +47,42 @@ function unwrap<T>(body: unknown): T {
   return (envelope.data ?? envelope) as T;
 }
 
+/** Garante listas e flags mesmo se a resposta vier incompleta (a tela de acompanhamento não pode quebrar por isso). */
+function normalizar(body: unknown, eventoId: number): FaseEvento {
+  const data = unwrap<Partial<FaseEvento> | null>(body);
+  const f = data && !Array.isArray(data) ? data : {};
+  return {
+    eventoId: f.eventoId ?? eventoId,
+    eventoTemplateId: f.eventoTemplateId ?? null,
+    opcoes: Array.isArray(f.opcoes) ? f.opcoes : [],
+    atual: f.atual ?? null,
+    historico: Array.isArray(f.historico) ? f.historico : [],
+    podeAlterar: Boolean(f.podeAlterar),
+    multiplicacaoPrevista: f.multiplicacaoPrevista ?? null,
+  };
+}
+
 export const fasesApi = {
   async obterDoEvento(eventoId: number): Promise<FaseEvento> {
     const response = await httpClient.get(apiRoute(`/api/eventos/${eventoId}/fase`));
-    return unwrap<FaseEvento>(response.data);
+    return normalizar(response.data, eventoId);
   },
 
   async registrar(eventoId: number, request: RegistrarFaseRequest): Promise<FaseEvento> {
     const response = await httpClient.post(apiRoute(`/api/eventos/${eventoId}/fase`), toSnakeCase(request));
-    return unwrap<FaseEvento>(response.data);
+    return normalizar(response.data, eventoId);
   },
 
   /** `data` em AAAA-MM-DD; nulo limpa a data prevista. */
   async definirMultiplicacao(eventoId: number, data: string | null): Promise<FaseEvento> {
     const response = await httpClient.put(apiRoute(`/api/eventos/${eventoId}/multiplicacao`), { data });
-    return unwrap<FaseEvento>(response.data);
+    return normalizar(response.data, eventoId);
   },
 
   async listarDoModelo(templateId: number): Promise<FasesDoModelo> {
     const response = await httpClient.get(apiRoute(`/api/evento-templates/${templateId}/fases`));
-    const data = unwrap<Partial<FasesDoModelo>>(response.data);
-    return { fases: data.fases ?? [], uso: data.uso ?? [] };
+    const data = unwrap<Partial<FasesDoModelo> | null>(response.data);
+    return { fases: Array.isArray(data?.fases) ? data.fases : [], uso: Array.isArray(data?.uso) ? data.uso : [] };
   },
 
   async definirDoModelo(templateId: number, fases: string[]): Promise<string[]> {
