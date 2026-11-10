@@ -25,7 +25,8 @@ MESES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "A
 DIAS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"]  # date.weekday()
 
 SIGLA = {"lider de célula": "L", "líder de célula": "L", "anfitrião": "A", "líder em treinamento": "LT",
-         "membro": "M", "frequentador assíduo": "FA", "visitante": "V", "discipulador": "L"}
+         "membro": "M", "frequentador assíduo": "FA", "visitante": "V", "discipulador": "L",
+         "lider": "L", "líder": "L", "lider em treinamento": "LT", "frequentador assiduo": "FA", "anfitriao": "A"}
 CATEGORIA = {"FA": "frequentador", "V": "visitante"}
 ORDEM_FUNCAO = {"L": 0, "LT": 1, "A": 2, "M": 3, "": 4, "FA": 5, "V": 6}
 PRESENCA = {"PRESENTE": "P", "AUSENTE": "F", "JUSTIFICADO": "FJ"}
@@ -161,6 +162,7 @@ def main():
     ap.add_argument("--templates-celula", default="1")
     ap.add_argument("--templates-culto", default="3", help="Ig: culto de celebração (Culto da Família)")
     ap.add_argument("--templates-jovens", default="2", help="RLGRU: culto de jovens")
+    ap.add_argument("--templates-visita", default="4", help="Número de Visitas: Visita de Célula")
     a = ap.parse_args()
 
     ano, mes = map(int, a.mes.split("-"))
@@ -169,6 +171,7 @@ def main():
     tpl_celula = {int(x) for x in a.templates_celula.split(",")}
     tpl_culto = {int(x) for x in a.templates_culto.split(",")}
     tpl_jovens = {int(x) for x in a.templates_jovens.split(",") if x}
+    tpl_visita = [int(x) for x in a.templates_visita.split(",") if x] or [0]
 
     db = conectar(a.cnf)
     cur = db.cursor()
@@ -191,7 +194,7 @@ def main():
                  "where rg.grupo_id=%s order by rg.id", g["id"])
         responsavel = resp[0]["nome"] if resp else g["nome"]
 
-        eventos = q("select id, titulo, evento_template_id, inicio_em, horario from Eventos "
+        eventos = q("select id, titulo, evento_template_id, inicio_em, horario, data_multiplicacao_prevista from Eventos "
                     "where grupo_id=%s and date(inicio_em) <= %s and (status is null or status <> 0)",
                     g["id"], fim_mes)
         eventos = [e for e in eventos if e["evento_template_id"] in tpl_celula | tpl_culto | tpl_jovens]
@@ -303,6 +306,26 @@ def main():
         # "Líder Trein." do Discipulador: data em que a célula passou a ter um líder em treinamento.
         lt_datas = [desde[k] for k, p in pessoas.items() if p["funcao"] == "LT" and k in desde]
         lt_desde = min(lt_datas).isoformat() if lt_datas else None
+
+        # Número de Visitas: ocorrências (não canceladas) de "Visita de Célula" do Grupo no mês.
+        visitas = q(f"""select count(*) n from ocorrencias_evento o join Eventos e on e.id = o.evento_id
+                        where e.grupo_id = %s and e.evento_template_id in ({",".join(["%s"] * len(tpl_visita))})
+                          and o.cancelada = 0 and date(o.data_hora) between %s and %s""",
+                    g["id"], *tpl_visita, ini_mes, fim_mes)[0]["n"]
+
+        # Alvos: objetivos ativos do modelo Célula que valem para o Grupo; ✅ quando a meta foi atingida.
+        alvos = []
+        for o in q(f"""select o.id, o.nome, o.meta_quantidade, o.papel_alvo_nome from objetivos_template o
+                       where o.estrutura_id = %s and o.ativo = 1 and o.evento_template_id in ({",".join(["%s"] * len(tpl_celula))})
+                         and (not exists (select 1 from objetivo_template_grupos x where x.objetivo_template_id = o.id)
+                              or exists (select 1 from objetivo_template_grupos x where x.objetivo_template_id = o.id and x.grupo_id = %s))
+                       order by o.id""", rede["estrutura_id"], *tpl_celula, g["id"]):
+            meta = o["meta_quantidade"] or 1
+            sigla = SIGLA.get((o["papel_alvo_nome"] or "").strip().lower())
+            atual = sum(1 for p in pessoas.values() if sigla and p["funcao"] == sigla)
+            rotulo = f'{meta} {o["papel_alvo_nome"] or o["nome"]}'
+            alvos.append(f"{rotulo}  ✅" if sigla and atual >= meta else rotulo)
+        multiplicacao = principal.get("data_multiplicacao_prevista")
         horario = principal["horario"]
         if isinstance(horario, dt.timedelta):
             horario = f"{int(horario.total_seconds() // 3600):02d}:{int(horario.total_seconds() % 3600 // 60):02d}"
@@ -311,7 +334,9 @@ def main():
         saida["grupos"].append({
             "grupo_id": g["id"], "nome": nome_curto(responsavel), "lider": nome_curto(responsavel), "lider_completo": responsavel,
             "anfitriao": anfitriao, "lt_desde": lt_desde,
-            "inicio": principal["inicio_em"].date().isoformat(), "multiplicacao": None,
+            "inicio": principal["inicio_em"].date().isoformat(),
+            "multiplicacao": str(multiplicacao)[:10] if multiplicacao else None,
+            "visitas_no_mes": visitas or None, "alvos": alvos[:4],
             "fase": fase_atual, "data_comunhao": data_comunhao,
             "dia_semana": DIAS[principal["inicio_em"].weekday()], "horario": horario,
             "cultos_no_mes": len({semana_do_mes(d) for d in datas["culto"]}),

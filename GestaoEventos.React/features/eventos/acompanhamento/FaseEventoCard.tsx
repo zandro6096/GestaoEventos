@@ -147,6 +147,8 @@ function FaseSheet({ visivel, info, eventoId, onFechar, onSalvo }: { visivel: bo
             </Pressable>
           </> : <Text style={styles.dica}>Apenas quem gerencia este evento pode mudar a fase.</Text>}
 
+          <MultiplicacaoPrevista info={info} eventoId={eventoId} />
+
           {info.historico.length ? <View style={styles.historico}>
             <Text style={styles.historicoTitulo}>HISTÓRICO</Text>
             {info.historico.map((h) => <View key={h.id} style={styles.historicoLinha}>
@@ -160,12 +162,55 @@ function FaseSheet({ visivel, info, eventoId, onFechar, onSalvo }: { visivel: bo
   </Modal>;
 }
 
+/** Data prevista de multiplicação: um campo, sem histórico (vale a última data informada). */
+function MultiplicacaoPrevista({ info, eventoId }: { info: FaseEvento; eventoId: number }) {
+  const queryClient = useQueryClient();
+  const atual = info.multiplicacaoPrevista ? isoParaBr(info.multiplicacaoPrevista) : '';
+  const [data, setData] = useState(atual);
+  const [erro, setErro] = useState<string | null>(null);
+  const [salvo, setSalvo] = useState(false);
+  useEffect(() => { setData(atual); }, [atual]);
+
+  const mutation = useMutation({
+    mutationFn: (iso: string | null) => fasesApi.definirMultiplicacao(eventoId, iso),
+    onSuccess: (resultado) => {
+      queryClient.setQueryData(['evento-fase', eventoId], resultado);
+      track('confirmation', 'acompanhar_evento:multiplicacao_salva');
+      setSalvo(true);
+    },
+  });
+
+  const salvar = (limpar = false) => {
+    if (limpar) { mutation.mutate(null); return; }
+    const iso = brParaIso(data);
+    if (!iso) { setErro('Informe a data no formato dd/mm/aaaa.'); return; }
+    setErro(null);
+    mutation.mutate(iso);
+  };
+
+  return <View style={styles.multiplicacao}>
+    <Text style={styles.historicoTitulo}>MULTIPLICAÇÃO PREVISTA</Text>
+    {info.podeAlterar ? <>
+      <CampoData valor={data} rotulo="Data prevista de multiplicação" ateHoje={false} onChange={(v) => { setData(v); setErro(null); setSalvo(false); }} />
+      {erro ? <Text accessibilityRole="alert" style={styles.erro}>{erro}</Text> : null}
+      {mutation.isError ? <Text accessibilityRole="alert" style={styles.erro}>{normalizeApiError(mutation.error, 'Não foi possível salvar a data.').message}</Text> : null}
+      {salvo && !mutation.isPending ? <Text style={styles.ok}>{info.multiplicacaoPrevista ? 'Data prevista salva.' : 'Data prevista removida.'}</Text> : null}
+      <View style={styles.multiplicacaoAcoes}>
+        {info.multiplicacaoPrevista ? <Pressable accessibilityRole="button" disabled={mutation.isPending} onPress={() => salvar(true)} style={styles.secundario}><Text style={styles.secundarioTexto}>Remover</Text></Pressable> : null}
+        <Pressable accessibilityRole="button" disabled={mutation.isPending || !data || data === atual} onPress={() => salvar()} style={[styles.botaoPequeno, (mutation.isPending || !data || data === atual) && styles.botaoOff]}>
+          <Text style={styles.botaoTexto}>{mutation.isPending ? 'Salvando...' : 'Salvar data'}</Text>
+        </Pressable>
+      </View>
+    </> : <Text style={styles.historicoFase}>{atual || 'Não definida'}</Text>}
+  </View>;
+}
+
 /** Data com calendário nativo (Android/iOS); no navegador, campo dd/mm/aaaa validado ao salvar. */
-function CampoData({ valor, onChange }: { valor: string; onChange: (valor: string) => void }) {
+function CampoData({ valor, onChange, rotulo = 'Data em que a fase começou', ateHoje = true }: { valor: string; onChange: (valor: string) => void; rotulo?: string; ateHoje?: boolean }) {
   const [aberto, setAberto] = useState(false);
   const [rascunho, setRascunho] = useState(() => brParaDate(valor) ?? new Date());
   if (Platform.OS === 'web') {
-    return <TextInput accessibilityLabel="Data em que a fase começou" value={valor} onChangeText={onChange} placeholder="dd/mm/aaaa" placeholderTextColor={colors.textMuted} maxLength={10} style={styles.input} />;
+    return <TextInput accessibilityLabel={rotulo} value={valor} onChangeText={onChange} placeholder="dd/mm/aaaa" placeholderTextColor={colors.textMuted} maxLength={10} style={styles.input} />;
   }
   const mudar = (event: DateTimePickerEvent, date?: Date) => {
     if (event.type === 'dismissed') { setAberto(false); return; }
@@ -173,13 +218,13 @@ function CampoData({ valor, onChange }: { valor: string; onChange: (valor: strin
     if (Platform.OS === 'android') { onChange(dateParaBr(date)); setAberto(false); } else setRascunho(date);
   };
   return <>
-    <Pressable accessibilityRole="button" accessibilityLabel={`Data em que a fase começou: ${valor}`} style={styles.dataCampo} onPress={() => { setRascunho(brParaDate(valor) ?? new Date()); setAberto(true); }}>
-      <Text style={styles.dataTexto}>{valor}{valor === hojeBr() ? ' (hoje)' : ''}</Text>
+    <Pressable accessibilityRole="button" accessibilityLabel={`${rotulo}: ${valor || 'não definida'}`} style={styles.dataCampo} onPress={() => { setRascunho(brParaDate(valor) ?? new Date()); setAberto(true); }}>
+      <Text style={valor ? styles.dataTexto : styles.dataVazia}>{valor ? `${valor}${valor === hojeBr() ? ' (hoje)' : ''}` : 'dd/mm/aaaa'}</Text>
       <Ionicons name="calendar-outline" size={19} color={colors.brandBlue} />
     </Pressable>
-    {aberto && Platform.OS === 'android' ? <DateTimePicker value={rascunho} mode="date" display="calendar" maximumDate={new Date()} onChange={mudar} /> : null}
+    {aberto && Platform.OS === 'android' ? <DateTimePicker value={rascunho} mode="date" display="calendar" maximumDate={ateHoje ? new Date() : undefined} onChange={mudar} /> : null}
     {Platform.OS === 'ios' && aberto ? <View style={styles.iosPicker}>
-      <DateTimePicker value={rascunho} mode="date" display="inline" locale="pt-BR" maximumDate={new Date()} onChange={mudar} />
+      <DateTimePicker value={rascunho} mode="date" display="inline" locale="pt-BR" maximumDate={ateHoje ? new Date() : undefined} onChange={mudar} />
       <View style={styles.iosAcoes}>
         <Pressable accessibilityRole="button" style={styles.secundario} onPress={() => setAberto(false)}><Text style={styles.secundarioTexto}>Cancelar</Text></Pressable>
         <Pressable accessibilityRole="button" style={styles.botaoPequeno} onPress={() => { onChange(dateParaBr(rascunho)); setAberto(false); }}><Text style={styles.botaoTexto}>Confirmar</Text></Pressable>
@@ -246,6 +291,10 @@ const styles = StyleSheet.create({
   inputMulti: { minHeight: 72, paddingTop: 10, textAlignVertical: 'top' },
   dataCampo: { minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: colors.borderDefault, borderRadius: radius.sm, paddingHorizontal: 12 },
   dataTexto: { ...typography.bodySmall, fontSize: 15, color: colors.textHeading },
+  dataVazia: { ...typography.bodySmall, fontSize: 15, color: colors.textMuted },
+  multiplicacao: { gap: 8, borderTopWidth: 1, borderColor: colors.borderSubtle, paddingTop: 12 },
+  multiplicacaoAcoes: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8 },
+  ok: { ...typography.caption, color: '#047857', fontWeight: '700' },
   iosPicker: { gap: 8 },
   iosAcoes: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8 },
   linkLinha: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start' },

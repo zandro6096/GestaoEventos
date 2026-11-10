@@ -27,6 +27,8 @@ export type FaseEvento = {
   historico: FaseHistorico[];
   /** Quem está logado pode registrar mudança de fase. */
   podeAlterar: boolean;
+  /** Data prevista para multiplicar (AAAA-MM-DD...), se definida. */
+  multiplicacaoPrevista?: string | null;
 };
 
 export type FaseUso = { nome: string; eventosEmUso: number };
@@ -53,6 +55,12 @@ export const fasesApi = {
 
   async registrar(eventoId: number, request: RegistrarFaseRequest): Promise<FaseEvento> {
     const response = await httpClient.post(apiRoute(`/api/eventos/${eventoId}/fase`), toSnakeCase(request));
+    return unwrap<FaseEvento>(response.data);
+  },
+
+  /** `data` em AAAA-MM-DD; nulo limpa a data prevista. */
+  async definirMultiplicacao(eventoId: number, data: string | null): Promise<FaseEvento> {
+    const response = await httpClient.put(apiRoute(`/api/eventos/${eventoId}/multiplicacao`), { data });
     return unwrap<FaseEvento>(response.data);
   },
 
