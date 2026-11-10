@@ -31,7 +31,7 @@ using (var doc = SpreadsheetDocument.Open(outputPath, isEditable: true))
 
     // 1) Células avulsas no nível do arquivo.
     foreach (var c in mapping.Cells)
-        filler.Write(c.Sheet, c.Cell, Data.Resolve(dataDoc.RootElement, c.Field), c.Type);
+        filler.Write(c.Sheet, c.Cell, Data.Resolve(dataDoc.RootElement, c.Field) ?? c.Fallback, c.Type);
 
     // 2) Slots de Grupo: cada Grupo ocupa uma aba-slot fixa do modelo.
     var gs = mapping.GroupSlots;
@@ -57,7 +57,13 @@ using (var doc = SpreadsheetDocument.Open(outputPath, isEditable: true))
         {
             // Slot vazio: fórmulas do resumo tratam como célula inexistente; a aba fica oculta
             // para não exibir o nome de aba herdado do modelo.
-            if (gs.HideUnusedSlots) filler.Hide(sheet);
+            if (gs.EmptySlotName is not null)
+            {
+                // Como no modelo original ("Celula 7"): a aba fica visível, vazia, com nome genérico.
+                var generico = gs.EmptySlotName.Replace("{n}", (i + 1).ToString(CultureInfo.InvariantCulture));
+                if (generico != sheet) renames[sheet] = generico;
+            }
+            else if (gs.HideUnusedSlots) filler.Hide(sheet);
             continue;
         }
 
@@ -83,6 +89,10 @@ using (var doc = SpreadsheetDocument.Open(outputPath, isEditable: true))
 
     // 3) Renomear abas reescrevendo referências em fórmulas, validações, formatação condicional e nomes definidos.
     filler.RenameSheets(renames);
+
+    // 3a) Abas-slot na mesma ordem das linhas do resumo (só trocam de lugar entre si; as demais abas não se movem).
+    if (gs.OrderSlotTabs)
+        filler.OrderSlotTabs(gs.Sheets.Select(n => renames.GetValueOrDefault(n, n)).ToList());
 
     // 3b) Aba que abre primeiro. O Excel reexibe uma aba oculta se ela for a ativa.
     filler.SetActiveSheet(mapping.OpenOnSheet);
@@ -124,6 +134,10 @@ sealed class Filler(SpreadsheetDocument doc, Report report)
         var raw = value is JsonElement je ? je.ToString() : value.ToString()!;
         if (string.IsNullOrEmpty(raw)) return;
         cell.InlineString = null; cell.CellValue = null;
+        // Valor que não é do tipo esperado (ex.: "-" como padrão numa célula de data) é gravado como texto.
+        if (type == "date" && !DateTime.TryParse(raw, CultureInfo.InvariantCulture, DateTimeStyles.None, out _)) type = null;
+        if (type == "time" && !TimeSpan.TryParse(raw, CultureInfo.InvariantCulture, out _)) type = null;
+        if (type == "number" && !double.TryParse(raw, NumberStyles.Any, CultureInfo.InvariantCulture, out _)) type = null;
         switch (type)
         {
             case "date":
@@ -182,6 +196,25 @@ sealed class Filler(SpreadsheetDocument doc, Report report)
         var s = doc.WorkbookPart!.Workbook.Sheets!.Elements<Sheet>().First(x => x.Name!.Value == sheet);
         s.State = SheetStateValues.Hidden;
         report.Info($"Aba-slot '{sheet}' sem Grupo: oculta.");
+    }
+
+    public void OrderSlotTabs(List<string> ordem)
+    {
+        var sheetsEl = doc.WorkbookPart!.Workbook.Sheets!;
+        var todas = sheetsEl.Elements<Sheet>().ToList();
+        var posicoes = todas.Select((s, i) => (s, i)).Where(x => ordem.Contains(x.s.Name!.Value!)).Select(x => x.i).ToList();
+        var definidos = doc.WorkbookPart.Workbook.DefinedNames?.Elements<DefinedName>().Where(d => d.LocalSheetId is not null).ToList() ?? [];
+        if (definidos.Any(d => posicoes.Contains((int)d.LocalSheetId!.Value)))
+        {
+            report.Warn("Nome definido local em aba-slot: ordem das abas mantida.");
+            return;
+        }
+        var ordenadas = ordem.Select(n => todas.First(s => s.Name!.Value == n)).ToList();
+        var novaLista = todas.ToList();
+        for (var k = 0; k < posicoes.Count; k++) novaLista[posicoes[k]] = ordenadas[k];
+        foreach (var s in todas) s.Remove();
+        foreach (var s in novaLista) sheetsEl.AppendChild(s);
+        report.Info("Abas de grupo ordenadas como o resumo.");
     }
 
     public void SetActiveSheet(string? preferred)
@@ -304,6 +337,12 @@ static class Data
         var cur = root;
         foreach (var seg in path.Split('.'))
         {
+            if (cur.ValueKind == JsonValueKind.Array && int.TryParse(seg, out var idx))
+            {
+                if (idx < 0 || idx >= cur.GetArrayLength()) return null;
+                cur = cur[idx];
+                continue;
+            }
             if (cur.ValueKind != JsonValueKind.Object || !cur.TryGetProperty(seg, out cur)) return null;
         }
         return cur.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined ? null : cur;
@@ -330,11 +369,11 @@ sealed class Report
 // --- Configuração de mapeamento (rascunho do formato da Story 1.2) ---------------------------
 
 sealed record Mapping(string Template, List<CellMap> Cells, GroupSlots GroupSlots, string? OpenOnSheet = null);
-sealed record CellMap(string Sheet, string Cell, string Field, string? Type = null);
+sealed record CellMap(string Sheet, string Cell, string Field, string? Type = null, string? Fallback = null);
 sealed record SlotCellMap(string Cell, string Field, string? Type = null);
 sealed record ColumnMap(string Field, string? Type = null);
 sealed record GroupSlots(string Source, List<string> Sheets, string? RenameSheetFrom, List<SlotCellMap> Cells, List<RowBlock> RowBlocks,
-    bool HideUnusedSlots = true);
+    bool HideUnusedSlots = true, string? EmptySlotName = null, bool OrderSlotTabs = false);
 sealed record RowBlock(string Name, string Source, int FirstRow, int Capacity, ColumnRange ClearColumns,
     Dictionary<string, string>? Filter, Dictionary<string, ColumnMap> Columns);
 sealed record ColumnRange(string From, string To)

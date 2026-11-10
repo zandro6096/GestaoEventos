@@ -67,15 +67,24 @@ SIGLAS_ACOMP = {"dizimista": ("DZ", "SN"), "batismo": ("B", "SN"), "encontro_com
                 "curso_maturidade": ("ME", "CA"), "curso_lideranca_treinamento": ("CTL", "CA")}
 
 
+PARTICULAS = {"de", "da", "do", "das", "dos", "e"}
+
+
+def nome_curto(nome):
+    """Como o Daniel escreve nas abas: os dois primeiros nomes, sem partículas ("Ana Clara De Oliveira" -> "Ana Clara")."""
+    partes = [p for p in (nome or "").split() if p.lower() not in PARTICULAS]
+    return " ".join(partes[:2]) if partes else (nome or "")
+
+
 def sigla_acomp(escala, status, valor):
     if escala == "SN":
-        return None if valor is None else ("S" if valor else "N")
+        return "S" if valor else None
     if status in ("concluido",):
         return "S" if escala == "SNA" else "C"
     if status in ("em_andamento", "iniciado"):
         return "A"
     if status in ("nao_iniciado", "cancelado"):
-        return "N" if escala == "SNA" else None
+        return None
     return None
 
 
@@ -132,7 +141,7 @@ def carregar_anjos(q, estrutura_id, pessoas, fim_mes):
                      and (pa.usuario_id in ({",".join(["%s"] * len(uids))}) or pa.usuario_virtual_id in ({",".join(["%s"] * len(vids))}))""",
                estrutura_id, fim_mes, fim_mes, *uids, *vids)
     for p in pessoas.values():
-        p["anjo"] = {"tem": "N", "nome": None}
+        p["anjo"] = {"tem": None, "nome": None}
     for r in linhas:
         k = chave(r)
         if k in pessoas:
@@ -290,14 +299,18 @@ def main():
 
         celula = sorted((e for e in eventos if tipo[e["id"]] == "celula"), key=lambda e: e["inicio_em"])
         principal = celula[0] if celula else eventos[0]
-        anfitriao = next((p["nome"] for p in pessoas.values() if p["funcao"] == "A"), None)
+        anfitriao = next((nome_curto(p["nome"]) for p in pessoas.values() if p["funcao"] == "A"), None)
+        # "Líder Trein." do Discipulador: data em que a célula passou a ter um líder em treinamento.
+        lt_datas = [desde[k] for k, p in pessoas.items() if p["funcao"] == "LT" and k in desde]
+        lt_desde = min(lt_datas).isoformat() if lt_datas else None
         horario = principal["horario"]
         if isinstance(horario, dt.timedelta):
             horario = f"{int(horario.total_seconds() // 3600):02d}:{int(horario.total_seconds() % 3600 // 60):02d}"
 
         lista = sorted(pessoas.values(), key=lambda p: (ORDEM_FUNCAO.get(p["funcao"], 4), p["nome"].lower()))
         saida["grupos"].append({
-            "grupo_id": g["id"], "nome": responsavel, "lider": responsavel, "anfitriao": anfitriao,
+            "grupo_id": g["id"], "nome": nome_curto(responsavel), "lider": nome_curto(responsavel), "lider_completo": responsavel,
+            "anfitriao": anfitriao, "lt_desde": lt_desde,
             "inicio": principal["inicio_em"].date().isoformat(), "multiplicacao": None,
             "fase": fase_atual, "data_comunhao": data_comunhao,
             "dia_semana": DIAS[principal["inicio_em"].weekday()], "horario": horario,
