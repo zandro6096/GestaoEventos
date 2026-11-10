@@ -26,7 +26,7 @@ export function RelatoriosMensaisScreen() {
         <View style={styles.pageHeader}>
           <Text style={styles.title}>Relatórios do mês</Text>
           <Text style={styles.subtitle}>
-            {modeloAtual ? `${modeloAtual.nome} · ${modeloAtual.grupoNome}` : 'Planilhas mensais preparadas para a sua estrutura.'}
+            {modeloAtual ? `${modeloAtual.nome}${state.rede ? ` · ${state.rede.nome}` : ''}` : 'Planilhas mensais preparadas para a sua estrutura.'}
           </Text>
         </View>
 
@@ -36,14 +36,16 @@ export function RelatoriosMensaisScreen() {
               const ativo = m.id === state.modeloId;
               return (
                 <Pressable key={m.id} accessibilityRole="tab" accessibilityState={{ selected: ativo }} style={[styles.chip, ativo && styles.chipOn]} onPress={() => state.escolherModelo(m.id)}>
-                  <Text style={[styles.chipText, ativo && styles.chipTextOn]}>{m.grupoNome || m.nome}</Text>
+                  <Text style={[styles.chipText, ativo && styles.chipTextOn]}>{m.nome}</Text>
                 </Pressable>
               );
             })}
           </View>
         ) : null}
 
-        {state.modelos.isLoading || state.meses.isLoading ? (
+        {modelos.length && (state.redes.data?.length ?? 0) > 0 ? <Filtros state={state} /> : null}
+
+        {state.modelos.isLoading || state.redes.isLoading || state.meses.isLoading ? (
           <View style={styles.estado}>
             <ActivityIndicator color={colors.brandBlue} />
             <Text style={styles.muted}>Conferindo os lançamentos de cada mês…</Text>
@@ -59,6 +61,16 @@ export function RelatoriosMensaisScreen() {
             <Ionicons name="cloud-offline-outline" size={28} color={colors.error} />
             <Text style={styles.estadoTitulo}>{state.erroMeses}</Text>
             <Pressable accessibilityRole="button" style={styles.btn2} onPress={() => void state.meses.refetch()}><Text style={styles.btn2Text}>Tentar de novo</Text></Pressable>
+          </View>
+        ) : !state.redes.data?.length ? (
+          <View style={styles.estado}>
+            <Ionicons name="people-outline" size={28} color={colors.textMuted} />
+            <Text style={styles.estadoTitulo}>Nenhuma rede de células para você</Text>
+            <Text style={styles.muted}>O relatório aparece para quem cuida de uma rede com células cadastradas.</Text>
+          </View>
+        ) : !dados?.meses.length ? (
+          <View style={styles.estado}>
+            <Text style={styles.estadoTitulo}>Nenhum mês para esse filtro</Text>
           </View>
         ) : (
           <View style={styles.lista}>
@@ -87,6 +99,57 @@ export function RelatoriosMensaisScreen() {
       />
       <ProntaSheet arquivo={state.pronta} onFechar={state.fecharPronta} onSalvar={state.salvar} />
     </SafeAreaView>
+  );
+}
+
+const MESES_CURTOS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+function Chip({ rotulo, ativo, onPress, acessivel }: { rotulo: string; ativo: boolean; onPress: () => void; acessivel?: string }) {
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={acessivel ?? rotulo} accessibilityState={{ selected: ativo }}
+      style={[styles.chip, ativo && styles.chipOn]} onPress={onPress}>
+      <Text style={[styles.chipText, ativo && styles.chipTextOn]} numberOfLines={1}>{rotulo}</Text>
+    </Pressable>
+  );
+}
+
+function Filtros({ state }: { state: ReturnType<typeof useRelatoriosMensais> }) {
+  const redes = state.redes.data ?? [];
+  const hoje = new Date();
+  const ultimoMes = state.ano === hoje.getFullYear() ? hoje.getMonth() + 1 : 12;
+  const [anoInicio, mesInicio] = (state.rede?.inicio ?? '').split('-').map(Number);
+  const primeiroMes = state.ano === anoInicio && mesInicio ? mesInicio : 1;
+  return (
+    <View style={styles.filtros}>
+      {redes.length > 1 ? (
+        <View style={styles.filtro}>
+          <Text style={styles.filtroRotulo}>Rede</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsLinha}>
+            {redes.map((r) => (
+              <Chip key={r.grupoId} rotulo={r.nome} acessivel={`Rede ${r.nome}, ${r.celulas} ${r.celulas === 1 ? 'célula' : 'células'}`}
+                ativo={r.grupoId === state.grupoId} onPress={() => state.escolherRede(r.grupoId)} />
+            ))}
+          </ScrollView>
+        </View>
+      ) : null}
+      <View style={styles.filtro}>
+        <Text style={styles.filtroRotulo}>Ano</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsLinha}>
+          {state.anosDisponiveis.map((a) => (
+            <Chip key={a} rotulo={String(a)} acessivel={`Ano ${a}`} ativo={a === state.ano} onPress={() => state.escolherAno(a)} />
+          ))}
+        </ScrollView>
+      </View>
+      <View style={styles.filtro}>
+        <Text style={styles.filtroRotulo}>Mês</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsLinha}>
+          <Chip rotulo="Todos" acessivel="Todos os meses" ativo={state.mes === null} onPress={() => state.escolherMes(null)} />
+          {Array.from({ length: Math.max(0, ultimoMes - primeiroMes + 1) }, (_, i) => ultimoMes - i).map((m) => (
+            <Chip key={m} rotulo={MESES_CURTOS[m - 1]} acessivel={`Mês ${MESES_CURTOS[m - 1]}`} ativo={state.mes === m} onPress={() => state.escolherMes(m)} />
+          ))}
+        </ScrollView>
+      </View>
+    </View>
   );
 }
 
@@ -254,6 +317,10 @@ const styles = StyleSheet.create({
   title: { ...typography.h3, color: colors.textHeading },
   subtitle: { ...typography.caption, color: colors.textSecondary },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  filtros: { gap: 10, padding: 12, borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.md, backgroundColor: colors.surfacePrimary },
+  filtro: { gap: 6 },
+  filtroRotulo: { ...typography.caption, fontWeight: '800', color: colors.textSecondary, letterSpacing: 0.4 },
+  chipsLinha: { flexDirection: 'row', gap: spacing.sm, paddingRight: spacing.sm },
   chip: { minHeight: 40, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius.full, borderWidth: 1, borderColor: colors.borderDefault, backgroundColor: colors.surfacePrimary },
   chipOn: { backgroundColor: colors.brandBlue, borderColor: colors.brandBlue },
   chipText: { ...typography.bodySmall, color: colors.textBody },

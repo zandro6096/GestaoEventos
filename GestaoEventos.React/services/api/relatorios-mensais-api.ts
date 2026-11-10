@@ -10,8 +10,17 @@ export type ModeloRelatorio = {
   id: number;
   nome: string;
   descricao?: string | null;
+};
+
+/** Rede de células (grupo cujos filhos são células): cada célula vira uma aba da planilha. */
+export type RedeRelatorio = {
   grupoId: number;
-  grupoNome: string;
+  nome: string;
+  responsavel?: string | null;
+  celulas: number;
+  /** Primeiro dia do mês do primeiro evento de célula (AAAA-MM-DD); antes disso não há relatório. */
+  inicio: string;
+  anoInicio: number;
 };
 
 export type ItemPendencia = { codigo: string; texto: string; ok: boolean };
@@ -34,7 +43,14 @@ export type MesRelatorio = {
   pendencias: PendenciaCelula[];
 };
 
-export type MesesRelatorio = { modelo: ModeloRelatorio; meses: MesRelatorio[] };
+export type MesesRelatorio = {
+  modelo: ModeloRelatorio;
+  rede?: RedeRelatorio | null;
+  /** Do mais recente para o mais antigo. */
+  anosDisponiveis: number[];
+  ano: number;
+  meses: MesRelatorio[];
+};
 
 export type ArquivoRelatorio = {
   nomeArquivo: string;
@@ -57,14 +73,24 @@ export const relatoriosMensaisApi = {
     return unwrap<{ itens: ModeloRelatorio[] }>(response.data).itens ?? [];
   },
 
-  async listarMeses(modeloId: number, quantidade = 4): Promise<MesesRelatorio> {
-    const response = await httpClient.get(apiRoute(`/api/relatorios-mensais/${modeloId}/meses`), { params: { quantidade } });
-    return unwrap<MesesRelatorio>(response.data);
+  async listarRedes(modeloId: number): Promise<RedeRelatorio[]> {
+    const response = await httpClient.get(apiRoute(`/api/relatorios-mensais/${modeloId}/redes`));
+    return unwrap<{ itens: RedeRelatorio[] }>(response.data).itens ?? [];
   },
 
-  async gerar(modeloId: number, ano: number, mes: number): Promise<ArquivoRelatorio> {
+  /** `mes` vazio = todos os meses do ano (até o atual). */
+  async listarMeses(modeloId: number, grupoId: number, ano: number | null, mes: number | null): Promise<MesesRelatorio> {
+    const params: Record<string, number> = { grupo_id: grupoId };
+    if (ano) params.ano = ano;
+    if (mes) params.mes = mes;
+    const response = await httpClient.get(apiRoute(`/api/relatorios-mensais/${modeloId}/meses`), { params, timeout: 60000 });
+    const data = unwrap<MesesRelatorio>(response.data);
+    return { ...data, anosDisponiveis: data.anosDisponiveis ?? [], meses: data.meses ?? [] };
+  },
+
+  async gerar(modeloId: number, grupoId: number, ano: number, mes: number): Promise<ArquivoRelatorio> {
     // A planilha é montada no servidor; pode levar alguns segundos.
-    const response = await httpClient.post(apiRoute(`/api/relatorios-mensais/${modeloId}/gerar`), toSnakeCase({ ano, mes }), { timeout: 60000 });
+    const response = await httpClient.post(apiRoute(`/api/relatorios-mensais/${modeloId}/gerar`), toSnakeCase({ grupoId, ano, mes }), { timeout: 60000 });
     // Não converter o conteúdo base64 (só as chaves): toCamelCase só mexe em chaves.
     return unwrap<ArquivoRelatorio>(response.data);
   },
