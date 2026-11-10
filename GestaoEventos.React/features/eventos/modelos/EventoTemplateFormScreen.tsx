@@ -171,11 +171,13 @@ export function EventoTemplateFormScreen() {
     enabled: editing && allowed,
     retry: false,
   });
-  useEffect(() => {
-    if (!fasesQuery.data) return;
+  // Carrega as fases do modelo quando a consulta responde (ajuste de estado na renderização, sem efeito).
+  const [fasesCarregadas, setFasesCarregadas] = useState<string[] | null>(null);
+  if (fasesQuery.data && fasesQuery.data.fases !== fasesCarregadas) {
+    setFasesCarregadas(fasesQuery.data.fases);
     setFases(fasesQuery.data.fases);
     setFasesOriginais(fasesQuery.data.fases);
-  }, [fasesQuery.data]);
+  }
   const save = useMutation({
     mutationFn: async () => {
       const validation = validateDraft(draft);

@@ -22,6 +22,7 @@ type Props = { eventoId: number; dataReferencia: string };
 export function FaseChip({ eventoId, dataReferencia }: Props) {
   const query = useFaseEvento(eventoId);
   const [aberto, setAberto] = useState(false);
+  const [aberturas, setAberturas] = useState(0);
   const [aviso, setAviso] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export function FaseChip({ eventoId, dataReferencia }: Props) {
   if (!naData && !info.podeAlterar) return null;
 
   const rotulo = naData?.fase ?? 'Definir fase';
-  const abrir = () => { track('entrance', 'acompanhar_evento:fase_abrir'); setAberto(true); };
+  const abrir = () => { track('entrance', 'acompanhar_evento:fase_abrir'); setAberturas((n) => n + 1); setAberto(true); };
 
   return <>
     <Pressable
@@ -50,7 +51,7 @@ export function FaseChip({ eventoId, dataReferencia }: Props) {
       <Ionicons name="chevron-down" size={13} color={colors.brandBlue} />
     </Pressable>
     {aviso ? <View accessibilityLiveRegion="polite" style={styles.aviso}><Ionicons name="checkmark-circle" size={14} color="#047857" /><Text style={styles.avisoText}>{aviso}</Text></View> : null}
-    <FaseSheet visivel={aberto} info={info} eventoId={eventoId} onFechar={() => setAberto(false)} onSalvo={(fase) => { setAberto(false); setAviso(`Fase alterada para ${fase}`); }} />
+    <FaseSheet key={aberturas} visivel={aberto} info={info} eventoId={eventoId} onFechar={() => setAberto(false)} onSalvo={(fase) => { setAberto(false); setAviso(`Fase alterada para ${fase}`); }} />
   </>;
 }
 
@@ -66,20 +67,12 @@ export function FaseAtualNota({ eventoId, dataReferencia }: Props) {
 function FaseSheet({ visivel, info, eventoId, onFechar, onSalvo }: { visivel: boolean; info: FaseEvento; eventoId: number; onFechar: () => void; onSalvo: (fase: string) => void }) {
   const queryClient = useQueryClient();
   const atual = info.atual?.fase ?? null;
-  const [fase, setFase] = useState<string | null>(null);
+  const [fase, setFase] = useState<string | null>(() => proximaFase(info.opcoes, atual));
   const [data, setData] = useState(hojeBr());
   const [comObservacao, setComObservacao] = useState(false);
   const [observacao, setObservacao] = useState('');
   const [erroData, setErroData] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!visivel) return;
-    setFase(proximaFase(info.opcoes, atual));
-    setData(hojeBr());
-    setComObservacao(false);
-    setObservacao('');
-    setErroData(null);
-  }, [visivel, info.opcoes, atual]);
 
   const mutation = useMutation({
     mutationFn: (vigenteDesde: string) => fasesApi.registrar(eventoId, { fase: fase ?? '', vigenteDesde, observacao: observacao.trim() || null }),
@@ -169,7 +162,8 @@ function MultiplicacaoPrevista({ info, eventoId }: { info: FaseEvento; eventoId:
   const [data, setData] = useState(atual);
   const [erro, setErro] = useState<string | null>(null);
   const [salvo, setSalvo] = useState(false);
-  useEffect(() => { setData(atual); }, [atual]);
+  const [atualVisto, setAtualVisto] = useState(atual);
+  if (atual !== atualVisto) { setAtualVisto(atual); setData(atual); }
 
   const mutation = useMutation({
     mutationFn: (iso: string | null) => fasesApi.definirMultiplicacao(eventoId, iso),

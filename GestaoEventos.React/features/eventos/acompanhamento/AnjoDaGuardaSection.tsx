@@ -22,6 +22,7 @@ export function AnjoDaGuardaSection({ estruturaId, participante, candidatos }: P
   const queryClient = useQueryClient();
   const query = useQuery({ queryKey: chave, queryFn: () => anjoApi.obter(estruturaId, pessoa), enabled: estruturaId > 0, retry: false });
   const [escolhendo, setEscolhendo] = useState(false);
+  const [aberturas, setAberturas] = useState(0);
   const [verHistorico, setVerHistorico] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
 
@@ -42,19 +43,21 @@ export function AnjoDaGuardaSection({ estruturaId, participante, candidatos }: P
   });
 
   // Pessoas do evento que podem ser anjo: sem a própria pessoa e sem repetir quem aparece mais de uma vez.
+  const usuarioId = pessoa.usuarioId;
+  const usuarioVirtualId = pessoa.usuarioVirtualId;
   const opcoes = useMemo(() => {
     const vistos = new Set<string>();
     return candidatos.filter((c) => {
       const k = c.usuarioId ? `u${c.usuarioId}` : `v${c.usuarioVirtualId}`;
-      if (vistos.has(k) || mesmaPessoa(ref(c), pessoa)) return false;
+      if (vistos.has(k) || mesmaPessoa(ref(c), { usuarioId, usuarioVirtualId })) return false;
       vistos.add(k);
       return true;
     });
-  }, [candidatos, pessoa.usuarioId, pessoa.usuarioVirtualId]);
+  }, [candidatos, usuarioId, usuarioVirtualId]);
 
   const info = query.data;
   const atual = info?.atual ?? null;
-  const abrir = () => { track('entrance', 'participante:anjo_abrir'); mutation.reset(); setEscolhendo(true); };
+  const abrir = () => { track('entrance', 'participante:anjo_abrir'); mutation.reset(); setAberturas((n) => n + 1); setEscolhendo(true); };
 
   return <View style={styles.secao}>
     <View style={styles.titulo}><Ionicons name="shield-outline" size={18} color={colors.brandBlue} /><Text style={styles.tituloTexto}>Anjo da guarda</Text></View>
@@ -81,6 +84,7 @@ export function AnjoDaGuardaSection({ estruturaId, participante, candidatos }: P
     </>}
 
     <SeletorAnjo
+      key={aberturas}
       visivel={escolhendo}
       nomePessoa={nomeDe(participante)}
       opcoes={opcoes}
@@ -99,7 +103,6 @@ function SeletorAnjo({ visivel, nomePessoa, opcoes, atual, temAtual, salvando, e
   erro: string | null; onEscolher: (anjo: Participante | null) => void; onFechar: () => void;
 }) {
   const [busca, setBusca] = useState('');
-  useEffect(() => { if (visivel) setBusca(''); }, [visivel]);
   const filtradas = opcoes.filter((o) => nomeDe(o).toLowerCase().includes(busca.trim().toLowerCase()));
   const primeiroNome = nomePessoa.split(' ')[0];
 

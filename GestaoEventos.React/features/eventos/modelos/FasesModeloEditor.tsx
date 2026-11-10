@@ -59,7 +59,7 @@ export function FasesModeloEditor({ value, onChange, uso }: Props) {
     {confirmarRemocao ? <View accessibilityRole="alert" style={styles.aviso}>
       <Ionicons name="warning-outline" size={20} color="#B45309" />
       <View style={styles.flex}>
-        <Text style={styles.avisoTitulo}>"{confirmarRemocao}" está em uso em {emUso(confirmarRemocao)} {emUso(confirmarRemocao) === 1 ? 'evento' : 'eventos'}</Text>
+        <Text style={styles.avisoTitulo}>“{confirmarRemocao}” está em uso em {emUso(confirmarRemocao)} {emUso(confirmarRemocao) === 1 ? 'evento' : 'eventos'}</Text>
         <Text style={styles.avisoTexto}>Ela some das opções, mas o histórico e os relatórios antigos continuam mostrando essa fase.</Text>
         <View style={styles.avisoAcoes}>
           <Pressable accessibilityRole="button" style={styles.avisoManter} onPress={() => setConfirmarRemocao(null)}><Text style={styles.avisoManterTexto}>Manter fase</Text></Pressable>
