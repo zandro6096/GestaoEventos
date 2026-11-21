@@ -34,3 +34,18 @@ O motor de notificações deve usar o fim da ocorrência como referência, ignor
 ocorrências canceladas e encerrar a cobrança quando o registro de presença for
 salvo. O próximo passo deve criar notificações idempotentes para o responsável
 e para o superior, com payload para abrir a pendência ou a lista filtrada.
+
+## Push de resumo de pendências
+
+- O responsável recebe o resumo do grupo pelo qual responde e dos grupos abaixo
+  dele na mesma ramificação.
+- Ser `Owner` não amplia o push para todos os grupos da estrutura. O Owner só
+  recebe o resumo das ramificações em que também está atribuído como responsável;
+  outras ramificações ficam com seus responsáveis.
+- Os jobs da manhã e da noite compartilham uma janela mínima de 7 dias por
+  usuário, evitando que a mesma fila de pendências gere push diário ou dois
+  pushes no mesmo dia. A lista de pendências no app continua disponível durante
+  esse intervalo.
+- Push de evento recém-encerrado permanece separado desse resumo e não altera
+  essa janela. Para o Owner, esse push também respeita suas atribuições de grupo;
+  notificações pessoais de eventos em que ele participa continuam válidas.
