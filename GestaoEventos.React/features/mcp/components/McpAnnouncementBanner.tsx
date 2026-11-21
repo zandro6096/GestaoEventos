@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { track } from '../../../services/analytics/analytics.service';
 import { secureStorage } from '../../../services/platform/secure-storage';
@@ -17,7 +17,7 @@ export function McpAnnouncementBanner() {
 
   useEffect(() => {
     let active = true;
-    void secureStorage.getItem(DISMISSED_KEY).then((value) => {
+    void readDismissed().then((value) => {
       if (!active) return;
       setVisible(value !== 'true');
       setReady(true);
@@ -40,7 +40,7 @@ export function McpAnnouncementBanner() {
 
   function dismiss() {
     setVisible(false);
-    void secureStorage.setItem(DISMISSED_KEY, 'true');
+    void writeDismissed();
     track('confirmation', 'mcp:banner_dismiss');
   }
 
@@ -68,6 +68,31 @@ export function McpAnnouncementBanner() {
       </View>
     </View>
   );
+}
+
+async function readDismissed() {
+  if (Platform.OS === 'web') {
+    try {
+      return globalThis.localStorage?.getItem(`gestaoeventos.announcement.${DISMISSED_KEY}`) ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  return secureStorage.getItem(DISMISSED_KEY);
+}
+
+async function writeDismissed() {
+  if (Platform.OS === 'web') {
+    try {
+      globalThis.localStorage?.setItem(`gestaoeventos.announcement.${DISMISSED_KEY}`, 'true');
+    } catch {
+      // A dispensa visual não deve bloquear a navegação.
+    }
+    return;
+  }
+
+  await secureStorage.setItem(DISMISSED_KEY, 'true');
 }
 
 const styles = StyleSheet.create({
