@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -31,7 +32,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
     const page = await context.newPage();
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message));
-    await page.goto('http://localhost:8083/auth/login');
+    await page.goto(`${SMOKE_BASE_URL}/auth/login`);
     await page.getByText('Bem-vindo de volta', { exact: true }).waitFor();
 
     await context.setOffline(true);

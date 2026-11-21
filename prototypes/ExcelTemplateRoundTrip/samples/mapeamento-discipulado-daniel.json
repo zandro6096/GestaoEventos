@@ -1,0 +1,88 @@
+{
+  // Rascunho do formato da Configuração de mapeamento (Story 1.2).
+  // Modelo: Discipulado - DANIEL.xlsm. Abas-slot na ordem das linhas 13..27 da aba Discipulador.
+  "template": "discipulado-daniel",
+  "openOnSheet": "Discipulador",
+  "cells": [
+    { "sheet": "Discipulador", "cell": "M4", "field": "discipulador.nome" },
+    { "sheet": "Discipulador", "cell": "Y4", "field": "periodo.mes_nome" },
+    { "sheet": "Discipulador", "cell": "AX4", "field": "periodo.fim", "type": "date" },
+    { "sheet": "Discipulador", "cell": "G14", "field": "grupos.0.lt_desde", "type": "date", "fallback": "-" },
+    { "sheet": "Discipulador", "cell": "H14", "field": "constantes.nao_definido" },
+    { "sheet": "Discipulador", "cell": "G16", "field": "grupos.1.lt_desde", "type": "date", "fallback": "-" },
+    { "sheet": "Discipulador", "cell": "H16", "field": "constantes.nao_definido" },
+    { "sheet": "Discipulador", "cell": "G18", "field": "grupos.2.lt_desde", "type": "date", "fallback": "-" },
+    { "sheet": "Discipulador", "cell": "H18", "field": "constantes.nao_definido" },
+    { "sheet": "Discipulador", "cell": "G20", "field": "grupos.3.lt_desde", "type": "date", "fallback": "-" },
+    { "sheet": "Discipulador", "cell": "H20", "field": "constantes.nao_definido" },
+    { "sheet": "Discipulador", "cell": "G22", "field": "grupos.4.lt_desde", "type": "date", "fallback": "-" },
+    { "sheet": "Discipulador", "cell": "H22", "field": "constantes.nao_definido" },
+    { "sheet": "Discipulador", "cell": "G24", "field": "grupos.5.lt_desde", "type": "date", "fallback": "-" },
+    { "sheet": "Discipulador", "cell": "H24", "field": "constantes.nao_definido" },
+    { "sheet": "Discipulador", "cell": "G26", "field": "grupos.6.lt_desde", "type": "date", "fallback": "-" },
+    { "sheet": "Discipulador", "cell": "H26", "field": "constantes.nao_definido" },
+    { "sheet": "Discipulador", "cell": "G28", "field": "grupos.7.lt_desde", "type": "date", "fallback": "-" },
+    { "sheet": "Discipulador", "cell": "H28", "field": "constantes.nao_definido" },
+    { "sheet": "Calculo", "cell": "E15", "field": "destaque.celula" }
+  ],
+  "groupSlots": {
+    "source": "grupos",
+    "sheets": ["Rafael", "João", "Gabriel", "Vithor ", "Davi", "Gabrielly", "Celula 7", "Duda"],
+    "renameSheetFrom": "nome",
+    "emptySlotName": "Celula {n}",
+    "orderSlotTabs": true,
+    "cells": [
+      { "cell": "C3", "field": "lider" },
+      { "cell": "C4", "field": "anfitriao" },
+      { "cell": "C5", "field": "inicio", "type": "date" },
+      { "cell": "C6", "field": "multiplicacao", "type": "date" },
+      { "cell": "H3", "field": "dia_semana" },
+      { "cell": "H4", "field": "horario" },
+      { "cell": "Q3", "field": "fase" },
+      { "cell": "H6", "field": "nao_disponivel.evento_ponte" },
+      { "cell": "Q5", "field": "visitas_no_mes", "type": "number" },
+      { "cell": "Q6", "field": "nao_disponivel.visitas_evento_ponte" },
+      { "cell": "U3", "field": "alvos.0" },
+      { "cell": "U4", "field": "alvos.1" },
+      { "cell": "U5", "field": "alvos.2" },
+      { "cell": "U6", "field": "alvos.3" },
+      { "cell": "AA9", "field": "cultos_no_mes", "type": "number" },
+      { "cell": "AA10", "field": "reunioes_no_mes", "type": "number" }
+    ],
+    "rowBlocks": [
+      { "name": "membros", "source": "pessoas", "firstRow": 14, "capacity": 30,
+        "clearColumns": { "from": "B", "to": "Z" }, "filter": { "categoria": "membro" },
+        "columns": {
+          "B": { "field": "nome" }, "C": { "field": "nascimento", "type": "date" }, "E": { "field": "celular" }, "F": { "field": "funcao" },
+          "G": { "field": "anjo.tem" }, "H": { "field": "acompanhamentos.DZ" }, "I": { "field": "acompanhamentos.IE" }, "J": { "field": "acompanhamentos.Co" },
+          "L": { "field": "acompanhamentos.B" }, "N": { "field": "acompanhamentos.Ceif" }, "O": { "field": "acompanhamentos.ME" },
+          "P": { "field": "acompanhamentos.CTL" },
+          "Q": { "field": "presencas.s1_culto" }, "R": { "field": "presencas.s1_celula" },
+          "S": { "field": "presencas.s2_culto" }, "T": { "field": "presencas.s2_celula" },
+          "U": { "field": "presencas.s3_culto" }, "V": { "field": "presencas.s3_celula" },
+          "W": { "field": "presencas.s4_culto" }, "X": { "field": "presencas.s4_celula" },
+          "Y": { "field": "presencas.s5_culto" }, "Z": { "field": "presencas.s5_celula" } } },
+      { "name": "frequentadores", "source": "pessoas", "firstRow": 48, "capacity": 30,
+        "clearColumns": { "from": "B", "to": "Z" }, "filter": { "categoria": "frequentador" },
+        "columns": {
+          "B": { "field": "nome" }, "C": { "field": "nascimento", "type": "date" }, "E": { "field": "celular" }, "F": { "field": "funcao" },
+          "G": { "field": "anjo.tem" }, "H": { "field": "acompanhamentos.DZ" }, "I": { "field": "acompanhamentos.IE" }, "J": { "field": "acompanhamentos.Co" },
+          "L": { "field": "acompanhamentos.B" }, "N": { "field": "acompanhamentos.Ceif" }, "O": { "field": "acompanhamentos.ME" },
+          "P": { "field": "acompanhamentos.CTL" },
+          "Q": { "field": "presencas.s1_culto" }, "R": { "field": "presencas.s1_celula" },
+          "S": { "field": "presencas.s2_culto" }, "T": { "field": "presencas.s2_celula" },
+          "U": { "field": "presencas.s3_culto" }, "V": { "field": "presencas.s3_celula" },
+          "W": { "field": "presencas.s4_culto" }, "X": { "field": "presencas.s4_celula" },
+          "Y": { "field": "presencas.s5_culto" }, "Z": { "field": "presencas.s5_celula" } } },
+      { "name": "visitantes", "source": "pessoas", "firstRow": 82, "capacity": 30,
+        "clearColumns": { "from": "B", "to": "Z" }, "filter": { "categoria": "visitante" },
+        "columns": {
+          "B": { "field": "nome" }, "C": { "field": "nascimento", "type": "date" }, "E": { "field": "celular" }, "F": { "field": "funcao" },
+          "Q": { "field": "presencas.s1_culto" }, "R": { "field": "presencas.s1_celula" },
+          "S": { "field": "presencas.s2_culto" }, "T": { "field": "presencas.s2_celula" },
+          "U": { "field": "presencas.s3_culto" }, "V": { "field": "presencas.s3_celula" },
+          "W": { "field": "presencas.s4_culto" }, "X": { "field": "presencas.s4_celula" },
+          "Y": { "field": "presencas.s5_culto" }, "Z": { "field": "presencas.s5_celula" } } }
+    ]
+  }
+}

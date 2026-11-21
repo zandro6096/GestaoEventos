@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -21,7 +22,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         if (url.pathname.includes('/faltas')) data = [{ data: '2026-09-01', evento_titulo: 'Encontro mensal', motivo: 'Ausencia registrada', status: 'AUSENTE' }];
         await route.fulfill({ json: data });
       });
-      await page.goto('http://localhost:8083/admin/painel/cockpit');
+      await page.goto(`${SMOKE_BASE_URL}/admin/painel/cockpit`);
       await page.getByText('Cockpit operacional', { exact: true }).waitFor();
       await page.getByText('Matriz Pessoa x Template', { exact: true }).waitFor();
       await page.getByRole('button', { name: /Detalhes de faltas Pessoa acompanhada Encontro mensal/ }).click({ force: true });

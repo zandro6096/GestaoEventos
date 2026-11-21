@@ -14,6 +14,7 @@ import {
 import { can } from "../../services/permissions/permission.facade";
 import { useContextStore } from "../../stores/context.store";
 import { usePermissionStore } from "../../stores/permission.store";
+import { useModelosRelatorioMensal } from "../../features/relatorios/mensais/useRelatoriosMensais";
 import {
   layoutMetrics,
   primaryNavigationItems,
@@ -96,8 +97,8 @@ const moreMenuSections: MoreMenuSection[] = [
         href: "/admin/eventos/modelos",
         icon: "copy-outline",
         activeIcon: "copy",
-        action: "criar",
-        resource: "eventos",
+        action: "gerenciar",
+        resource: "configuracoes",
       },
       {
         key: "more-objetivos",
@@ -105,8 +106,8 @@ const moreMenuSections: MoreMenuSection[] = [
         href: "/admin/eventos/objetivos",
         icon: "locate-outline",
         activeIcon: "locate",
-        action: "criar",
-        resource: "eventos",
+        action: "gerenciar",
+        resource: "configuracoes",
       },
       {
         key: "more-iniciar-evento",
@@ -150,6 +151,15 @@ const moreMenuSections: MoreMenuSection[] = [
         action: "ler",
         resource: "relatorios",
       },
+      {
+        key: "more-relatorios-mensais",
+        label: "Relatórios do mês",
+        href: "/relatorios/mensais",
+        icon: "document-attach-outline",
+        activeIcon: "document-attach",
+        action: "ler",
+        resource: "jornada",
+      },
     ],
   },
   {
@@ -188,6 +198,16 @@ const moreMenuSections: MoreMenuSection[] = [
   },
 ];
 
+const relatoriosMensaisItem: NavigationItem = {
+  key: "relatorios-mensais",
+  label: "Relatórios do mês",
+  href: "/relatorios/mensais",
+  icon: "document-attach-outline",
+  activeIcon: "document-attach",
+  action: "ler",
+  resource: "jornada",
+};
+
 export function AppNavigation({ variant, notificationCount = 0 }: AppNavigationProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -198,9 +218,14 @@ export function AppNavigation({ variant, notificationCount = 0 }: AppNavigationP
   const primaryItems = primaryNavigationItems.filter((item) =>
     can(item.action, item.resource),
   );
-  const secondaryItems = secondaryNavigationItems.filter((item) =>
-    can(item.action, item.resource),
-  );
+  // "Relatórios do mês" só aparece para quem tem planilha publicada para a sua rede.
+  const temRelatorioMensal = (useModelosRelatorioMensal().data?.length ?? 0) > 0;
+  const visivel = (item: NavigationItem) =>
+    can(item.action, item.resource) && (item.key !== "more-relatorios-mensais" || temRelatorioMensal);
+  const secondaryItems = [
+    ...secondaryNavigationItems,
+    ...(temRelatorioMensal ? [relatoriosMensaisItem] : []),
+  ].filter((item) => can(item.action, item.resource));
 
   if (variant === "bottom") {
     const quickItems = primaryItems.filter(
@@ -209,7 +234,7 @@ export function AppNavigation({ variant, notificationCount = 0 }: AppNavigationP
     const visibleMoreSections = moreMenuSections
       .map((section) => ({
         ...section,
-        items: section.items.filter((item) => can(item.action, item.resource)),
+        items: section.items.filter(visivel),
       }))
       .filter((section) => section.items.length > 0);
     const navigate = (href: string) => {

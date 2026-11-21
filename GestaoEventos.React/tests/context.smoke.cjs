@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -17,10 +18,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         if (url.pathname === '/api/contexto/inicial') data = { data: { usuario_id: 3, usuario_nome: 'Pessoa de teste', estrutura_id: null, grupo_id: null, estrutura_nome: null, grupo_nome: null, tem_estrutura: true, estruturas: [{ id: 2, nome: 'Coaching Path', papel: 'Owner' }, { id: 3, nome: 'Segunda estrutura', papel: 'Membro' }] } };
         await route.fulfill({ json: data });
       });
-      await page.goto('http://localhost:8083/estrutura/selecionar');
+      await page.goto(`${SMOKE_BASE_URL}/estrutura/selecionar`);
       await page.getByText('Selecione uma estrutura', { exact: true }).waitFor();
       await page.getByText('Segunda estrutura', { exact: true }).click();
-      await page.getByText('Minha Jornada', { exact: true }).waitFor();
+      await page.waitForURL('**/admin/jornada');
+      await page.getByRole('tab', { name: 'Hoje', exact: true }).waitFor();
       assert.deepEqual(errors, []);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       console.log(`PASS ${width}px troca de estrutura e reidrata jornada`);

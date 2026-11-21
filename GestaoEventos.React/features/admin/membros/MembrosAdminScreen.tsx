@@ -20,6 +20,7 @@ import {
 } from "../../../shared/design/tokens";
 import { layoutMetrics } from "../../../shared/theme";
 import { useContextStore } from "../../../stores/context.store";
+import { AcompanhamentosParticipante } from "./AcompanhamentosParticipante";
 import {
   useAdminMembros,
   type AdminMember,
@@ -38,6 +39,7 @@ export function MembrosAdminScreen() {
   const compact = width < layoutMetrics.desktopBreakpoint;
   const state = useAdminMembros();
   const estruturaNome = useContextStore((store) => store.estruturaNome);
+  const estruturaId = useContextStore((store) => store.estruturaId);
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView
@@ -146,6 +148,7 @@ export function MembrosAdminScreen() {
               member={member}
               onAction={state.execute}
               disabled={state.isMutating}
+              estruturaId={estruturaId}
             />
           ))}
         </View>
@@ -180,10 +183,12 @@ function MemberRow({
   member,
   onAction,
   disabled,
+  estruturaId,
 }: {
   member: AdminMember;
   onAction: ReturnType<typeof useAdminMembros>["execute"];
   disabled: boolean;
+  estruturaId: number | null;
 }) {
   const [funcao, setFuncao] = useState(member.funcao ?? "");
   return (
@@ -224,6 +229,7 @@ function MemberRow({
       </View>
       {member.tipo === "usuario" && member.ativo ? (
         <>
+          {estruturaId ? <AcompanhamentosParticipante estruturaId={estruturaId} usuarioId={member.id} /> : null}
           <View style={styles.actions}>
             <Pressable
               disabled={disabled}

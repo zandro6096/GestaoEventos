@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { normalizeApiError } from '../../../services/api/api-error';
@@ -38,9 +38,20 @@ export function JornadaScreen() {
   const [selectedTarget, setSelectedTarget] = useState<JornadaActionTarget | null>(null);
   const [expandedPendenciaGrupoId, setExpandedPendenciaGrupoId] = useState<number | null>(null);
   const [pendenciaDetailTake, setPendenciaDetailTake] = useState(10);
+  const autoExpandedPendenciaScopes = useRef(new Set<string>());
   const [actionBlockedMessage, setActionBlockedMessage] = useState<string | null>(null);
   const pendenciaDetalheQuery = usePendenciasDetalhe(expandedPendenciaGrupoId, pendenciaDetailTake);
   const canOpenEvent = can('ler', 'eventos');
+
+  useEffect(() => {
+    const firstGrupo = jornada.pendenciasResumo?.grupos[0];
+    const scopeKey = `${jornada.usuarioId ?? 0}:${jornada.estruturaId ?? 0}:${jornada.grupoId ?? 'all'}`;
+    if (!compact || autoExpandedPendenciaScopes.current.has(scopeKey) || !firstGrupo || firstGrupo.total <= 0) return;
+
+    autoExpandedPendenciaScopes.current.add(scopeKey);
+    setPendenciaDetailTake(firstGrupo.total);
+    setExpandedPendenciaGrupoId(firstGrupo.grupoId);
+  }, [compact, jornada.estruturaId, jornada.grupoId, jornada.pendenciasResumo, jornada.usuarioId]);
 
   function selectTarget(target: JornadaActionTarget) {
     setActionBlockedMessage(null);
@@ -153,7 +164,7 @@ export function JornadaScreen() {
 
   return (
     <ScreenShell>
-      {compact && jornada.pendenciasResumo && jornada.pendenciasResumo.total > 0 ? (
+      {compact && activeView !== 'pendencias' && jornada.pendenciasResumo && jornada.pendenciasResumo.total > 0 ? (
         <PendenciasSection
           data={jornada.pendenciasResumo}
           status={jornada.pendenciasStatus}
@@ -161,8 +172,10 @@ export function JornadaScreen() {
           expandedGrupoId={expandedPendenciaGrupoId}
           detail={pendenciaDetalheQuery.data ?? null}
           detailsLoading={pendenciaDetalheQuery.isFetching}
+          detailsError={pendenciaDetalheQuery.isError ? normalizeApiError(pendenciaDetalheQuery.error, 'Nao foi possivel carregar as pendencias.').message : null}
           onToggle={togglePendenciaGrupo}
           onOpenItem={openPendenciaItem}
+          onRetryDetails={() => void pendenciaDetalheQuery.refetch()}
           onLoadMore={() => setPendenciaDetailTake((current) => current + 10)}
         />
       ) : null}
@@ -209,8 +222,10 @@ export function JornadaScreen() {
               expandedGrupoId={expandedPendenciaGrupoId}
               detail={pendenciaDetalheQuery.data ?? null}
               detailsLoading={pendenciaDetalheQuery.isFetching}
+              detailsError={pendenciaDetalheQuery.isError ? normalizeApiError(pendenciaDetalheQuery.error, 'Nao foi possivel carregar as pendencias.').message : null}
               onToggle={togglePendenciaGrupo}
               onOpenItem={openPendenciaItem}
+              onRetryDetails={() => void pendenciaDetalheQuery.refetch()}
               onLoadMore={() => setPendenciaDetailTake((current) => current + 10)}
             />
           ) : null}
@@ -369,8 +384,10 @@ function PendenciasSection({
   expandedGrupoId,
   detail,
   detailsLoading,
+  detailsError,
   onToggle,
   onOpenItem,
+  onRetryDetails,
   onLoadMore,
 }: {
   data: JornadaPendenciasResumo | null;
@@ -379,12 +396,16 @@ function PendenciasSection({
   expandedGrupoId: number | null;
   detail: JornadaPendenciasDetalhe | null;
   detailsLoading: boolean;
+  detailsError: string | null;
   onToggle: (grupoId: number) => void;
   onOpenItem: (item: JornadaPendenciasDetalhe['itens'][number]) => void;
+  onRetryDetails: () => void;
   onLoadMore: () => void;
 }) {
   const { width } = useWindowDimensions();
   const compact = width < layoutMetrics.desktopBreakpoint;
+  const groupLimit = compact ? 4 : 8;
+  const [showAllGroups, setShowAllGroups] = useState(false);
 
   const state = (
     <SectionState status={status} empty={!data || data.total === 0} emptyMessage="Nenhuma pendencia aberta." onRetry={onRetry}>
@@ -404,7 +425,7 @@ function PendenciasSection({
             </View>
           ) : null}
           <View style={styles.pendencyGroups}>
-            {data.grupos.slice(0, compact ? 4 : 8).map((grupo) => {
+            {(showAllGroups ? data.grupos : data.grupos.slice(0, groupLimit)).map((grupo) => {
               const isExpanded = expandedGrupoId === grupo.grupoId;
               const grupoDetail = isExpanded ? detail : null;
               const grupoTemAtrasadas = grupo.atrasadas > 0;
@@ -434,7 +455,15 @@ function PendenciasSection({
                   {isExpanded ? (
                     <View style={compact ? styles.mobilePendencyDetails : styles.pendencyDetails}>
                       {detailsLoading ? <Text style={styles.detailMeta}>Carregando...</Text> : null}
-                      {!detailsLoading && !grupoDetail?.itens.length ? <Text style={styles.detailMeta}>Nenhuma pendencia encontrada.</Text> : null}
+                      {!detailsLoading && detailsError ? (
+                        <View>
+                          <Text style={styles.detailMeta}>{detailsError}</Text>
+                          <Pressable accessibilityRole="button" style={styles.pendencyMoreButton} onPress={onRetryDetails}>
+                            <Text style={styles.pendencyMoreText}>Tentar novamente</Text>
+                          </Pressable>
+                        </View>
+                      ) : null}
+                      {!detailsLoading && !detailsError && !grupoDetail?.itens.length ? <Text style={styles.detailMeta}>Nenhuma pendencia encontrada.</Text> : null}
                       {grupoDetail?.itens.map((item, index) => {
                         const tone = getPendingItemTone(item.dataHora);
                         return (
@@ -473,6 +502,11 @@ function PendenciasSection({
                 </View>
               );
             })}
+            {data.grupos.length > groupLimit ? (
+              <Pressable accessibilityRole="button" accessibilityLabel={showAllGroups ? 'Mostrar menos grupos' : 'Mostrar todos os grupos com pendencia'} style={styles.pendencyMoreButton} onPress={() => setShowAllGroups((value) => !value)}>
+                <Text style={styles.pendencyMoreText}>{showAllGroups ? 'Ver menos' : `Ver mais ${data.grupos.length - groupLimit} grupo(s)`}</Text>
+              </Pressable>
+            ) : null}
           </View>
         </View>
       ) : null}

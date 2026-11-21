@@ -35,6 +35,7 @@ const api = read('services/api/eventos-api.ts');
 const service = read('features/eventos/meus-eventos/services/meus-eventos.service.ts');
 const hook = read('features/eventos/meus-eventos/hooks/useMeusEventos.ts');
 const screen = read('features/eventos/meus-eventos/screens/MeusEventosScreen.tsx');
+const acompanhamentoScreen = read('features/eventos/acompanhamento/AcompanhamentoScreen.tsx');
 const ocorrenciasApi = read('services/api/ocorrencias-api.ts');
 const publicRoute = read('app/(app)/eventos/meus.tsx');
 const adminRoute = read('app/(app)/admin/eventos/meus.tsx');
@@ -98,7 +99,7 @@ assert(hook.includes('gruposApi.list'), 'meus eventos hook must load group optio
 assert(ocorrenciasApi.includes('ciclosCache'), 'event cycles API must keep an in-memory request cache');
 assert(ocorrenciasApi.includes('ciclosCache.get(eventoId)'), 'event cycles API must reuse requests by event');
 
-for (const label of ['Meus Eventos', 'Acompanhar', 'Futuros', 'Historico', 'Cancelar', 'Confirmar visita']) {
+for (const label of ['Meus Eventos', 'Acompanhar', 'Futuros', 'Historico', 'Confirmar visita']) {
   assert(screen.includes(label), `MeusEventosScreen must render label: ${label}`);
 }
 
@@ -109,7 +110,9 @@ assert(screen.includes('empty'), 'MeusEventosScreen must represent empty state')
 assert(screen.includes('error'), 'MeusEventosScreen must represent error state');
 assert(screen.includes('router.push'), 'MeusEventosScreen must navigate to event flows');
 assert(screen.includes('handleConfirmVisit'), 'MeusEventosScreen must expose confirm visit action');
-assert(screen.includes('handleCancelOccurrence'), 'MeusEventosScreen must expose cancel action');
+assert(!screen.includes('Cancelar ocorrencia'), 'MeusEventosScreen must not expose cancellation in the listing');
+assert(acompanhamentoScreen.includes('label="Cancelar evento"'), 'event follow-up screen must expose cancellation after selecting an occurrence');
+assert(acompanhamentoScreen.includes('Motivo do cancelamento (obrigatorio)'), 'event follow-up cancellation must require a reason');
 assert(screen.includes('Escolha um grupo para continuar'), 'MeusEventosScreen must request group selection for broad contexts');
 assert(screen.includes('minHeight: 44'), 'MeusEventosScreen buttons must keep touch target floor');
 assert(!screen.includes('horizontal={true}'), 'MeusEventosScreen must not rely on wide horizontal table scrolling');

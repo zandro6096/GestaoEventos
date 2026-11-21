@@ -6,17 +6,20 @@ import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, Text
 import { adminApi } from '../../../services/api/admin-api';
 import { colors, radius, spacing, typography } from '../../../shared/design/tokens';
 import type { Participante } from '../../../services/api/participantes-evento-api';
+import { AnjoDaGuardaSection } from './AnjoDaGuardaSection';
 
 type Props = {
   participante: Participante | null;
   estruturaId: number;
+  /** Pessoas do evento que podem ser escolhidas como anjo da guarda. */
+  candidatos?: Participante[];
   pending: boolean;
   error: string | null;
   onClose: () => void;
   onSave: (values: { nome: string; email: string | null; telefone: string | null; dataNascimento: string | null; papelIds: number[]; papelPrincipalId: number | null }) => void;
 };
 
-export function EditarParticipantePanel({ participante, estruturaId, pending, error, onClose, onSave }: Props) {
+export function EditarParticipantePanel({ participante, estruturaId, candidatos = [], pending, error, onClose, onSave }: Props) {
   const [nome, setNome] = useState(() => participante?.nomeExibicao || participante?.nome || '');
   const [email, setEmail] = useState(() => participante?.email ?? '');
   const [telefone, setTelefone] = useState(() => participante?.telefone ?? '');
@@ -46,6 +49,7 @@ export function EditarParticipantePanel({ participante, estruturaId, pending, er
         <Text style={styles.label}>Telefone</Text><TextInput accessibilityLabel="Telefone do participante" value={telefone} onChangeText={setTelefone} keyboardType="phone-pad" style={styles.input} />
         <Text style={styles.label}>Data de nascimento</Text><TextInput accessibilityLabel="Data de nascimento do participante" value={dataNascimento} onChangeText={(value) => setDataNascimento(formatDateInput(value))} placeholder="DD/MM/AAAA" keyboardType="numeric" maxLength={10} style={styles.input} />
         <View style={styles.roleSection}><Text style={styles.label}>Papéis na estrutura</Text>{papeis.isLoading ? <ActivityIndicator color={colors.brandBlue} /> : papeis.data?.map((papel) => <Pressable key={papel.id} accessibilityRole="checkbox" accessibilityState={{ checked: papelIds.includes(papel.id) }} style={styles.roleRow} onPress={() => togglePapel(papel.id)}><Ionicons name={papelIds.includes(papel.id) ? 'checkbox' : 'square-outline'} size={21} color={colors.brandBlue} /><Text style={styles.roleName}>{papel.nome}</Text>{papelIds.includes(papel.id) ? <Pressable accessibilityRole="radio" accessibilityState={{ checked: papelPrincipalId === papel.id }} onPress={() => setPapelPrincipalId(papel.id)}><Text style={styles.primaryRole}>{papelPrincipalId === papel.id ? 'Principal' : 'Definir principal'}</Text></Pressable> : null}</Pressable>)}</View>
+        {participante && estruturaId > 0 ? <AnjoDaGuardaSection estruturaId={estruturaId} participante={participante} candidatos={candidatos} /> : null}
         {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
         <View style={styles.footer}><Pressable disabled={pending} style={styles.secondaryButton} onPress={onClose}><Text style={styles.secondaryText}>Cancelar</Text></Pressable><Pressable disabled={pending || !nome.trim()} style={[styles.primaryButton, (pending || !nome.trim()) && styles.disabled]} onPress={() => onSave({ nome: nome.trim(), email: email.trim() || null, telefone: telefone.trim() || null, dataNascimento: toIsoDate(dataNascimento), papelIds, papelPrincipalId })}><Ionicons name="save-outline" size={18} color={colors.surfacePrimary} /><Text style={styles.primaryText}>{pending ? 'Salvando...' : 'Salvar'}</Text></Pressable></View>
       </ScrollView>

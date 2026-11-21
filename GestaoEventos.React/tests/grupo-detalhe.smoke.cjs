@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -23,7 +24,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         if (url.pathname === '/api/ocorrencias') data = { data: [] };
         await route.fulfill({ json: data });
       });
-      await page.goto('http://localhost:8083/admin/grupos/2');
+      await page.goto(`${SMOKE_BASE_URL}/admin/grupos/2`);
       await page.getByText('Filhos', { exact: true }).waitFor();
       await page.getByText('Raiz / Filhos', { exact: true }).waitFor();
       await page.getByRole('button', { name: 'Membros', exact: true }).click();

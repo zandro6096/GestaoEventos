@@ -2,6 +2,14 @@ import { getActiveContext } from '../../stores/context.store';
 import { usePermissionStore } from '../../stores/permission.store';
 import type { PermissionAction, PermissionCheckScope, PermissionGrant, PermissionResource } from './permission.types';
 
+// Piso de acesso de quem pertence a uma estrutura, igual ao conjunto padrao do web (ver/criar eventos,
+// preencher participacoes, ver grupos). O que cada pessoa enxerga ou altera de fato continua sendo decidido
+// pelo servidor (responsavel do grupo + descendentes); administracao segue exclusiva do dono.
+const memberBaseline: Record<string, PermissionAction[]> = {
+  eventos: ['ler', 'criar', 'gerenciar'],
+  grupos: ['ler'],
+};
+
 export function can(action: PermissionAction, resource: PermissionResource | string, scope: PermissionCheckScope = {}) {
   const context = getActiveContext();
 
@@ -14,7 +22,13 @@ export function can(action: PermissionAction, resource: PermissionResource | str
     grupoId: scope.grupoId ?? context.grupoId,
   };
 
+  if (isStructureMember(effectiveScope.estruturaId) && memberBaseline[resource]?.includes(action)) return true;
+
   return usePermissionStore.getState().grants.some((grant) => grantAllows(grant, action, resource, effectiveScope));
+}
+
+function isStructureMember(estruturaId: number | null | undefined) {
+  return Boolean(estruturaId) && getActiveContext().estruturas.some((estrutura) => estrutura.id === estruturaId);
 }
 
 export function isOwnerContext() {

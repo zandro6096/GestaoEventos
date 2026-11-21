@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const fs = require('node:fs');
@@ -23,10 +24,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         if (url.pathname === '/api/pendencias/minhas') data = { data: { itens: [{ ocorrencia_id: 31, evento_id: 41, evento_titulo: 'Encontro teste', data_hora: '2026-09-07T19:00:00', grupo_id: 21, grupo_nome: 'Grupo teste', responsavel_nome: 'Pessoa de teste' }], tem_mais: false } };
         await route.fulfill({ json: data });
       });
-      await page.goto('http://localhost:8083/jornada');
+      await page.goto(`${SMOKE_BASE_URL}/jornada`);
       await page.getByText('Eventos de hoje', { exact: true }).waitFor();
       if (width === 390) {
-        await page.getByLabel('Abrir pendencias de Grupo teste').click();
+        // No celular o primeiro grupo com pendência já abre expandido.
+        await page.getByLabel('Recolher pendencias de Grupo teste').waitFor();
         await page.getByText('Encontro teste', { exact: true }).waitFor();
         assert.equal(await page.getByText('Resolver pendencia', { exact: true }).count(), 0);
       }

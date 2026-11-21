@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 
 import { track } from '../../../services/analytics/analytics.service';
 import { spacing } from '../../../shared/design/tokens';
@@ -18,10 +18,11 @@ import {
 } from '../hooks/usePublicAuth';
 import { signupSchema, type SignupFormValues } from '../schemas/public-auth.schemas';
 import { getErrorMessage, getSingleParam } from './screen-utils';
+import { allowsPublicRegistration, assertExistingOrganizationInvite, isExistingOrganizationInvite } from '../services/registration-policy';
 
 export function SignupScreen() {
   const params = useLocalSearchParams<{ convite?: string | string[] }>();
-  const inviteToken = getSingleParam(params.convite);
+  const inviteToken = getSingleParam(params.convite)?.trim() || null;
   const router = useRouter();
   const inviteQuery = useInviteDetails(inviteToken);
   const registerMutation = useRegisterMutation();
@@ -29,6 +30,8 @@ export function SignupScreen() {
   const resendMutation = useResendConfirmationMutation();
   const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [createdEmail, setCreatedEmail] = useState<string | null>(null);
+  const publicRegistrationAllowed = allowsPublicRegistration(Platform.OS);
+  const validInvite = isExistingOrganizationInvite(inviteQuery.data) && !inviteQuery.isFetching && !inviteQuery.isError;
 
   const {
     control,
@@ -67,6 +70,10 @@ export function SignupScreen() {
 
     try {
       if (inviteToken) {
+        if (!publicRegistrationAllowed) {
+          if (!validInvite) throw new Error('Aguarde a validação de um convite válido para uma organização existente.');
+          assertExistingOrganizationInvite(inviteQuery.data);
+        }
         await acceptInviteMutation.mutateAsync({
           token: inviteToken,
           senha: values.senha,
@@ -104,17 +111,50 @@ export function SignupScreen() {
     }
   }
 
+  function goToLogin() {
+    router.push({ pathname: '/auth/login', params: inviteToken ? { convite: inviteToken } : {} });
+  }
+
+  if (!publicRegistrationAllowed && (!inviteToken || !validInvite)) {
+    return (
+      <AuthLayout
+        title="Acesso por convite"
+        subtitle="Entre na sua conta ou aceite um convite para participar de uma organização existente."
+        footer={<AuthButton label="Entrar na plataforma" variant="secondary" onPress={goToLogin} />}
+      >
+        <View style={{ gap: spacing.md }}>
+          {!inviteToken ? (
+            <AuthMessage tone="info">
+              Peça ao administrador da organização um convite para o seu e-mail. Abra o link recebido para ativar sua conta pessoal.
+            </AuthMessage>
+          ) : inviteQuery.isFetching || inviteQuery.isPending ? (
+            <AuthMessage tone="info">Validando convite...</AuthMessage>
+          ) : (
+            <>
+              <AuthMessage tone="warning">
+                {inviteQuery.error
+                  ? getErrorMessage(inviteQuery.error, 'Não foi possível validar este convite.')
+                  : 'Este convite não é válido para uma organização existente. Solicite um novo convite ao administrador.'}
+              </AuthMessage>
+              <AuthButton label="Tentar novamente" onPress={() => { void inviteQuery.refetch(); }} />
+            </>
+          )}
+        </View>
+      </AuthLayout>
+    );
+  }
+
   return (
     <AuthLayout
       title={inviteToken ? 'Aceitar convite' : 'Criar conta'}
-      subtitle={inviteToken ? 'Defina sua senha para concluir o convite.' : 'Preencha os dados para comecar.'}
-      footer={<AuthButton label="Entrar na plataforma" variant="secondary" onPress={() => router.push('/auth/login')} />}
+      subtitle={inviteToken ? 'Ative sua conta pessoal na organização que enviou o convite.' : 'Preencha os dados para comecar.'}
+      footer={<AuthButton label="Entrar na plataforma" variant="secondary" onPress={goToLogin} />}
     >
       <View style={{ gap: spacing.md }}>
-        {inviteQuery.data?.valid ? (
+        {(publicRegistrationAllowed ? inviteQuery.data?.valid : validInvite) ? (
           <AuthMessage tone="info" title="Convite encontrado">
-            {`Estrutura: ${inviteQuery.data.estruturaNome ?? 'Nao informada'}\nGrupo: ${
-              inviteQuery.data.grupoNome ?? 'Sem grupo definido'
+            {`Estrutura: ${inviteQuery.data?.estruturaNome ?? 'Nao informada'}\nGrupo: ${
+              inviteQuery.data?.grupoNome ?? 'Sem grupo definido'
             }`}
           </AuthMessage>
         ) : null}
@@ -187,6 +227,8 @@ export function SignupScreen() {
               onChangeText={onChange}
               autoComplete="new-password"
               placeholder="Repita a senha"
+              returnKeyType="done"
+              onSubmitEditing={handleSignupPress}
               error={errors.confirmarSenha?.message}
             />
           )}
@@ -195,7 +237,7 @@ export function SignupScreen() {
         <AuthButton
           label={inviteToken ? 'Aceitar convite' : 'Criar conta gratuitamente'}
           loading={registerMutation.isPending || acceptInviteMutation.isPending}
-          disabled={Boolean(inviteToken && inviteQuery.error)}
+          disabled={Boolean(inviteToken && (publicRegistrationAllowed ? inviteQuery.error : !validInvite))}
           onPress={handleSignupPress}
         />
 

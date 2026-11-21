@@ -14,6 +14,10 @@ if (!['development', 'preview', 'prod'].includes(lane)) {
 const apiUrl = (process.env.EXPO_PUBLIC_API_URL || '').trim();
 if (releaseLanes.has(configuredLane)) assertReleaseApiUrl(apiUrl, lane);
 
+// Push exige o plugin expo-notifications (entitlement aps-environment + capability na Apple) e Firebase no Android.
+// Fica desligado ate as credenciais existirem: ligue com EXPO_PUBLIC_PUSH_ENABLED=1 no profile do EAS.
+const isNotificationsPlugin = (plugin) => (Array.isArray(plugin) ? plugin[0] : plugin) === 'expo-notifications';
+
 const suffix = lane === 'development' ? '.dev' : lane === 'preview' ? '.preview' : '';
 const laneLabel = lane === 'development' ? 'Dev' : lane === 'preview' ? 'Preview' : 'Prod';
 const googleServicesFile = resolveFirebaseFile(process.env.GOOGLE_SERVICES_JSON, 'google-services.json');
@@ -31,21 +35,37 @@ if (lane === 'prod' && process.env.EAS_BUILD === 'true') {
   }
 }
 
+// Firebase (FCM) do Android: no EAS vem como arquivo em GOOGLE_SERVICES_JSON; local, ./google-services.json.
+// Sem o arquivo o app compila normalmente, mas o Android nao recebe push.
+// No build Android sem google-services.json o push nao funciona: nem inclui o plugin (evita pedir permissao a toa).
+const androidWithoutFirebase = process.env.EAS_BUILD_PLATFORM === 'android' && !googleServicesFile;
+if (androidWithoutFirebase && releaseLanes.has(configuredLane) && process.env.EXPO_PUBLIC_PUSH_ENABLED === '1') {
+  throw new Error('Build Android de producao bloqueado: GOOGLE_SERVICES_JSON ausente; push nativo nao funcionaria.');
+}
+const pushEnabled = process.env.EXPO_PUBLIC_PUSH_ENABLED === '1' && !androidWithoutFirebase;
+
 module.exports = ({ config }) => ({
   ...config,
   name: lane === 'prod' ? 'Gestao de Eventos' : `Gestao de Eventos ${laneLabel}`,
-  android: {
-    ...config.android,
-    package: `${appIdentifier}${suffix.replaceAll('.', '')}`,
-    ...(googleServicesFile ? { googleServicesFile } : {}),
-  },
   ios: {
     ...config.ios,
     bundleIdentifier: `${appIdentifier}${suffix}`,
     ...(googleServiceInfoPlist ? { googleServicesFile: googleServiceInfoPlist } : {}),
   },
+  android: {
+    ...config.android,
+    package: `${appIdentifier}${suffix.replaceAll('.', '')}`,
+    ...(googleServicesFile ? { googleServicesFile } : {}),
+  },
   plugins: [
-    ...(config.plugins ?? []),
+    ...(config.plugins ?? [])
+    .concat('@react-native-community/datetimepicker')
+    .filter((plugin) => pushEnabled || !isNotificationsPlugin(plugin))
+    .map((plugin) => (
+      Array.isArray(plugin) && isNotificationsPlugin(plugin)
+        ? [plugin[0], { ...plugin[1], mode: lane === 'development' ? 'development' : 'production' }]
+        : plugin
+    )),
     '@react-native-firebase/app',
     [
       '@react-native-firebase/analytics',
@@ -67,6 +87,7 @@ module.exports = ({ config }) => ({
   extra: {
     ...config.extra,
     appEnvironment: lane,
+    pushEnabled,
   },
 });
 

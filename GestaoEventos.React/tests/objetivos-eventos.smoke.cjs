@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require("node:assert/strict");
 const { Buffer } = require("node:buffer");
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || "playwright");
@@ -146,7 +147,7 @@ async function mockApi(page, writes) {
         token,
       );
       await mockApi(page, writes);
-      await page.goto("http://localhost:8083/admin/eventos/objetivos");
+      await page.goto(`${SMOKE_BASE_URL}/admin/eventos/objetivos`);
       await page.getByText("Objetivos", { exact: true }).first().waitFor();
       await page.getByText("Presenca minima", { exact: true }).waitFor();
       await page.getByRole("button", { name: "Novo objetivo" }).click();

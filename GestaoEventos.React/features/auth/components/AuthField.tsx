@@ -13,6 +13,8 @@ export function AuthTextField({ label, error, editable = true, style, ...props }
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
+        autoCorrect={false}
+        spellCheck={false}
         {...props}
         editable={editable}
         placeholderTextColor={colors.textDisabled}
@@ -36,6 +38,9 @@ export function AuthPasswordField({ label, error, ...props }: AuthTextFieldProps
       <Text style={styles.label}>{label}</Text>
       <View style={[styles.passwordRow, error ? styles.inputError : undefined]}>
         <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          spellCheck={false}
           {...props}
           secureTextEntry={!visible}
           placeholderTextColor={colors.textDisabled}

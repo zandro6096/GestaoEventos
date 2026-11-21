@@ -31,6 +31,7 @@ export type EventoTemplate = {
   permitirAddResponsaveis: boolean;
   permitirRemoverResponsaveis: boolean;
   permitirAddParticipantes: boolean;
+  adicionarNovosParticipantesEmTodosEventos: boolean;
   permitirRemoverParticipantes: boolean;
   requerJustificativaRemocao: boolean;
   requerJustificativaAusencia: boolean;

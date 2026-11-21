@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { can } from '../../../services/permissions/permission.facade';
 import { assertOnlineForMutation } from '../../../services/offline/mutation-guard';
 import { track } from '../../../services/analytics/analytics.service';
@@ -11,6 +12,7 @@ import { validateAttendance } from './presenca.rules';
 type AttendanceData = { evento: { id: number; grupoId: number; eventoTemplateId: number | null }; ocorrencia: { id: number; dataHora: string }; participantes: Participante[] };
 type AttendanceOperation = { mode: 'single'; participant: Participante; status: AttendanceStatus; observacao: string } | { mode: 'bulk'; items: { participant: Participante; status: AttendanceStatus; observacao: string }[] };
 
+// Cada pessoa tem o proprio estado de gravacao: marcar uma nao trava as demais.
 export function usePresenca(data: AttendanceData | undefined, queryKey: readonly unknown[], usuarioId: number, estruturaId: number) {
   const client = useQueryClient();
   const templateQuery = useQuery({
@@ -23,6 +25,7 @@ export function usePresenca(data: AttendanceData | undefined, queryKey: readonly
   });
   const template = templateQuery.data as EventoTemplate | null | undefined;
   const requerJustificativaAusencia = template?.requerJustificativaAusencia ?? false;
+  const [saving, setSaving] = useState<Record<number, AttendanceStatus>>({});
   const mutation = useMutation({
     retry: false,
     mutationFn: async (operation: AttendanceOperation) => {
@@ -41,10 +44,31 @@ export function usePresenca(data: AttendanceData | undefined, queryKey: readonly
       track('confirmation', 'acompanhar_evento:salvar_presencas_success', { extra: { total: items.length } });
       return items;
     },
-    onSuccess: () => {
-      void client.invalidateQueries({ queryKey });
+    // A lista reflete o novo status assim que a API confirma; o refetch em segundo plano so reconcilia.
+    onSuccess: (items) => {
+      client.setQueryData<{ participantes: Participante[] } | undefined>(queryKey, (current) => current && {
+        ...current,
+        participantes: current.participantes.map((participant) => {
+          const done = items.find((item) => item.participant.id === participant.id && item.participant.isVirtual === participant.isVirtual);
+          return done ? { ...participant, status: done.status, observacao: done.observacao } : participant;
+        }),
+      });
       void client.invalidateQueries({ queryKey: ['jornada'] });
+      void client.invalidateQueries({ queryKey });
     },
   });
-  return { mutation, templateQuery, requerJustificativaAusencia };
+  const save = async (operation: AttendanceOperation) => {
+    const targets = operation.mode === 'single' ? [operation] : operation.items;
+    setSaving((current) => ({ ...current, ...Object.fromEntries(targets.map((item) => [item.participant.id, item.status])) }));
+    try {
+      return await mutation.mutateAsync(operation);
+    } finally {
+      setSaving((current) => {
+        const next = { ...current };
+        for (const item of targets) delete next[item.participant.id];
+        return next;
+      });
+    }
+  };
+  return { mutation, save, saving, templateQuery, requerJustificativaAusencia };
 }

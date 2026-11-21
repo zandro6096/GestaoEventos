@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -29,7 +30,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         if (url.pathname === '/api/participacoes-evento/lote' && request.method() === 'POST') { writes.push({ path: url.pathname, body: request.postDataJSON() }); data = { data: {} }; }
         await route.fulfill({ json: data });
       });
-      await page.goto('http://localhost:8083/eventos/acompanhar/42?data=2026-09-07');
+      await page.goto(`${SMOKE_BASE_URL}/eventos/acompanhar/42?data=2026-09-07`);
       await page.getByText('Participante de teste', { exact: true }).waitFor();
       await page.getByRole('button', { name: 'Marcar Participante de teste como presente', exact: true }).click();
       await page.waitForTimeout(150);
@@ -38,13 +39,19 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
       assert.equal(writes[0].body.ocorrencia_id, 91);
       assert.equal(writes[0].body.usuario_id, 8);
       assert.equal(writes[0].body.status, 'PRESENTE');
-      await page.getByRole('checkbox', { name: 'Selecionar Participante de teste', exact: true }).click();
+      // A seleção em lote começa com um toque longo; ele já marca a primeira pessoa.
+      await page.getByRole('button', { name: 'Segure para selecionar Participante de teste', exact: true }).click({ delay: 700 });
+      await page.getByRole('checkbox', { name: 'Selecionar Participante de teste', exact: true }).waitFor();
       await page.getByRole('checkbox', { name: 'Selecionar Outra pessoa', exact: true }).click();
       await page.getByRole('button', { name: 'Marcar selecionados como ausentes', exact: true }).click();
-      await page.waitForTimeout(150);
+      // Ausência em lote abre o painel e pede o motivo.
+      await page.getByLabel('Motivo', { exact: true }).fill('Viagem');
+      await page.getByRole('button', { name: 'Confirmar', exact: true }).click();
+      await page.waitForTimeout(300);
       assert.equal(writes[1].path, '/api/participacoes-evento/lote');
       assert.equal(writes[1].body.itens.length, 2);
       assert.deepEqual(writes[1].body.itens.map((item) => item.status), ['AUSENTE', 'AUSENTE']);
+      assert.ok(writes[1].body.itens.every((item) => (item.motivo ?? item.observacao ?? item.justificativa ?? writes[1].body.motivo) === 'Viagem'));
       assert.deepEqual(errors, []);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       console.log(`PASS ${width}px presence single and batch`);

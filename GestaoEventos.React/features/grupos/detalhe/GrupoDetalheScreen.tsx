@@ -16,6 +16,9 @@ type Tab = 'resumo' | 'membros' | 'responsaveis' | 'eventos';
 type ListItem = { id: number; title: string; subtitle: string };
 type RemovalTarget = { kind: ManagementKind; id: number; title: string };
 
+// A tela desmonta ao abrir um evento (Slot); lembrar a aba evita voltar sempre para "Resumo".
+const lastTabByGroup = new Map<number, Tab>();
+
 export function GrupoDetalheScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const grupoId = Number(id);
@@ -24,7 +27,7 @@ export function GrupoDetalheScreen() {
   const compact = width < layoutMetrics.desktopBreakpoint;
   const { usuarioId, estruturaId } = useContextStore();
   const state = useGrupoDetalhe(grupoId);
-  const [tab, setTab] = useState<Tab>('resumo');
+  const [tab, setTab] = useState<Tab>(() => lastTabByGroup.get(grupoId) ?? 'resumo');
   const [managementKind, setManagementKind] = useState<ManagementKind | null>(null);
   const [directoryTerm, setDirectoryTerm] = useState('');
   const [inviteName, setInviteName] = useState('');
@@ -33,6 +36,7 @@ export function GrupoDetalheScreen() {
   const data = state.query.data;
   const memberIds = useMemo(() => data?.membros.map((item) => item.usuarioId) ?? [], [data?.membros]);
   const responsibleIds = useMemo(() => data?.responsaveis.map((item) => item.usuarioId) ?? [], [data?.responsaveis]);
+  const acompanhamentoPorUsuario = useMemo(() => new Map((state.acompanhamentosQuery.data ?? []).filter((item) => item.usuarioId).map((item) => [item.usuarioId!, item.acompanhamentos])), [state.acompanhamentosQuery.data]);
   const management = useGrupoMembros(grupoId, estruturaId ?? 0, !!managementKind, state.canManage, { memberIds, responsibleIds });
 
   const closeManagement = () => {
@@ -64,7 +68,7 @@ export function GrupoDetalheScreen() {
   if (state.query.isError) return <Centered><Text accessibilityRole="alert" style={styles.error}>{normalizeApiError(state.query.error, 'Nao foi possivel carregar o grupo.').message}</Text><Action label="Voltar para grupos" icon="arrow-back-outline" onPress={() => router.replace('/admin/grupos' as Href)} /></Centered>;
   if (!data) return null;
   const path = groupPath(data.hierarquia, data.grupo);
-  const pendingTab = (next: Tab) => { setTab(next); track('simulation', 'grupos:aba_trocar', { extra: { aba: next } }); };
+  const pendingTab = (next: Tab) => { setTab(next); lastTabByGroup.set(grupoId, next); track('simulation', 'grupos:aba_trocar', { extra: { aba: next } }); };
   const events: ListItem[] = data.eventos.map((item) => ({ id: item.id, title: item.eventoTitulo, subtitle: `${item.status} · ${item.dataHora.slice(0, 16).replace('T', ' ')}` }));
   const feedbackError = management.mutation.error ?? management.inviteMutation.error;
   return <SafeAreaView style={styles.safe}><ScrollView contentContainerStyle={[styles.content, compact && styles.contentCompact]} keyboardShouldPersistTaps="handled">
@@ -73,7 +77,7 @@ export function GrupoDetalheScreen() {
     <View style={styles.summary}><Metric compact={compact} label="Nivel" value={String(data.grupo.nivelHierarquico)} icon="git-network-outline" /><Metric compact={compact} label="Membros" value={String(data.membros.length)} icon="people-outline" /><Metric compact={compact} label="Responsaveis" value={String(data.responsaveis.length)} icon="person-outline" /><Metric compact={compact} label="Eventos" value={String(data.eventos.length)} icon="calendar-outline" /></View>
     <TabBar compact={compact} tab={tab} onChange={pendingTab} />
     {tab === 'resumo' && <Section title="Estrutura"><Text style={styles.body}>Grupo pai: {data.grupo.grupoSuperiorId ? data.hierarquia.find((item) => item.id === data.grupo.grupoSuperiorId)?.nome ?? 'Nao informado' : 'Raiz da estrutura'}</Text><Text style={styles.body}>Subgrupos: {data.hierarquia.filter((item) => item.grupoSuperiorId === data.grupo.id).map((item) => item.nome).join(', ') || 'Nenhum subgrupo vinculado.'}</Text></Section>}
-    {tab === 'membros' && <ListSection title="Membros" empty="Nenhum membro vinculado." items={data.membros.map((item) => ({ id: item.id, title: item.usuario?.nome ?? `Usuario ${item.usuarioId}`, subtitle: item.usuario?.email ?? 'Email nao informado' }))} canManage={state.canManage} removeLabel="Remover membro" onAdd={() => openManagement('membro')} onRemove={(item) => setPendingRemoval({ kind: 'membro', id: item.id, title: item.title })} />}
+    {tab === 'membros' && <ListSection title="Membros" empty="Nenhum membro vinculado." items={data.membros.map((item) => ({ id: item.id, title: item.usuario?.nome ?? `Usuario ${item.usuarioId}`, subtitle: `${item.usuario?.email ?? 'Email nao informado'}${acompanhamentoPorUsuario.get(item.usuarioId)?.length ? ` · ${acompanhamentoPorUsuario.get(item.usuarioId)!.map((acompanhamento) => acompanhamento.natureza === 'indicador' ? `${acompanhamento.nome}: ${acompanhamento.valor === true ? 'Sim' : 'Nao'}` : `${acompanhamento.nome}: ${acompanhamento.status ?? 'Nao iniciado'}`).join(' | ')}` : ''}` }))} canManage={state.canManage} removeLabel="Remover membro" onAdd={() => openManagement('membro')} onRemove={(item) => setPendingRemoval({ kind: 'membro', id: item.id, title: item.title })} />}
     {tab === 'responsaveis' && <ListSection title="Responsaveis" empty="Nenhum responsavel vinculado." items={data.responsaveis.map((item) => ({ id: item.id, title: item.usuario?.nome ?? `Usuario ${item.usuarioId}`, subtitle: item.usuario?.email ?? 'Email nao informado' }))} canManage={state.canManage} removeLabel="Remover responsavel" onAdd={() => openManagement('responsavel')} onRemove={(item) => setPendingRemoval({ kind: 'responsavel', id: item.id, title: item.title })} />}
     {tab === 'eventos' && <ListSection title="Eventos relacionados" empty="Nenhuma ocorrencia encontrada." items={events} onPress={(item) => { track('entrance', 'grupos:evento_abrir'); router.push(`/admin/eventos/acompanhar/${item.id}` as Href); }} />}
   </ScrollView><ManagementModal kind={managementKind} term={directoryTerm} onTerm={setDirectoryTerm} candidates={management.query.data ?? []} directoryError={management.query.error} existingIds={managementKind === 'membro' ? memberIds : responsibleIds} onClose={closeManagement} onSelect={(person) => void submitPerson(person)} onInvite={() => void submitInvite()} inviteName={inviteName} inviteEmail={inviteEmail} setInviteName={setInviteName} setInviteEmail={setInviteEmail} isPending={management.mutation.isPending || management.inviteMutation.isPending} error={feedbackError} /><RemovalModal target={pendingRemoval} isPending={management.removeMutation.isPending} error={management.removeMutation.error} onClose={() => { if (!management.removeMutation.isPending) setPendingRemoval(null); }} onConfirm={() => void confirmRemoval()} /></SafeAreaView>;

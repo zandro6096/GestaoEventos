@@ -1,0 +1,86 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "version": "1.0.7",
+    "copyright": "Seven Projetos 2026",
+    "release": {
+      "automaticRelease": true
+    },
+    "info": {
+      "pt-BR": {
+        "description": "Gestao de Eventos organiza estruturas, grupos, eventos, participantes e registros de presenca em um so lugar. Crie e acompanhe eventos recorrentes, registre presencas individualmente ou em grupo e consulte pendencias e relatorios com seguranca.",
+        "keywords": [
+          "eventos",
+          "grupos",
+          "presenca",
+          "participantes",
+          "organizacao",
+          "relatorios",
+          "acompanhamento",
+          "agenda"
+        ],
+        "marketingUrl": "https://sistema-eventos.seven-projetos.com",
+        "promoText": "Organize grupos, eventos e presencas em um unico lugar.",
+        "supportUrl": "https://sistema-eventos.seven-projetos.com",
+        "title": "Gestao de Eventos",
+        "subtitle": "Organize eventos e grupos",
+        "privacyPolicyUrl": "https://sistema-eventos.seven-projetos.com/privacidade.html",
+        "screenshots": {
+          "APP_IPAD_PRO_3GEN_129": [
+            "store\\apple\\screenshot\\pt-BR\\APP_IPAD_PRO_3GEN_129\\01-inicio.png",
+            "store\\apple\\screenshot\\pt-BR\\APP_IPAD_PRO_3GEN_129\\02-meus-eventos.png",
+            "store\\apple\\screenshot\\pt-BR\\APP_IPAD_PRO_3GEN_129\\03-detalhe-presenca.png"
+          ],
+          "APP_IPHONE_65": [
+            "store\\apple\\screenshot\\pt-BR\\APP_IPHONE_65\\01-inicio.png",
+            "store\\apple\\screenshot\\pt-BR\\APP_IPHONE_65\\03-detalhe-presenca.png",
+            "store\\apple\\screenshot\\pt-BR\\APP_IPHONE_65\\02-meus-eventos.png"
+          ]
+        }
+      }
+    },
+    "categories": [
+      "BUSINESS",
+      "PRODUCTIVITY"
+    ],
+    "advisory": {
+      "ageRatingOverride": "NONE",
+      "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+      "contests": "NONE",
+      "gambling": false,
+      "gamblingSimulated": "NONE",
+      "horrorOrFearThemes": "NONE",
+      "kidsAgeBand": null,
+      "koreaAgeRatingOverride": "NONE",
+      "lootBox": false,
+      "matureOrSuggestiveThemes": "NONE",
+      "medicalOrTreatmentInformation": "NONE",
+      "profanityOrCrudeHumor": "NONE",
+      "sexualContentGraphicAndNudity": "NONE",
+      "sexualContentOrNudity": "NONE",
+      "unrestrictedWebAccess": false,
+      "violenceCartoonOrFantasy": "NONE",
+      "violenceRealistic": "NONE",
+      "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+      "advertising": false,
+      "ageAssurance": false,
+      "ageRatingOverrideV2": "NONE",
+      "developerAgeRatingInfoUrl": null,
+      "gunsOrOtherWeapons": "NONE",
+      "healthOrWellnessTopics": false,
+      "messagingAndChat": false,
+      "parentalControls": false,
+      "userGeneratedContent": false
+    },
+    "review": {
+      "firstName": "Sandro",
+      "lastName": "Oliveira Sena",
+      "email": "sandro.o.sena@outlook.com",
+      "phone": "+5511948691849",
+      "demoUsername": "sandro.o.sena+appreview@outlook.com",
+      "demoPassword": "Gestao@2026!Sandro",
+      "demoRequired": true,
+      "notes": "RESPONSE TO GUIDELINE 3.1.1 — version 1.0.7 (9): We removed open account registration from the iOS app. The login screen no longer offers public sign-up. Opening the sign-up route without an invitation shows access instructions and a login button, with no registration form or external sign-up link. New participants can only activate a personal account using a valid invitation linked to an existing organization; this does not create a business/organization or purchase a subscription. The app cannot create organizations and does not offer subscription purchase, upgrade, external checkout, or payment portal actions. Please review the corrected build.\n\nREVIEW ACCESS: The existing demo credentials provided in this form remain the review login. They open the pre-populated organization Comunidade Demo with groups, events, attendance history and administrative features. Password recovery and account deletion remain available. Account deletion is in Perfil > Excluir minha conta and on the screen for accounts without an organization; the permanent demo account is protected against deletion to preserve review data. Public sign-up is no longer available in iOS.\n\nPT: Removemos o cadastro aberto da versão iOS, inclusive por link direto. O app permite login de contas existentes e ativação pessoal exclusivamente por convite válido de organização existente, sem cadastro de empresas/organizações e sem contratação ou direcionamento a pagamento externo. Solicitamos nova avaliação da build 1.0.7 (9)."
+    }
+  }
+}

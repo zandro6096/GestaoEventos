@@ -1,5 +1,5 @@
 import * as ExpoLinking from 'expo-linking';
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 
 import { track } from '../../../services/analytics/analytics.service';
 import {
@@ -15,6 +15,7 @@ import { assertOnlineForMutation } from '../../../services/offline/mutation-guar
 import { authSessionService } from '../../../services/session/auth-session.service';
 import { applyAuthSessionResult } from '../../../stores/auth.store';
 import { authenticateBiometricLogin, enableBiometricLogin } from './biometric-login.service';
+import { assertExistingOrganizationInvite, assertPublicRegistrationAllowed } from './registration-policy';
 
 export type PublicLoginRequest = LoginRequest & {
   inviteToken?: string | null;
@@ -57,6 +58,7 @@ export const publicAuthService = {
   },
 
   async registerUser(request: RegisterUserRequest) {
+    assertPublicRegistrationAllowed(Platform.OS);
     assertOnlineForMutation('cadastro');
     track('simulation', 'auth:signup_submit', {
       extra: { via_convite: false },
@@ -138,6 +140,11 @@ export const publicAuthService = {
     });
 
     try {
+      if (Platform.OS === 'ios') {
+        if (!request.token.trim()) throw new Error('Token de convite ausente.');
+        const invite = await authApi.validateInviteToken(request.token);
+        assertExistingOrganizationInvite(invite);
+      }
       const result = await authApi.acceptInviteToken(request);
       track('confirmation', 'auth:signup_success', {
         extra: { via_convite: true },

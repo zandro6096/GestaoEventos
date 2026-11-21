@@ -16,6 +16,7 @@ import { can } from '../../../../services/permissions/permission.facade';
 import { track } from '../../../../services/analytics/analytics.service';
 import { colors, radius, spacing, typography } from '../../../../shared/design/tokens';
 import { layoutMetrics } from '../../../../shared/theme';
+import { readFilters, useMeusEventosViewStore } from '../../../../stores/meus-eventos-view.store';
 import { useMeusEventos } from '../hooks/useMeusEventos';
 import type { MeusEventoItem } from '../services/meus-eventos.service';
 
@@ -43,11 +44,12 @@ export function MeusEventosScreen() {
   const { isInitialLoading, loadMonth, loadYear } = meusEventos;
   const { width } = useWindowDimensions();
   const compact = width < layoutMetrics.desktopBreakpoint;
-  const [cancelTarget, setCancelTarget] = useState<MeusEventoItem | null>(null);
-  const [cancelReason, setCancelReason] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<string | null | undefined>(undefined);
+  const storedFilters = useMeusEventosViewStore((state) => state.filters);
+  const patchFilters = useMeusEventosViewStore((state) => state.patchFilters);
+  const { year: selectedYear, month: selectedMonth, eventGroup: selectedGroup } = readFilters(storedFilters, meusEventos.contextKey);
+  const setSelectedGroup = (eventGroup: string | null) => patchFilters(meusEventos.contextKey, { eventGroup });
+  const setSelectedYear = (year: number | null) => patchFilters(meusEventos.contextKey, { year });
+  const setSelectedMonth = (month: string | null | undefined) => patchFilters(meusEventos.contextKey, { month });
   const [groupSearch, setGroupSearch] = useState('');
   const [showCancelled, setShowCancelled] = useState(true);
   const canCreateEvents = can('criar', 'eventos');
@@ -132,18 +134,6 @@ export function MeusEventosScreen() {
   async function handleConfirmVisit(item: MeusEventoItem) {
     try {
       await meusEventos.confirmVisit(item);
-    } catch {
-      // Mutation error is exposed by the hook and rendered below the header.
-    }
-  }
-
-  async function handleCancelOccurrence() {
-    if (!cancelTarget || !cancelReason.trim()) return;
-
-    try {
-      await meusEventos.cancelOccurrence({ item: cancelTarget, motivo: cancelReason });
-      setCancelTarget(null);
-      setCancelReason('');
     } catch {
       // Mutation error is exposed by the hook and rendered below the header.
     }
@@ -342,10 +332,8 @@ export function MeusEventosScreen() {
                   canManageEvents={canManageEvents}
                   compact={compact}
                   group={group}
-                  isCancelling={meusEventos.isCancellingOccurrence}
                   isConfirming={meusEventos.isConfirmingVisit}
                   key={group.key}
-                  onCancel={(item) => { setCancelTarget(item); setCancelReason(''); }}
                   onConfirmVisit={(item) => void handleConfirmVisit(item)}
                   onOpen={handleOpenEvent}
                   onPresence={handleOpenPresence}
@@ -354,11 +342,9 @@ export function MeusEventosScreen() {
                 <SingleEventCard
                   canManageEvents={canManageEvents}
                   compact={compact}
-                  isCancelling={meusEventos.isCancellingOccurrence}
                   isConfirming={meusEventos.isConfirmingVisit}
                   item={group.eventos[0]}
                   key={group.key}
-                  onCancel={(item) => { setCancelTarget(item); setCancelReason(''); }}
                   onConfirmVisit={(item) => void handleConfirmVisit(item)}
                   onOpen={handleOpenEvent}
                   onPresence={handleOpenPresence}
@@ -369,44 +355,6 @@ export function MeusEventosScreen() {
         </>
       ) : null}
 
-      {cancelTarget ? (
-        <View style={styles.cancelPanel}>
-          <View style={styles.cancelHeader}>
-            <Ionicons name="ban-outline" size={20} color={colors.error} />
-            <View style={styles.cancelTitleBlock}>
-              <Text style={styles.cancelTitle}>Cancelar ocorrencia</Text>
-              <Text numberOfLines={1} style={styles.cancelSubtitle}>
-                {cancelTarget.titulo}
-              </Text>
-            </View>
-          </View>
-          <TextInput
-            accessibilityLabel="Motivo do cancelamento"
-            multiline
-            placeholder="Motivo do cancelamento"
-            placeholderTextColor={colors.textDisabled}
-            style={styles.reasonInput}
-            value={cancelReason}
-            onChangeText={setCancelReason}
-          />
-          <Text style={styles.cancelNotice}>Cancelar nao remove o item: ele continua visivel no Historico.</Text>
-          <View style={styles.cancelActions}>
-            <Pressable accessibilityRole="button" style={styles.secondaryButton} onPress={() => setCancelTarget(null)}>
-              <Ionicons name="close-outline" size={18} color={colors.brandBlue} />
-              <Text style={styles.secondaryButtonText}>Voltar</Text>
-            </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              disabled={!cancelReason.trim() || meusEventos.isCancellingOccurrence}
-              style={[styles.dangerButton, !cancelReason.trim() || meusEventos.isCancellingOccurrence ? styles.disabledButton : null]}
-              onPress={() => void handleCancelOccurrence()}
-            >
-              <Ionicons name="ban-outline" size={18} color={colors.surfacePrimary} />
-              <Text style={styles.dangerButtonText}>{meusEventos.isCancellingOccurrence ? 'Cancelando' : 'Cancelar'}</Text>
-            </Pressable>
-          </View>
-        </View>
-      ) : null}
     </ScreenShell>
   );
 }
@@ -415,11 +363,9 @@ type EventActionProps = {
   compact: boolean;
   canManageEvents: boolean;
   isConfirming: boolean;
-  isCancelling: boolean;
   onOpen: (item: MeusEventoItem) => void;
   onPresence: (item: MeusEventoItem) => void;
   onConfirmVisit: (item: MeusEventoItem) => void;
-  onCancel: (item: MeusEventoItem) => void;
 };
 
 function SingleEventCard({ item, ...actions }: { item: MeusEventoItem } & EventActionProps) {
@@ -479,7 +425,7 @@ function RecurringEventCard({ group, ...actions }: { group: EventoGrupo } & Even
   );
 }
 
-function TimelineRow({ item, index, firstFutureIndex, compact, canManageEvents, isConfirming, isCancelling, onOpen, onPresence, onConfirmVisit, onCancel }: { item: MeusEventoItem; index: number; firstFutureIndex: number } & EventActionProps) {
+function TimelineRow({ item, index, firstFutureIndex, compact, canManageEvents, isConfirming, onOpen, onPresence, onConfirmVisit }: { item: MeusEventoItem; index: number; firstFutureIndex: number } & EventActionProps) {
   const statusColor = getStatusColor(item);
   const isPast = isTimelinePast(item);
   const isNext = !isPast && index === firstFutureIndex;
@@ -515,17 +461,12 @@ function TimelineRow({ item, index, firstFutureIndex, compact, canManageEvents, 
             <Ionicons name="checkmark-outline" size={18} color={colors.success} />
           </Pressable>
         ) : null}
-        {canManageEvents && !item.isVirtual && !item.cancelada ? (
-          <Pressable accessibilityRole="button" accessibilityLabel="Cancelar ocorrencia" disabled={isCancelling} style={[styles.timelineIconButtonDanger, isCancelling ? styles.disabledButton : null]} onPress={() => onCancel(item)}>
-            <Ionicons name="trash-outline" size={17} color={colors.error} />
-          </Pressable>
-        ) : null}
       </View>
     </View>
   );
 }
 
-function OccurrenceActions({ item, compact, canManageEvents, isConfirming, isCancelling, onOpen, onPresence, onConfirmVisit, onCancel }: { item: MeusEventoItem } & EventActionProps) {
+function OccurrenceActions({ item, compact, canManageEvents, isConfirming, onOpen, onPresence, onConfirmVisit }: { item: MeusEventoItem } & EventActionProps) {
   const canMutate = canManageEvents && !item.isVirtual && !item.cancelada;
   const callHighlighted = isCallHighlighted(item);
   const callMuted = isCallMuted(item);
@@ -549,12 +490,6 @@ function OccurrenceActions({ item, compact, canManageEvents, isConfirming, isCan
           {!compact ? <Text style={styles.confirmActionText}>Confirmar visita</Text> : null}
         </Pressable>
       ) : null}
-      {canMutate ? (
-        <Pressable accessibilityRole="button" accessibilityLabel="Cancelar ocorrencia" disabled={isCancelling} style={[compact ? styles.mobileIconButtonDanger : styles.mobileIconButton, isCancelling ? styles.disabledButton : null]} onPress={() => onCancel(item)}>
-          <Ionicons name="trash-outline" size={18} color={colors.error} />
-          {!compact ? <Text style={styles.cancelActionText}>Cancelar</Text> : null}
-        </Pressable>
-      ) : null}
     </View>
   );
 }
@@ -574,7 +509,14 @@ function ScreenShell({ children }: { children: ReactNode }) {
   const compact = width < layoutMetrics.desktopBreakpoint;
   return (
     <View style={styles.safe}>
-      <ScrollView contentContainerStyle={[styles.content, compact ? styles.mobileContent : null]}>{children}</ScrollView>
+      <ScrollView
+        contentContainerStyle={[styles.content, compact ? styles.mobileContent : null]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        automaticallyAdjustKeyboardInsets
+      >
+        {children}
+      </ScrollView>
     </View>
   );
 }

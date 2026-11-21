@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
@@ -22,7 +23,7 @@ function mockApi(page, role) {
       const token = `test.${Buffer.from(JSON.stringify({ sub: '3', exp: 4102444800 })).toString('base64url')}.test`;
       await page.addInitScript((value) => sessionStorage.setItem('gestaoeventos.secure.auth_token', value), token);
       await mockApi(page, 'Owner');
-      await page.goto('http://localhost:8083/configuracoes');
+      await page.goto(`${SMOKE_BASE_URL}/configuracoes`);
       await page.getByText('Configuracoes', { exact: true }).last().waitFor();
       await page.getByText('Membros', { exact: true }).waitFor();
       await page.getByRole('button', { name: 'Abrir Membros' }).click();
@@ -38,7 +39,7 @@ function mockApi(page, role) {
       blocked.on('pageerror', (error) => blockedErrors.push(error.message));
       await blocked.addInitScript((value) => sessionStorage.setItem('gestaoeventos.secure.auth_token', value), token);
       await mockApi(blocked, 'Membro');
-      await blocked.goto('http://localhost:8083/admin/membros');
+      await blocked.goto(`${SMOKE_BASE_URL}/admin/membros`);
       await blocked.getByText('Acesso negado', { exact: true }).waitFor();
       assert.equal(await blocked.getByText('Esta area esta protegida', { exact: false }).count(), 0);
       assert.deepEqual(blockedErrors, []);

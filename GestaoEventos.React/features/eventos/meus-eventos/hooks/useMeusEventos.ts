@@ -8,6 +8,7 @@ import { queryKeys } from '../../../../services/query/query-keys';
 import { gruposApi, type GrupoDto } from '../../../../services/api/grupos-api';
 import { useAuthStore } from '../../../../stores/auth.store';
 import { useContextStore } from '../../../../stores/context.store';
+import { useMeusEventosViewStore } from '../../../../stores/meus-eventos-view.store';
 import {
   meusEventosService,
   mergeMeusEventos,
@@ -30,11 +31,12 @@ export function useMeusEventos() {
   const enabled = Boolean(usuarioId && estruturaId);
   const contextError = enabled ? null : 'Meus Eventos exige usuario autenticado e estrutura ativa.';
   const contextSelectionKey = `${usuarioId ?? 0}:${estruturaId ?? 0}:${grupoId ?? 'all'}`;
-  const [groupSelection, setGroupSelection] = useState<{ contextKey: string; groupId: number | null }>({ contextKey: '', groupId: null });
+  const groupSelection = useMeusEventosViewStore((state) => state.groupSelection);
+  const setGroupSelection = useMeusEventosViewStore((state) => state.setGroupSelection);
   const selectedGroupId = groupSelection.contextKey === contextSelectionKey ? groupSelection.groupId : null;
   const selectGroup = useCallback((groupId: number) => {
     setGroupSelection({ contextKey: contextSelectionKey, groupId });
-  }, [contextSelectionKey]);
+  }, [contextSelectionKey, setGroupSelection]);
   const groupQueryEnabled = Boolean(enabled && !grupoId);
   const gruposQuery = useQuery({
     queryKey: queryKeys.eventos.gruposFiltro(estruturaId),
@@ -179,31 +181,6 @@ export function useMeusEventos() {
     },
   });
 
-  const cancelOccurrenceMutation = useMutation({
-    mutationFn: async ({ item, motivo }: { item: MeusEventoItem; motivo: string }) => {
-      assertOnlineForMutation('cancelar ocorrencia');
-      if (!item.ocorrenciaId) throw new Error('Cancelamento exige ocorrencia materializada.');
-
-      track('simulation', 'meus_eventos:cancelar_ocorrencia_submit', {
-        extra: {
-          evento_id: item.eventoId,
-          ocorrencia_id: item.ocorrenciaId,
-        },
-      });
-
-      return meusEventosService.cancelarOcorrencia(item.ocorrenciaId, motivo);
-    },
-    onSuccess: (_data, variables) => {
-      track('confirmation', 'meus_eventos:cancelar_ocorrencia_sucesso', {
-        extra: {
-          evento_id: variables.item.eventoId,
-          ocorrencia_id: variables.item.ocorrenciaId,
-        },
-      });
-      void queryClient.invalidateQueries({ queryKey });
-    },
-  });
-
   function trackOpenEvent(item: MeusEventoItem) {
     track('entrance', 'btn:meus_eventos_abrir', {
       extra: {
@@ -215,6 +192,7 @@ export function useMeusEventos() {
   }
 
   return {
+    contextKey: contextSelectionKey,
     contextError,
     usuarioId,
     estruturaId,
@@ -238,17 +216,15 @@ export function useMeusEventos() {
       ? normalizeApiError(meusEventosQuery.error, 'Nao foi possivel carregar seus eventos.').message
       : null,
     mutationError:
-      confirmVisitMutation.isError || cancelOccurrenceMutation.isError
-        ? normalizeApiError(confirmVisitMutation.error ?? cancelOccurrenceMutation.error, 'Nao foi possivel concluir a acao.').message
+      confirmVisitMutation.isError
+        ? normalizeApiError(confirmVisitMutation.error, 'Nao foi possivel concluir a acao.').message
         : null,
     isConfirmingVisit: confirmVisitMutation.isPending,
-    isCancellingOccurrence: cancelOccurrenceMutation.isPending,
     refetch: occurrenceQueryEnabled ? meusEventosQuery.refetch : gruposQuery.refetch,
     loadMonth,
     loadYear,
     loadingMonth,
     confirmVisit: confirmVisitMutation.mutateAsync,
-    cancelOccurrence: cancelOccurrenceMutation.mutateAsync,
     trackOpenEvent,
   };
 }

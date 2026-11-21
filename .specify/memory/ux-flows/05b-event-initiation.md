@@ -266,13 +266,14 @@ ao escopo de grupos permitido para aquele responsável dentro da estrutura ativa
 
 ### Hotfix de Produção (2026-05-17) — Cancelamento e Navegação de Período
 
-1. Cancelamento em `Meus Eventos` é por **ocorrência** (não delete de evento):
-   - ação abre modal com `motivo` obrigatório;
+1. Cancelamento é feito dentro do acompanhamento da ocorrência selecionada (como no fluxo Angular), não na listagem `Meus Eventos`:
+   - a ação `Cancelar evento` aparece na tela de acompanhamento quando permitida;
+   - ação abre formulário com `motivo` obrigatório;
    - submit vazio fica bloqueado na UI;
    - backend valida `motivo` para `novo_status = Cancelada` e retorna `400` se ausente.
 
 2. Após cancelar:
-   - ocorrência **permanece na lista**;
+   - ocorrência **permanece no histórico da listagem**;
    - status/motivo ficam visíveis no card/timeline;
    - comportamento persiste após `F5`.
 

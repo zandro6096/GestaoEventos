@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { notificacoesInternasApi } from '../../services/api/notificacoes-internas-api';
 import { painelApi, type CockpitAniversariante } from '../../services/api/painel-api';
+import { usePushNotifications } from '../../services/notifications/usePushNotifications';
 import { can } from '../../services/permissions/permission.facade';
 import { AppNavigation } from './AppNavigation';
 import { ContextSwitcher } from './ContextSwitcher';
@@ -16,6 +17,7 @@ import { colors, radius, spacing, typography } from '../design/tokens';
 import { layoutMetrics, primaryNavigationItems, secondaryNavigationItems } from '../theme';
 
 export function AppShell() {
+  usePushNotifications();
   const pathname = usePathname();
   const { width } = useWindowDimensions();
   const router = useRouter();

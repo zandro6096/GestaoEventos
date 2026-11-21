@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 
@@ -26,7 +27,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         if (request.method() === 'POST' || request.method() === 'DELETE') await route.fulfill({ status: 204, body: '' });
         else await route.fulfill({ json: data });
       });
-      await page.goto('http://localhost:8083/admin/grupos/2');
+      await page.goto(`${SMOKE_BASE_URL}/admin/grupos/2`);
       await page.getByRole('button', { name: 'Membros', exact: true }).click();
       await page.getByRole('button', { name: 'Adicionar membro', exact: true }).click();
       assert.equal(await page.getByRole('button', { name: 'Reativar', exact: true }).count(), 1);

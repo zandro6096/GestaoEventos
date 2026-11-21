@@ -15,7 +15,12 @@ export function AuthLayout({ title, subtitle, footer, children }: AuthLayoutProp
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={[styles.scroll, wide ? styles.scrollWide : undefined]}>
+      <ScrollView
+        contentContainerStyle={[styles.scroll, wide ? styles.scrollWide : undefined]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        automaticallyAdjustKeyboardInsets
+      >
         <View style={[styles.brandPanel, wide ? undefined : styles.brandPanelCompact]}>
           <Image source={require('../../../assets/android-icon-foreground.png')} style={styles.brandMark} resizeMode="contain" />
           <Text style={styles.brandName}>GestaoEventos</Text>

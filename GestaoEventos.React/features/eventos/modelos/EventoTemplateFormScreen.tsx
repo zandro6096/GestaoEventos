@@ -21,6 +21,8 @@ import {
   type EventoTemplatePayload,
 } from "../../../services/api/evento-templates-api";
 import { track } from "../../../services/analytics/analytics.service";
+import { fasesApi } from "../../../services/api/fases-api";
+import { FasesModeloEditor } from "./FasesModeloEditor";
 import { assertOnlineForMutation } from "../../../services/offline/mutation-guard";
 import { can } from "../../../services/permissions/permission.facade";
 import { useAuthStore } from "../../../stores/auth.store";
@@ -53,6 +55,7 @@ type Draft = {
   permitirAddResponsaveis: boolean;
   permitirRemoverResponsaveis: boolean;
   permitirAddParticipantes: boolean;
+  adicionarNovosParticipantesEmTodosEventos: boolean;
   permitirRemoverParticipantes: boolean;
   requerJustificativaRemocao: boolean;
   requerJustificativaAusencia: boolean;
@@ -108,6 +111,7 @@ const emptyDraft: Draft = {
   permitirAddResponsaveis: false,
   permitirRemoverResponsaveis: false,
   permitirAddParticipantes: true,
+  adicionarNovosParticipantesEmTodosEventos: false,
   permitirRemoverParticipantes: false,
   requerJustificativaRemocao: false,
   requerJustificativaAusencia: false,
@@ -143,6 +147,9 @@ export function EventoTemplateFormScreen() {
   const client = useQueryClient();
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [errors, setErrors] = useState<string[]>([]);
+  // Fases do evento (ex.: Evangelismo, Comunhão...), na ordem em que o grupo avança; gravadas em endpoint próprio.
+  const [fases, setFases] = useState<string[]>([]);
+  const [fasesOriginais, setFasesOriginais] = useState<string[]>([]);
   const allowed = Boolean(
     estruturaId && can("criar", "eventos", { estruturaId }),
   );
@@ -158,6 +165,19 @@ export function EventoTemplateFormScreen() {
     enabled: editing && allowed,
     retry: false,
   });
+  const fasesQuery = useQuery({
+    queryKey: ["evento-template-fases", templateId],
+    queryFn: () => fasesApi.listarDoModelo(templateId),
+    enabled: editing && allowed,
+    retry: false,
+  });
+  // Carrega as fases do modelo quando a consulta responde (ajuste de estado na renderização, sem efeito).
+  const [fasesCarregadas, setFasesCarregadas] = useState<string[] | null>(null);
+  if (fasesQuery.data && fasesQuery.data.fases !== fasesCarregadas) {
+    setFasesCarregadas(fasesQuery.data.fases);
+    setFases(fasesQuery.data.fases);
+    setFasesOriginais(fasesQuery.data.fases);
+  }
   const save = useMutation({
     mutationFn: async () => {
       const validation = validateDraft(draft);
@@ -192,6 +212,7 @@ export function EventoTemplateFormScreen() {
         permitirAddResponsaveis: draft.permitirAddResponsaveis,
         permitirRemoverResponsaveis: draft.permitirRemoverResponsaveis,
         permitirAddParticipantes: draft.permitirAddParticipantes,
+        adicionarNovosParticipantesEmTodosEventos: draft.adicionarNovosParticipantesEmTodosEventos,
         permitirRemoverParticipantes: draft.permitirRemoverParticipantes,
         requerJustificativaRemocao: draft.requerJustificativaRemocao,
         requerJustificativaAusencia: draft.requerJustificativaAusencia,
@@ -210,9 +231,15 @@ export function EventoTemplateFormScreen() {
         repetirCobrancaQuantidade: nonNegativeNumber(draft.repetirCobrancaQuantidade, 7),
         repetirCobrancaUnidade: draft.repetirCobrancaUnidade,
       };
-      return editing
-        ? eventoTemplatesApi.update(templateId, payload)
-        : eventoTemplatesApi.create(payload);
+      const result = editing
+        ? await eventoTemplatesApi.update(templateId, payload)
+        : await eventoTemplatesApi.create(payload);
+      const idSalvo = editing ? templateId : Number(result?.data?.id ?? 0);
+      if (idSalvo > 0 && fases.join("|") !== fasesOriginais.join("|")) {
+        await fasesApi.definirDoModelo(idSalvo, fases);
+        void client.invalidateQueries({ queryKey: ["evento-template-fases", idSalvo] });
+      }
+      return result;
     },
     onSuccess: () => {
       track(
@@ -597,6 +624,12 @@ export function EventoTemplateFormScreen() {
           onChange={(value) => update("permitirAddParticipantes", value)}
         />
         <Toggle
+          label="Vincular novos participantes a todos os eventos do grupo"
+          description="Quando ativo, novos cadastros ja ficam selecionados nos demais eventos deste grupo."
+          value={draft.adicionarNovosParticipantesEmTodosEventos}
+          onChange={(value) => update("adicionarNovosParticipantesEmTodosEventos", value)}
+        />
+        <Toggle
           label="Permitir remover participantes"
           value={draft.permitirRemoverParticipantes}
           onChange={(value) => update("permitirRemoverParticipantes", value)}
@@ -616,6 +649,13 @@ export function EventoTemplateFormScreen() {
           value={draft.permitirReatribuicaoResponsavel}
           onChange={(value) => update("permitirReatribuicaoResponsavel", value)}
         />
+      </Section>
+      <Section
+        icon="flag-outline"
+        title="Fases do evento"
+        description="Opcional. Coloque na ordem em que o grupo avança: a próxima fase é sugerida na hora de trocar. Cada evento deste modelo registra sua fase e quando mudou."
+      >
+        <FasesModeloEditor value={fases} onChange={setFases} uso={fasesQuery.data?.uso ?? []} />
       </Section>
       <Section
         icon="grid-outline"
@@ -855,10 +895,12 @@ function Choice({
 }
 function Toggle({
   label,
+  description,
   value,
   onChange,
 }: {
   label: string;
+  description?: string;
   value: boolean;
   onChange: (value: boolean) => void;
 }) {
@@ -866,7 +908,7 @@ function Toggle({
     <View style={styles.toggle}>
       <View style={styles.toggleText}>
         <Text style={styles.toggleLabel}>{label}</Text>
-        <Text style={styles.toggleHint}>{value ? "Ativo" : "Desativado"}</Text>
+        <Text style={styles.toggleHint}>{description ?? (value ? "Ativo" : "Desativado")}</Text>
       </View>
       <Switch
         accessibilityLabel={label}
@@ -931,6 +973,8 @@ function templateToDraft(template: EventoTemplate): Draft {
     permitirAddResponsaveis: template.permitirAddResponsaveis ?? false,
     permitirRemoverResponsaveis: template.permitirRemoverResponsaveis ?? false,
     permitirAddParticipantes: template.permitirAddParticipantes ?? true,
+    adicionarNovosParticipantesEmTodosEventos:
+      template.adicionarNovosParticipantesEmTodosEventos ?? false,
     permitirRemoverParticipantes:
       template.permitirRemoverParticipantes ?? false,
     requerJustificativaRemocao: template.requerJustificativaRemocao ?? false,

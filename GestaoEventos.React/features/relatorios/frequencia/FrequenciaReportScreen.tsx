@@ -86,6 +86,7 @@ export function FrequenciaReportScreen() {
         {!state.query.isLoading && !state.query.isError && data ? (
           <>
             <Summary data={data.resumo} />
+            <AcompanhamentosSection items={state.acompanhamentosQuery.data ?? []} />
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <View style={styles.titleRow}>
@@ -139,6 +140,11 @@ export function FrequenciaReportScreen() {
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+function AcompanhamentosSection({ items }: { items: import('../../../services/api/acompanhamentos-api').ParticipanteAcompanhamento[] }) {
+  const grouped = useMemo(() => { const map = new Map<number, typeof items[number]>(); for (const item of items) { const key = item.usuarioId ?? item.usuarioVirtualId ?? 0; if (key) map.set(key, item); } return [...map.values()].sort((a, b) => a.nome.localeCompare(b.nome)); }, [items]);
+  return <View style={styles.section}><View style={styles.sectionHeader}><View style={styles.titleRow}><Ionicons name="list-outline" size={19} color={colors.brandBlue} /><Text style={styles.sectionTitle}>Situacao dos participantes</Text></View><Text style={styles.meta}>{grouped.length} registro(s)</Text></View>{grouped.length ? grouped.map((item) => <View key={item.id} style={styles.item}><Text style={styles.itemName}>{item.nome}</Text><Text style={styles.body}>{item.natureza === 'indicador' ? `${item.nome}: ${item.valor === true ? 'Sim' : 'Nao'}` : `${item.nome}: ${item.status ?? 'Nao iniciado'}`}</Text>{item.natureza === 'indicador' && item.historico.length ? <Text style={styles.meta}>Historico: {item.historico.slice(0, 3).map((history) => `${history.valorNovo ? 'Sim' : 'Nao'} (${new Date(history.alteradoEm).toLocaleDateString('pt-BR')})`).join(' · ')}</Text> : null}</View>) : <Text style={styles.empty}>Nenhum acompanhamento cadastrado.</Text>}</View>;
 }
 
 function Filters({

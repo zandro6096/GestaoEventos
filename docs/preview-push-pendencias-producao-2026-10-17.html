@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Preview de push de pendências · Videira Guarulhos</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0c1220;--panel:#151e30;--panel2:#1b2840;--line:#2a3a56;--text:#edf3ff;--muted:#9eacc4;--blue:#84b7ff;--green:#6ee7b7;--amber:#ffd166;--red:#ff8e8e}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 20% 0,#172746 0,transparent 38%),var(--bg);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
+    main{max-width:1180px;margin:auto;padding:42px 24px 72px}header{margin-bottom:24px}.eyebrow{color:var(--blue);font-size:12px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}h1{font-size:clamp(28px,5vw,42px);line-height:1.1;margin:10px 0}h2{font-size:20px;margin:0 0 14px}h3{font-size:15px;margin:0 0 10px}.muted{color:var(--muted)}
+    .notice{background:#352d1c;border:1px solid #69552b;border-radius:14px;padding:16px 18px;margin:22px 0}.notice strong{color:var(--amber)}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:20px 0}.metric,.panel{background:linear-gradient(160deg,var(--panel),#111a2a);border:1px solid var(--line);border-radius:16px}.metric{padding:17px}.metric b{display:block;font-size:25px;margin-bottom:2px}.metric span{font-size:13px;color:var(--muted)}.panel{padding:20px;margin:16px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}tbody tr:last-child td{border-bottom:0}.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:750;white-space:nowrap}.sent{background:#12392f;color:var(--green)}.none{background:#3b2028;color:var(--red)}.available{background:#17304c;color:var(--blue)}.pending{background:#3c321c;color:var(--amber)}
+    .push{background:#090e18;border:1px solid #35445e;border-radius:16px;max-width:570px;padding:16px 18px;box-shadow:0 14px 38px #0005}.push-top{display:flex;align-items:center;gap:9px;color:#c7d4eb;font-size:12px}.appicon{width:27px;height:27px;border-radius:8px;background:linear-gradient(135deg,#4c8dff,#5ed8bd);display:grid;place-items:center;color:#071323;font-weight:900}.push time{margin-left:auto;color:#8797b1}.push h3{margin:13px 0 4px;font-size:16px}.push p{margin:0;color:#d7e1f1}.placeholder{color:var(--amber)}.tree{display:grid;gap:8px}.tree-row{border:1px solid var(--line);background:#101a2a;border-radius:11px;padding:10px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.tree-row.child{margin-left:22px}.tree-row.grandchild{margin-left:44px}.tree-row.leaf{margin-left:66px}.group-name{font-weight:700}.owner{color:var(--blue);font-size:12px}.token{margin-left:auto}.tree-title{color:var(--muted);font-size:12px;margin:14px 0 4px;text-transform:uppercase;letter-spacing:.07em}.small{font-size:13px}.callout{border-left:3px solid var(--blue);padding:10px 13px;background:#101a2a;color:#ced9eb;border-radius:0 9px 9px 0}.footer{margin-top:20px;padding:15px 17px;background:#111a2a;border-radius:12px;color:var(--muted);font-size:13px}
+    @media(max-width:760px){main{padding:28px 15px 50px}.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.panel{padding:16px}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Simulação somente leitura · dados de produção</div>
+    <h1>Quem receberia o push de pendências?</h1>
+    <div class="muted">Estrutura <strong>Videira Guarulhos</strong> · captura em 17/10/2026 às 18:42 (horário de Brasília)</div>
+  </header>
+
+  <div class="notice"><strong>Estado observado:</strong> a tabela de envios de hoje registra quatro pushes da manhã, para quatro pessoas/dispositivos. Os registros guardam a quantidade total e o número de dispositivos, mas não guardam o texto enviado, os nomes dos eventos ou a divisão de pendências diretas e subordinadas. Os cartões abaixo reproduzem a contagem real e mostram o formato da mensagem conforme a regra atual; trechos entre colchetes dependem do detalhe que não ficou persistido no log.</div>
+
+  <section class="cards" aria-label="Resumo da produção">
+    <div class="metric"><b>35</b><span>grupos na estrutura</span></div>
+    <div class="metric"><b>5</b><span>usuários com dispositivo push ativo</span></div>
+    <div class="metric"><b>4</b><span>pushes da manhã registrados hoje</span></div>
+    <div class="metric"><b>349</b><span>pendências somadas nos envios registrados</span></div>
+  </section>
+
+  <section class="panel">
+    <h2>Destinatários no estado atual</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Responsável</th><th>Grupo atribuído</th><th>Push ativo</th><th>Manhã de hoje</th><th>Prévia de conteúdo</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Sandro de Oliveira Sena</strong><div class="muted small">owner da estrutura</div></td><td>Videira Guarulhos (raiz)</td><td><span class="badge available">1 dispositivo</span></td><td><span class="badge sent">Enviado · 332</span></td><td>“Pendências na sua equipe” · 332 eventos sem presença registrada. A orientação lista responsáveis com pendências na estrutura.</td></tr>
+        <tr><td><strong>Erika</strong></td><td>Erika (abaixo de Gabriel)</td><td><span class="badge available">1 dispositivo</span></td><td><span class="badge sent">Enviado · 3</span></td><td>Resumo de 3 pendências da subárvore atribuída; o log não informa títulos/datas nem a frase de orientação original.</td></tr>
+        <tr><td><strong>Isa</strong> <span class="muted small">(Isabelly Nunes da Silva Santos)</span></td><td>Isabelly Nunes da Silva Santos (abaixo de Gabriel)</td><td><span class="badge available">1 dispositivo</span></td><td><span class="badge sent">Enviado · 2</span></td><td>Resumo de 2 pendências da subárvore atribuída; o log não informa títulos/datas nem a frase de orientação original.</td></tr>
+        <tr><td><strong>Samuel Moreira Reis</strong></td><td>Samuel Moreira Reis (abaixo de Davi)</td><td><span class="badge available">1 dispositivo</span></td><td><span class="badge sent">Enviado · 12</span></td><td>Resumo de 12 pendências da subárvore atribuída; o log não informa títulos/datas nem a frase de orientação original.</td></tr>
+        <tr><td><strong>Layza</strong></td><td>Layza (abaixo de Leticia Pedroso)</td><td><span class="badge available">1 dispositivo</span></td><td><span class="badge pending">Sem envio registrado</span></td><td>Não aparece em <code>push_envios</code> hoje. Pelo fluxo, isso pode significar sem pendências elegíveis ou envio não concluído; o log sozinho não diferencia.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>Exemplo visual da notificação</h2>
+      <p class="muted small">Usando o envio real de 332 pendências de Sandro. A frase exata do título e a quantidade atrasada dependem da distribuição por data, que não está salva no registro de envio.</p>
+      <div class="push">
+        <div class="push-top"><div class="appicon">V</div><strong>GestaoEventos</strong><time>hoje</time></div>
+        <h3>Pendências na sua equipe</h3>
+        <p>332 eventos estão sem presença registrada. Peça a <span class="placeholder">[responsáveis mais próximos dos grupos pendentes]</span> para registrar as presenças.</p>
+      </div>
+      <p class="callout small" style="margin-top:14px">A notificação leva para <code>/admin/eventos/meus</code>. O push da manhã de hoje já foi enviado e a deduplicação diária impede outro envio da manhã para esses usuários.</p>
+    </section>
+
+    <section class="panel">
+      <h2>O ramo do Roney, na produção</h2>
+      <p class="muted small">A regra recursiva alcança pendências em qualquer descendente. Os cinco responsáveis abaixo estão na hierarquia real; os quatro primeiros não têm dispositivo push ativo cadastrado agora.</p>
+      <div class="tree">
+        <div class="tree-row"><span class="group-name">Roney e Samila</span><span class="owner">Roney Reis</span><span class="badge none token">0 dispositivos</span></div>
+        <div class="tree-row child"><span class="group-name">Gabriel Sarno</span><span class="owner">Gabriel Sarno · usuário 39</span><span class="badge none token">0 dispositivos</span></div>
+        <div class="tree-row grandchild"><span class="group-name">Erika</span><span class="owner">Erika</span><span class="badge available token">1 ativo · 3 no envio da manhã</span></div>
+        <div class="tree-row grandchild"><span class="group-name">Ícaro Magno</span><span class="owner">Ícaro Magno Cardoso de Melo</span><span class="badge none token">0 dispositivos</span></div>
+        <div class="tree-row grandchild"><span class="group-name">Júlia Freitas Borges</span><span class="owner">Júlia Freitas Borges</span><span class="badge none token">0 dispositivos</span></div>
+        <div class="tree-row grandchild"><span class="group-name">Pedro Vinicius Sousa Martins</span><span class="owner">Pedro</span><span class="badge none token">0 dispositivos</span></div>
+        <div class="tree-row grandchild"><span class="group-name">Isabelly Nunes da Silva Santos</span><span class="owner">Isa</span><span class="badge available token">1 ativo · 2 no envio da manhã</span></div>
+        <div class="tree-row child"><span class="group-name">Daniel Ferreira</span><span class="owner">Daniel Ferreira</span><span class="badge none token">0 dispositivos</span></div>
+        <div class="tree-row grandchild"><span class="group-name">Grupos abaixo de Daniel</span><span class="muted small">4 grupos cadastrados</span></div>
+        <div class="tree-row child"><span class="group-name">Davi Rocha</span><span class="owner">Davi Rocha</span><span class="badge none token">0 dispositivos</span></div>
+        <div class="tree-row grandchild"><span class="group-name">Samuel Moreira Reis</span><span class="owner">Samuel Moreira Reis</span><span class="badge available token">1 ativo · 12 no envio da manhã</span></div>
+        <div class="tree-row grandchild"><span class="group-name">Vithor Tomaz Macedo</span><span class="owner">Vithor Tomaz Macedo</span><span class="badge none token">0 dispositivos</span></div>
+      </div>
+      <p class="callout small" style="margin-top:14px">Se Gabriel, Daniel, Davi ou Roney tiverem pendências próprias ou em seus descendentes, entram no cálculo recursivo. No estado atual não recebem push porque não há dispositivo ativo para esses usuários. O envio registrado para Erika, Isa e Samuel confirma que eles têm dispositivos e foram notificados hoje.</p>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Como a regra percorre os grupos</h2>
+    <div class="tree">
+      <div class="tree-row"><span class="group-name">Videira Guarulhos</span><span class="owner">Sandro · owner · toda a estrutura</span><span class="badge sent">332 no envio</span></div>
+      <div class="tree-row child"><span class="group-name">Adolescente</span><span class="muted small">contém o ramo do Roney</span></div>
+      <div class="tree-row grandchild"><span class="group-name">Roney e Samila → Gabriel Sarno → Erika, Ícaro, Júlia, Pedro e Isa</span><span class="muted small">recursão até cada grupo descendente</span></div>
+      <div class="tree-row grandchild"><span class="group-name">Roney e Samila → Daniel Ferreira → 4 grupos descendentes</span><span class="muted small">recursão até cada grupo descendente</span></div>
+      <div class="tree-row grandchild"><span class="group-name">Roney e Samila → Davi Rocha → Samuel e Vithor</span><span class="muted small">Samuel recebeu o envio registrado de 12</span></div>
+      <div class="tree-row child"><span class="group-name">Jovens → Rafael e Isabela</span><span class="muted small">demais ramos da estrutura</span></div>
+      <div class="tree-row child"><span class="group-name">Adultos → Tiago Pedroso</span><span class="muted small">demais ramos da estrutura</span></div>
+    </div>
+  </section>
+
+  <div class="footer">Fonte: leitura somente leitura do banco de produção em 17/10/2026. Foram consultados grupos, responsáveis, dispositivos push ativos e registros de envio do dia. Nenhum push foi disparado e nenhum dado foi alterado. O registro <code>push_envios</code> conserva total e dispositivos notificados, mas não o payload original nem o detalhe dos eventos.</div>
+</main>
+</body>
+</html>

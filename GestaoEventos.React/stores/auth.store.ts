@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 import { setUnauthorizedHandler } from '../services/api/http-client';
+import { pushRegistrationService } from '../services/notifications/push-registration.service';
 import {
   authSessionService,
   type AuthenticatedUser,
@@ -41,6 +42,11 @@ export const useAuthStore = create<AuthStore>((set) => ({
     return result;
   },
   async logout() {
+    // Antes de limpar a sessao: a remocao do token de push precisa do JWT. Limitado a 3s para nao travar a saida.
+    await Promise.race([
+      pushRegistrationService.unregister(),
+      new Promise<void>((resolve) => setTimeout(resolve, 3000)),
+    ]);
     await authSessionService.clearSession();
     useContextStore.getState().clearContext();
     usePermissionStore.getState().clearPermissions();

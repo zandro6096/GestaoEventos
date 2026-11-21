@@ -18,9 +18,10 @@ import { gruposApi } from '../../../services/api/grupos-api';
 import { EventoEditModal, type EventoEditValues } from './EventoEditModal';
 import { AdicionarParticipantePanel } from './AdicionarParticipantePanel';
 import { EditarParticipantePanel } from './EditarParticipantePanel';
+import { FaseAtualNota, FaseChip } from './FaseEventoCard';
 
 type PanelAction = AcompanhamentoAction['kind'] | 'attendance';
-const actionLabels: Record<PanelAction, string> = { iniciar: 'Iniciar ocorrencia', cancelar: 'Cancelar ocorrencia', reabrir: 'Reabrir ocorrencia', descancelar: 'Restaurar ocorrencia', confirmar: 'Confirmar responsavel', finalizar: 'Finalizar ocorrencia', adicionar: 'Adicionar participante', adicionar_virtual: 'Adicionar participante', remover: 'Remover participante', attendance: 'Salvar presenca' };
+const actionLabels: Record<PanelAction, string> = { iniciar: 'Iniciar ocorrencia', cancelar: 'Cancelar evento', reabrir: 'Reabrir ocorrencia', descancelar: 'Restaurar ocorrencia', confirmar: 'Confirmar responsavel', finalizar: 'Finalizar ocorrencia', adicionar: 'Adicionar participante', adicionar_virtual: 'Adicionar participante', remover: 'Remover participante', attendance: 'Salvar presenca' };
 
 export function AcompanhamentoScreen() {
   const params = useLocalSearchParams<{ id: string; data?: string }>();
@@ -108,7 +109,7 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
     if (!['PRESENTE', 'AUSENTE', 'JUSTIFICADO'].includes(currentStatus ?? '')) return;
     setSavingObservationId(participant.id);
     try {
-      await presenca.mutation.mutateAsync({ mode: 'single', participant, status: currentStatus as AttendanceStatus, observacao: observation });
+      await presenca.save({ mode: 'single', participant, status: currentStatus as AttendanceStatus, observacao: observation });
     } catch {
       setAttendanceError('Nao foi possivel salvar a observacao do participante.');
     } finally {
@@ -119,7 +120,7 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
     setAttendanceTargets(targets); setAttendanceStatus(status); setAttendanceError(''); setMotivo(targets.length === 1 ? participantObservation(targets[0]) : ''); setPanel('attendance');
     track('entrance', 'acompanhar_evento:justificativa_modal');
   };
-  const runAttendance = async (targets: Participante[], status: AttendanceStatus, observacao = '') => {
+  const runAttendance = async (targets: Participante[], status: AttendanceStatus, observacao = '', fromPanel = false) => {
     setAttendanceError('');
     try {
       const normalizedReason = observacao.trim();
@@ -128,18 +129,26 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
         setStoredAbsenceReasons(nextReasons);
         void secureStorage.setItem(absenceReasonStorageKey, JSON.stringify(nextReasons));
       }
-      if (targets.length === 1) await presenca.mutation.mutateAsync({ mode: 'single', participant: targets[0], status, observacao });
-      else await presenca.mutation.mutateAsync({ mode: 'bulk', items: targets.map((participant) => ({ participant, status, observacao })) });
-      setSelectedParticipants([]); setSelectionMode(false); setPanel(null);
+      const occurrenceStatus = data?.ocorrencia.status?.toUpperCase().replaceAll(' ', '_').replaceAll('Á', 'A');
+      if (data && ['AGENDADA', 'REAGENDADA'].includes(occurrenceStatus ?? '')) {
+        if (!state.actions?.iniciar) throw new Error('Esta ocorrencia precisa ser iniciada antes de registrar presencas, e voce nao tem permissao para inicia-la.');
+        track('entrance', 'acompanhar_evento:iniciar_automaticamente_ao_marcar_presenca', { extra: { ocorrencia_id: data.ocorrencia.id } });
+        await state.mutation.mutateAsync({ kind: 'iniciar', motivo: '' });
+      }
+      if (targets.length === 1) await presenca.save({ mode: 'single', participant: targets[0], status, observacao });
+      else await presenca.save({ mode: 'bulk', items: targets.map((participant) => ({ participant, status, observacao })) });
+      if (fromPanel || targets.length > 1) { setSelectedParticipants([]); setSelectionMode(false); }
+      if (fromPanel) setPanel(null);
     } catch (error) {
       setAttendanceError(error instanceof Error && error.name === 'OfflineMutationBlockedError'
         ? 'Sem conexao. O registro de presenca fica bloqueado enquanto estiver offline.'
         : normalizeApiError(error, 'Nao foi possivel salvar presencas.').message);
     }
   };
-  const startForRegistration = async () => {
-    if (submitLock.current) return;
+  const startOccurrence = async () => {
+    if (submitLock.current || state.mutation.isPending) return;
     submitLock.current = true;
+    state.mutation.reset();
     try { await state.mutation.mutateAsync({ kind: 'iniciar', motivo: '' }); }
     catch { /* Hook exposes the operational error. */ }
     finally { submitLock.current = false; }
@@ -150,6 +159,21 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
     if (requiresReason) openAttendance(targets, status);
     else void runAttendance(targets, status, targets.length === 1 ? participantObservation(targets[0]) : '');
   };
+  const isAttendancePending = (participant: Participante, status: AttendanceStatus) => presenca.saving[participant.id] === status;
+  const renderAttendanceActions = (p: Participante) => attendanceOptions.map((option) => (
+    <Action
+      key={option.status}
+      shortLabel={option.short}
+      active={p.status?.toUpperCase() === option.status}
+      loading={isAttendancePending(p, option.status)}
+      label={`Marcar ${p.nomeExibicao || p.nome} como ${option.verb}`}
+      icon={option.icon}
+      iconOnly
+      variant={option.variant}
+      disabled={presenca.saving[p.id] !== undefined}
+      onPress={() => applyAttendance([p], option.status)}
+    />
+  ));
   const saveParticipant = async (participant: Participante, values: { nome: string; email: string | null; telefone: string | null; dataNascimento: string | null; papelIds: number[]; papelPrincipalId: number | null }) => {
     setParticipantEditPending(true);
     setParticipantEditError(null);
@@ -169,7 +193,7 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
     if (!panel || submitLock.current || (needsReason && !motivo.trim())) return;
     if (panel === 'attendance') {
       submitLock.current = true;
-      try { await runAttendance(attendanceTargets, attendanceStatus, motivo); }
+      try { await runAttendance(attendanceTargets, attendanceStatus, motivo, true); }
       finally { submitLock.current = false; }
       return;
     }
@@ -190,7 +214,10 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
       finally { submitLock.current = false; }
       return;
     }
-    else if (panel === 'iniciar' || panel === 'cancelar' || panel === 'reabrir' || panel === 'descancelar' || panel === 'confirmar') action = { kind: panel, motivo };
+    else if (panel === 'iniciar' || panel === 'cancelar' || panel === 'reabrir' || panel === 'descancelar' || panel === 'confirmar') {
+      if (panel === 'cancelar' && motivo.trim().length < 5) return;
+      action = { kind: panel, motivo };
+    }
     else return;
     submitLock.current = true;
     try { await state.mutation.mutateAsync(action); setPanel(null); }
@@ -212,7 +239,8 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
       cep: values.cep.trim() || null, logradouro: values.logradouro.trim() || null, numero: values.numero.trim() || null,
       complemento: values.complemento.trim() || null, bairro: values.bairro.trim() || null, cidade: values.cidade.trim() || null,
       estado: values.estado.trim().toUpperCase() || null, recorrente: data.evento.recorrente,
-      diasSemanais: data.evento.recorrente ? data.evento.diasSemanais : null,
+      // Lista vazia apagaria a recorrência semanal no servidor (evento passa a valer todo dia); null = manter.
+      diasSemanais: data.evento.recorrente && data.evento.diasSemanais.length ? data.evento.diasSemanais : null,
       consolidacaoPermanente: values.consolidacaoPermanente, dataLimiteAjuste: values.dataLimiteAjuste.trim() ? `${values.dataLimiteAjuste.trim()}T00:00:00` : null,
       permitirReabertura: values.permitirReabertura, permitirPresencaAgrupada: values.permitirPresencaAgrupada,
       chaveAgrupamentoPresenca: values.permitirPresencaAgrupada ? data.evento.chaveAgrupamentoPresenca : null,
@@ -234,7 +262,6 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
       <View style={styles.eventToolbarActions}>
         {state.manage && <Action label="Editar evento" icon="create-outline" iconOnly variant="icon" onPress={() => { setEditingEvento(true); track('entrance', 'acompanhar_evento:editar_abrir'); }} />}
         {state.actions?.confirmar && <Action label="Confirmar responsavel" icon="people-outline" iconOnly variant="icon" onPress={() => openPanel('confirmar')} />}
-        {state.actions?.cancelar && <Action label="Cancelar ocorrencia" icon="trash-outline" iconOnly variant="danger" onPress={() => openPanel('cancelar')} />}
       </View>
     </View>
     {state.query.isLoading && <View style={styles.loading}><ActivityIndicator color={colors.brandBlue} accessibilityLabel="Carregando acompanhamento" /></View>}
@@ -251,8 +278,10 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
           <InfoChip icon="calendar-outline" label={dateLabel} tone="neutral" />
           <InfoChip icon="location-outline" label={data.evento.local || data.ocorrencia.local || 'Local nao informado'} tone="green" />
           {data.evento.recorrente && <InfoChip icon="repeat-outline" label="Recorrente" tone="blue" />}
+          <FaseChip eventoId={data.evento.id} dataReferencia={data.ocorrencia.dataHora} />
         </View>
         <Text style={styles.responsible}>Responsavel: {data.ocorrencia.responsavelNome || data.evento.responsavelAtualNome || data.evento.responsavelPrincipalNome || 'Nao informado'}</Text>
+        <FaseAtualNota eventoId={data.evento.id} dataReferencia={data.ocorrencia.dataHora} />
         {!!data.ocorrencia.motivoCancelamento && <Text style={styles.cancelReason}>Motivo: {data.ocorrencia.motivoCancelamento}</Text>}
       </View>
 
@@ -266,12 +295,14 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
         <StatusBadge status={currentStatus} virtual={data.ocorrencia.isVirtual} />
         <View style={[styles.statusActions, compactParticipantRows ? styles.statusActionsCompact : null]}>
           {data.evento.permitirPresencaAgrupada && <Action label="Preencher em Grupo" icon="grid-outline" iconOnly={compactParticipantRows} variant="secondary" onPress={openGroupAttendance} />}
-          {state.actions?.iniciar && <Action label={data.ocorrencia.isVirtual ? 'Abrir para Registro' : 'Iniciar evento'} icon="play-outline" iconOnly={compactParticipantRows} variant="primary" onPress={() => data.ocorrencia.isVirtual ? void startForRegistration() : openPanel('iniciar')} />}
+          {state.actions?.iniciar && <Action label={data.ocorrencia.isVirtual ? 'Abrir para Registro' : 'Iniciar evento'} icon="play-outline" iconOnly={compactParticipantRows} loading={state.mutation.isPending} disabled={state.mutation.isPending} variant="primary" onPress={() => void startOccurrence()} />}
+          {state.actions?.cancelar && <Action label="Cancelar evento" icon="trash-outline" variant="danger" disabled={state.mutation.isPending} onPress={() => openPanel('cancelar')} />}
           {state.actions?.finalizar && <Action label="Finalizar" icon="checkmark-circle-outline" iconOnly={compactParticipantRows} variant="primary" onPress={() => openPanel('finalizar')} />}
           {state.actions?.reabrir && <Action label="Reabrir" icon="refresh-outline" iconOnly={compactParticipantRows} variant="primary" onPress={() => openPanel('reabrir')} />}
           {state.actions?.descancelar && <Action label="Restaurar ocorrencia" icon="refresh-outline" iconOnly={compactParticipantRows} variant="primary" onPress={() => openPanel('descancelar')} />}
         </View>
       </View>
+      {state.mutation.isError && !panel && <Text accessibilityRole="alert" style={styles.error}>{normalizeApiError(state.mutation.error, 'Nao foi possivel iniciar o evento.').message}</Text>}
 
       <View style={styles.statsGrid}>
         <StatCard label="Total" value={counts.total} icon="people-outline" tone="blue" />
@@ -280,7 +311,7 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
         <StatCard label="Pendentes" value={counts.pendentes} icon="time-outline" tone="amber" />
       </View>
 
-      <View style={styles.participantSection}>
+      <View style={[styles.participantSection, openParticipantMenuId !== null && styles.participantSectionMenuOpen]}>
         <View style={styles.sectionHeader}>
           <View style={styles.sectionTitleRow}><Text style={styles.heading}>Participantes</Text><View style={styles.countBadge}><Text style={styles.countBadgeText}>{counts.total}</Text></View></View>
           <View style={styles.sectionActions}>
@@ -308,12 +339,12 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
         {openParticipantMenuId !== null && <Pressable accessibilityLabel="Fechar menu de acoes" style={styles.participantMenuOverlay} onPress={() => setOpenParticipantMenuId(null)} />}
         <View style={styles.participantList}>{visibleParticipants.map((p, index) => <Fragment key={`${p.isVirtual}:${p.usuarioId ?? p.usuarioVirtualId}:${p.id}`}>
           {(index === 0 || (visibleParticipants[index - 1].funcao || 'Participante') !== (p.funcao || 'Participante')) ? <View style={{ backgroundColor: colors.surfaceMuted, borderTopWidth: 1, borderBottomWidth: 1, borderColor: colors.borderSubtle, paddingHorizontal: 16, paddingVertical: 7 }}><Text style={{ ...typography.caption, color: colors.textSecondary, fontWeight: '800' }}>{p.funcao || 'Participante'}</Text></View> : null}
-          <View key={`${p.isVirtual}:${p.usuarioId ?? p.usuarioVirtualId}:${p.id}`} style={[styles.participantRow, compactParticipantRows && styles.participantRowCompact, selectedParticipants.includes(p.id) ? { backgroundColor: '#F8FBFF' } : null]}>
+          <View key={`${p.isVirtual}:${p.usuarioId ?? p.usuarioVirtualId}:${p.id}`} style={[styles.participantRow, compactParticipantRows && styles.participantRowCompact, openParticipantMenuId === p.id ? styles.participantRowMenuOpen : null, selectedParticipants.includes(p.id) ? { backgroundColor: '#F8FBFF' } : null]}>
             <Pressable accessibilityRole={selectionMode ? 'checkbox' : 'button'} accessibilityLabel={selectionMode ? `Selecionar ${p.nomeExibicao || p.nome}` : `Segure para selecionar ${p.nomeExibicao || p.nome}`} accessibilityState={selectionMode ? { checked: selectedParticipants.includes(p.id) } : undefined} onPress={() => selectionMode && toggleParticipantSelection(p.id)} onLongPress={() => { if (state.actions?.participantes) { setSelectionMode(true); toggleParticipantSelection(p.id); } }} delayLongPress={350} style={[styles.participantIdentity, compactParticipantRows && styles.participantIdentityCompact]}>
               <View style={styles.avatar}><Text style={styles.avatarText}>{(p.nomeExibicao || p.nome).charAt(0).toUpperCase()}</Text></View>
               <View style={styles.personInfo}><Text numberOfLines={1} ellipsizeMode="tail" style={styles.personName}>{p.nomeExibicao || p.nome}</Text><View style={styles.personMeta}><Text numberOfLines={1} ellipsizeMode="tail" style={styles.roleText}>{p.funcao || 'Participante'}</Text><Text style={styles.dot}>·</Text><Text numberOfLines={1} ellipsizeMode="tail" style={statusToneStyle(p.status)}>{statusLabel(p.status)}</Text></View>{p.email ? <Text numberOfLines={1} ellipsizeMode="tail" style={styles.email}>{p.email}</Text> : null}</View>
             </Pressable>
-            {state.actions?.participantes && compactParticipantRows ? <View style={[styles.participantActions, styles.participantActionsCompact]}>
+            {state.actions?.participantes ? <View style={[styles.participantActions, compactParticipantRows && styles.participantActionsCompact]}>
               <View style={styles.participantMenuWrap}>
                 <Pressable accessibilityRole="button" accessibilityLabel={`Mais acoes de ${p.nomeExibicao || p.nome}`} accessibilityState={{ expanded: openParticipantMenuId === p.id }} disabled={savingObservationId === p.id} style={[styles.mobileIconButton, openParticipantMenuId === p.id && styles.mobileIconButtonActive]} onPress={() => { setOpenObservationId(null); setOpenParticipantMenuId((current) => current === p.id ? null : p.id); }}>
                   <Ionicons name="add-outline" size={21} color={colors.brandBlue} />
@@ -324,13 +355,7 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
                   <Pressable style={[styles.participantMenuItem, styles.participantMenuItemDanger]} onPress={() => { setOpenParticipantMenuId(null); openPanel('remover', p); }}><Ionicons name="person-remove-outline" size={16} color={colors.error} /><Text style={styles.participantMenuDangerText}>Remover participante</Text></Pressable>
                 </View> : null}
               </View>
-              <Action shortLabel="P" active={p.status?.toUpperCase() === 'PRESENTE'} label={`Marcar ${p.nomeExibicao || p.nome} como presente`} icon="checkmark-outline" iconOnly variant="success" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'PRESENTE')} />
-              <Action shortLabel="A" active={p.status?.toUpperCase() === 'AUSENTE'} label={`Marcar ${p.nomeExibicao || p.nome} como ausente`} icon="close-outline" iconOnly variant="danger" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'AUSENTE')} />
-              <Action shortLabel="J" active={p.status?.toUpperCase() === 'JUSTIFICADO'} label={`Marcar ${p.nomeExibicao || p.nome} como justificado`} icon="document-text-outline" iconOnly variant="secondary" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'JUSTIFICADO')} />
-            </View> : state.actions?.participantes ? <View style={styles.participantActions}>
-              <Action shortLabel="P" active={p.status?.toUpperCase() === 'PRESENTE'} label={`Marcar ${p.nomeExibicao || p.nome} como presente`} icon="checkmark-outline" iconOnly variant="success" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'PRESENTE')} />
-              <Action shortLabel="A" active={p.status?.toUpperCase() === 'AUSENTE'} label={`Marcar ${p.nomeExibicao || p.nome} como ausente`} icon="close-outline" iconOnly variant="danger" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'AUSENTE')} />
-              <Action shortLabel="J" active={p.status?.toUpperCase() === 'JUSTIFICADO'} label={`Marcar ${p.nomeExibicao || p.nome} como justificado`} icon="document-text-outline" iconOnly variant="secondary" disabled={presenca.mutation.isPending} onPress={() => applyAttendance([p], 'JUSTIFICADO')} />
+              {renderAttendanceActions(p)}
             </View> : null}
           </View>
           {openObservationId === p.id ? <View style={styles.observationPanel}><View style={styles.observationHeading}><Ionicons name="chatbubble-outline" size={16} color={colors.brandBlue} /><Text style={styles.label}>Observacao</Text><Text style={styles.observationHint}>{['PRESENTE', 'AUSENTE', 'JUSTIFICADO'].includes(p.status?.toUpperCase() ?? '') ? 'Atualiza o registro atual.' : 'Sera enviada ao marcar presenca.'}</Text></View><TextInput accessibilityLabel={`Observacao de ${p.nomeExibicao || p.nome}`} multiline maxLength={500} value={participantObservation(p)} onChangeText={(value) => setObservationDrafts((current) => ({ ...current, [p.id]: value }))} placeholder="Adicionar observacao opcional" placeholderTextColor={colors.textMuted} style={styles.observationInput} /><View style={styles.observationActions}><Text style={styles.observationCount}>{participantObservation(p).length}/500</Text><Pressable style={styles.secondaryButton} onPress={() => setOpenObservationId(null)}><Text style={styles.secondaryButtonText}>Fechar</Text></Pressable><Pressable disabled={savingObservationId === p.id} style={[styles.primaryButton, savingObservationId === p.id && styles.actionDisabled]} onPress={() => void saveObservation(p)}><Ionicons name="save-outline" size={17} color={colors.surfacePrimary} /><Text style={styles.primaryButtonText}>{savingObservationId === p.id ? 'Salvando...' : 'Salvar'}</Text></Pressable></View></View> : null}
@@ -378,6 +403,7 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
             estruturaId={state.scope.estruturaId}
             grupoId={data.evento.grupoId}
             eventoId={data.evento.id}
+            eventoTemplateId={data.evento.eventoTemplateId}
             dataReferencia={data.ocorrencia.dataHora}
             participantes={data.participantes}
             pending={state.mutation.isPending}
@@ -385,23 +411,42 @@ function AcompanhamentoContent({ eventoId, day }: { eventoId: number; day?: stri
             onSubmit={async (action) => state.mutation.mutateAsync(action)}
             onClose={() => { if (!state.mutation.isPending) setPanel(null); }}
           />}
-          {needsReason && <View style={styles.section}><Text style={styles.label}>Motivo da ausência</Text>{recentAbsenceReasons.length > 0 && <View style={styles.reasonChips}>{recentAbsenceReasons.map((reason) => <Pressable key={reason} accessibilityRole="button" accessibilityLabel={`Usar motivo ${reason}`} style={styles.reasonChip} onPress={() => setMotivo(reason)}><Text numberOfLines={1} style={styles.reasonChipText}>{reason}</Text></Pressable>)}</View>}<TextInput accessibilityLabel="Motivo" multiline value={motivo} onChangeText={setMotivo} placeholder="Descreva o motivo da ausência" placeholderTextColor={colors.textMuted} style={[styles.input, styles.reasonInput]} /></View>}
+          {needsReason && <View style={styles.section}><Text style={styles.label}>{panel === 'cancelar' ? 'Motivo do cancelamento (obrigatorio)' : 'Motivo da ausência'}</Text>{recentAbsenceReasons.length > 0 && panel === 'attendance' && <View style={styles.reasonChips}>{recentAbsenceReasons.map((reason) => <Pressable key={reason} accessibilityRole="button" accessibilityLabel={`Usar motivo ${reason}`} style={styles.reasonChip} onPress={() => setMotivo(reason)}><Text numberOfLines={1} style={styles.reasonChipText}>{reason}</Text></Pressable>)}</View>}<TextInput accessibilityLabel={panel === 'cancelar' ? 'Motivo do cancelamento' : 'Motivo'} multiline value={motivo} onChangeText={setMotivo} placeholder={panel === 'cancelar' ? 'Explique por que esta ocorrencia nao vai acontecer' : 'Descreva o motivo da ausência'} placeholderTextColor={colors.textMuted} style={[styles.input, styles.reasonInput]} />{panel === 'cancelar' && <Text style={styles.secondary}>Informe pelo menos 5 caracteres. A ocorrencia permanecerá no historico.</Text>}</View>}
           {state.mutation.isError && <Text accessibilityRole="alert" style={styles.error}>{normalizeApiError(state.mutation.error, 'Nao foi possivel concluir a acao.').message}</Text>}
           {presenca.mutation.isError && <Text accessibilityRole="alert" style={styles.error}>{normalizeApiError(presenca.mutation.error, 'Nao foi possivel salvar presencas.').message}</Text>}
-          {panel !== 'adicionar' && <Action label={state.mutation.isPending || presenca.mutation.isPending ? 'Salvando...' : 'Confirmar'} icon="checkmark" variant="primary" disabled={state.mutation.isPending || presenca.mutation.isPending || (needsReason && !motivo.trim()) || (panel === 'attendance' && !attendanceTargets.length)} onPress={() => void save()} />}
+          {panel !== 'adicionar' && <Action label="Confirmar" icon="checkmark" loading={state.mutation.isPending || presenca.mutation.isPending} variant="primary" disabled={state.mutation.isPending || presenca.mutation.isPending || (needsReason && !motivo.trim()) || (panel === 'cancelar' && motivo.trim().length < 5) || (panel === 'attendance' && !attendanceTargets.length)} onPress={() => void save()} />}
         </ScrollView>
       </View></View>
       </KeyboardAvoidingView>
     </Modal>
     <EventoEditModal key={editingEvento ? `evento:${data?.evento.id}:${data?.evento.inicioEm}` : 'evento-closed'} evento={editingEvento ? data?.evento ?? null : null} grupos={grupos.data ?? []} pending={state.editMutation.isPending} error={state.editMutation.isError ? normalizeApiError(state.editMutation.error, 'Nao foi possivel editar o evento.').message : null} onClose={() => { if (!state.editMutation.isPending) setEditingEvento(false); }} onSave={saveEvento} />
-    <EditarParticipantePanel key={editingParticipant ? `participante:${editingParticipant.id}:${editingParticipant.nomeExibicao || editingParticipant.nome}` : 'participante-closed'} participante={editingParticipant} estruturaId={state.scope.estruturaId} pending={participantEditPending} error={participantEditError} onClose={() => { if (!participantEditPending) { setEditingParticipant(null); setParticipantEditError(null); } }} onSave={(values) => { if (editingParticipant) void saveParticipant(editingParticipant, values); }} />
+    <EditarParticipantePanel key={editingParticipant ? `participante:${editingParticipant.id}:${editingParticipant.nomeExibicao || editingParticipant.nome}` : 'participante-closed'} participante={editingParticipant} estruturaId={state.scope.estruturaId} candidatos={data?.participantes ?? []} pending={participantEditPending} error={participantEditError} onClose={() => { if (!participantEditPending) { setEditingParticipant(null); setParticipantEditError(null); } }} onSave={(values) => { if (editingParticipant) void saveParticipant(editingParticipant, values); }} />
   </ScrollView>;
 }
 
-function Action({ label, icon, shortLabel, onPress, disabled = false, iconOnly = false, active = true, variant = 'secondary' }: { label: string; icon: React.ComponentProps<typeof Ionicons>['name']; shortLabel?: string; onPress: () => void; disabled?: boolean; iconOnly?: boolean; active?: boolean; variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'icon' }) {
+const attendanceOptions = [
+  { status: 'PRESENTE', short: 'P', icon: 'checkmark-outline', variant: 'success', verb: 'presente' },
+  { status: 'AUSENTE', short: 'A', icon: 'close-outline', variant: 'danger', verb: 'ausente' },
+  { status: 'JUSTIFICADO', short: 'J', icon: 'document-text-outline', variant: 'secondary', verb: 'justificado' },
+] as const;
+
+const markTones = {
+  success: { solid: '#10B981', tint: '#ECFDF5', ink: '#047857' },
+  danger: { solid: '#EF4444', tint: '#FEF2F2', ink: '#B91C1C' },
+  warning: { solid: '#F59E0B', tint: '#FFFBEB', ink: '#B45309' },
+} as const;
+
+function Action({ label, icon, shortLabel, onPress, disabled = false, loading = false, iconOnly = false, active = true, variant = 'secondary' }: { label: string; icon: React.ComponentProps<typeof Ionicons>['name']; shortLabel?: string; onPress: () => void; disabled?: boolean; loading?: boolean; iconOnly?: boolean; active?: boolean; variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'icon' }) {
   const iconColor = variant === 'primary' ? colors.surfacePrimary : variant === 'success' ? '#059669' : variant === 'danger' ? colors.error : colors.brandBlue;
-  return <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled, selected: active }} disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.action, iconOnly ? styles.actionIcon : null, shortLabel ? styles.action_icon : styles[`action_${variant}`], iconOnly && !active ? styles.actionInactive : null, pressed ? styles.actionPressed : null, disabled && styles.actionDisabled]}>
-    {shortLabel ? <View style={styles.actionMark}><Ionicons name={icon} size={14} color={colors.textSecondary} /><Text style={styles.actionLetter}>{shortLabel}</Text></View> : <Ionicons name={icon} size={iconOnly ? 20 : 18} color={iconColor} />}{!iconOnly && <Text style={[styles.actionText, variant === 'primary' ? styles.actionTextPrimary : null]}>{label}</Text>}
+  const markTone = shortLabel ? markTones[variant === 'success' ? 'success' : variant === 'danger' ? 'danger' : 'warning'] : null;
+  const filled = Boolean(markTone && active && !loading);
+  const markStyle = markTone && (loading || active) ? { backgroundColor: markTone.tint, borderColor: markTone.solid } : null;
+  return <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ disabled, selected: active, busy: loading }} disabled={disabled || loading} onPress={onPress} style={({ pressed }) => [styles.action, iconOnly ? styles.actionIcon : null, shortLabel ? [styles.action_icon, styles.markButton] : styles[`action_${variant}`], iconOnly && !active ? styles.actionInactive : null, markStyle, pressed ? styles.actionPressed : null, disabled && !loading && styles.actionDisabled]}>
+    {loading
+      ? <ActivityIndicator size="small" color={markTone?.solid ?? iconColor} />
+      : shortLabel && markTone
+      ? <View style={styles.actionMark}><Ionicons name={icon} size={14} color={filled && markTone ? markTone.ink : colors.textMuted} /><Text style={[styles.actionLetter, { color: filled && markTone ? markTone.ink : colors.textMuted }]}>{shortLabel}</Text></View>
+      : <Ionicons name={icon} size={iconOnly ? 20 : 18} color={iconColor} />}{!iconOnly && <Text style={[styles.actionText, variant === 'primary' ? styles.actionTextPrimary : null]}>{label}</Text>}
   </Pressable>;
 }
 
@@ -485,18 +530,18 @@ const styles = StyleSheet.create({
   occurrenceHeading: { minWidth: 160, alignItems: 'center', gap: 2 }, monthLabel: { ...typography.bodySmall, fontWeight: '800', color: colors.textHeading, textTransform: 'capitalize' }, occurrenceDate: { ...typography.caption, color: colors.textSecondary, textTransform: 'capitalize' },
   roundControl: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.full, backgroundColor: colors.surfacePrimary },
   statusRail: { minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 10, borderBottomWidth: 1, borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary, paddingHorizontal: 16, paddingVertical: 10 },
-  statusActions: { flex: 1, flexDirection: 'row', justifyContent: 'flex-end', gap: 8 }, statusActionsCompact: { flex: 0, gap: 6 },
+  statusActions: { flex: 1, flexDirection: 'row', justifyContent: 'flex-end', gap: 8 }, statusActionsCompact: { gap: 6, flexWrap: 'wrap' },
   statusBadge: { minHeight: 34, flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: radius.full, paddingHorizontal: 11 }, statusBadge_green: { backgroundColor: '#ECFDF5', borderColor: '#A7F3D0' }, statusBadge_red: { backgroundColor: '#FEF2F2', borderColor: '#FECACA' }, statusBadge_amber: { backgroundColor: '#FFFBEB', borderColor: '#FDE68A' }, statusBadge_neutral: { backgroundColor: colors.surfaceMuted, borderColor: colors.borderSubtle }, statusDot: { width: 7, height: 7, borderRadius: radius.full }, statusDot_green: { backgroundColor: '#059669' }, statusDot_red: { backgroundColor: colors.error }, statusDot_amber: { backgroundColor: '#D97706' }, statusDot_neutral: { backgroundColor: colors.textMuted }, statusBadgeText: { ...typography.caption, fontWeight: '800', color: colors.textBody },
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, backgroundColor: colors.surfacePage, padding: 12 }, statCard: { flex: 1, minWidth: 130, minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 9, borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.sm, backgroundColor: colors.surfacePrimary, padding: 10 }, statIcon: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: 9 }, statIcon_blue: { backgroundColor: '#EFF6FF' }, statIcon_green: { backgroundColor: '#ECFDF5' }, statIcon_red: { backgroundColor: '#FEF2F2' }, statIcon_amber: { backgroundColor: '#FFFBEB' }, statValue: { ...typography.h2, fontSize: 22, lineHeight: 24, fontWeight: '800' }, statValue_blue: { color: colors.textHeading }, statValue_green: { color: '#059669' }, statValue_red: { color: colors.error }, statValue_amber: { color: '#D97706' }, statLabel: { ...typography.caption, color: colors.textSecondary },
-  participantSection: { position: 'relative', borderTopWidth: 1, borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary }, sectionHeader: { minHeight: 64, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingHorizontal: 16 }, sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 }, heading: { ...typography.h3, fontSize: 18, color: colors.textHeading }, countBadge: { minWidth: 24, height: 24, alignItems: 'center', justifyContent: 'center', borderRadius: radius.full, backgroundColor: '#EFF6FF' }, countBadgeText: { ...typography.caption, color: colors.brandBlue, fontWeight: '800' }, sectionActions: { flexDirection: 'row', gap: 8 },
+  participantSection: { position: 'relative', borderTopWidth: 1, borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary }, participantSectionMenuOpen: { zIndex: 100, elevation: 20 }, sectionHeader: { minHeight: 64, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, paddingHorizontal: 16 }, sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 }, heading: { ...typography.h3, fontSize: 18, color: colors.textHeading }, countBadge: { minWidth: 24, height: 24, alignItems: 'center', justifyContent: 'center', borderRadius: radius.full, backgroundColor: '#EFF6FF' }, countBadgeText: { ...typography.caption, color: colors.brandBlue, fontWeight: '800' }, sectionActions: { flexDirection: 'row', gap: 8 },
   filterRail: { flexDirection: 'row', gap: 7, overflow: 'hidden', paddingHorizontal: 16, paddingBottom: 10 }, filterChip: { minHeight: 36, flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.full, backgroundColor: colors.surfacePrimary, paddingHorizontal: 11 }, filterChipActive: { borderColor: colors.brandBlue, backgroundColor: colors.brandBlue }, filterChipGreen: { borderColor: '#D1FAE5' }, filterChipRed: { borderColor: '#FECACA' }, filterChipText: { ...typography.caption, color: colors.textBody, fontWeight: '700' }, filterChipTextActive: { color: colors.surfacePrimary }, filterCount: { ...typography.caption, minWidth: 18, textAlign: 'center', color: colors.textMuted, fontWeight: '800' }, filterCountActive: { color: colors.surfacePrimary },
-  searchRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.sm, marginHorizontal: 16, paddingHorizontal: 12, backgroundColor: colors.surfacePage }, searchInput: { flex: 1, minWidth: 0, height: 42, color: colors.textBody, fontSize: 15 }, bulkBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingHorizontal: 16, paddingVertical: 10 }, bulkBarCompact: { flexDirection: 'column', alignItems: 'stretch', gap: 8 }, bulkActions: { flexDirection: 'row', gap: 5 }, bulkActionsCompact: { justifyContent: 'flex-end' },
-  participantList: { marginTop: 8 }, participantRow: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 9, borderTopWidth: 1, borderColor: colors.borderSubtle, paddingHorizontal: 16, paddingVertical: 10 }, participantRowCompact: { flexDirection: 'column', alignItems: 'stretch', gap: 8, paddingVertical: 12 }, participantIdentity: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 9 }, participantIdentityCompact: { flexGrow: 0, flexShrink: 1, flexBasis: 'auto', width: '100%' }, checkbox: { width: 24, height: 36, alignItems: 'center', justifyContent: 'center' }, avatar: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: radius.full, backgroundColor: '#3B82F6' }, avatarText: { ...typography.body, color: colors.surfacePrimary, fontWeight: '800' }, personInfo: { flex: 1, minWidth: 0, gap: 2 }, personName: { ...typography.bodySmall, color: colors.textHeading, fontWeight: '800' }, personMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, flexWrap: 'wrap' }, roleText: { ...typography.caption, color: colors.textSecondary, flexShrink: 1 }, dot: { ...typography.caption, color: colors.textMuted }, statusPresent: { ...typography.caption, color: '#059669', fontWeight: '700' }, statusAbsent: { ...typography.caption, color: colors.error, fontWeight: '700' }, statusJustified: { ...typography.caption, color: '#D97706', fontWeight: '700' }, statusPending: { ...typography.caption, color: colors.textMuted, fontWeight: '700' }, email: { ...typography.caption, color: colors.textMuted }, participantActions: { flexDirection: 'row', gap: 4 }, participantActionsCompact: { width: '100%', flexGrow: 0, flexShrink: 0, justifyContent: 'flex-end', paddingLeft: 0, paddingTop: 4 }, mobileIconButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.sm, backgroundColor: colors.surfacePrimary }, mobileIconButtonActive: { borderColor: colors.brandBlue, backgroundColor: '#EFF6FF' }, participantMenuOverlay: { ...StyleSheet.absoluteFill, zIndex: 10 }, participantMenuWrap: { position: 'relative', zIndex: 30 }, participantMenu: { position: 'absolute', top: 48, right: 0, minWidth: 146, zIndex: 40, elevation: 8, borderWidth: 1, borderColor: colors.borderDefault, borderRadius: radius.sm, backgroundColor: colors.surfacePrimary, padding: 5, boxShadow: '0px 10px 24px rgba(15, 23, 42, 0.18)' }, participantMenuItem: { minHeight: 38, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: radius.sm, paddingHorizontal: 9 }, participantMenuItemDanger: { borderTopWidth: 1, borderColor: colors.borderSubtle, marginTop: 3, paddingTop: 6 }, participantMenuText: { ...typography.caption, color: colors.textBody, fontWeight: '700' }, participantMenuDangerText: { ...typography.caption, color: colors.error, fontWeight: '700' }, observationPanel: { gap: 8, marginHorizontal: 12, marginBottom: 10, borderWidth: 1, borderColor: '#BFDBFE', borderRadius: radius.sm, backgroundColor: '#F8FBFF', padding: 10 }, observationHeading: { flexDirection: 'row', alignItems: 'center', gap: 6 }, observationHint: { ...typography.caption, flex: 1, color: colors.textMuted }, observationInput: { minHeight: 78, borderWidth: 1, borderColor: colors.borderDefault, borderRadius: radius.sm, padding: 9, color: colors.textBody, backgroundColor: colors.surfacePrimary, textAlignVertical: 'top' }, observationActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 7 }, observationCount: { ...typography.caption, marginRight: 'auto', color: colors.textMuted }, secondaryButton: { minHeight: 40, justifyContent: 'center', borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.sm, paddingHorizontal: 11 }, secondaryButtonText: { ...typography.caption, color: colors.textBody, fontWeight: '700' }, primaryButton: { minHeight: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderRadius: radius.sm, backgroundColor: colors.brandBlue, paddingHorizontal: 12 }, primaryButtonText: { ...typography.caption, color: colors.surfacePrimary, fontWeight: '800' },
+  searchRow: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.sm, marginHorizontal: 16, paddingHorizontal: 12, backgroundColor: colors.surfacePrimary }, searchInput: { flex: 1, minWidth: 0, height: 42, color: colors.textBody, fontSize: 15 }, bulkBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingHorizontal: 16, paddingVertical: 10 }, bulkBarCompact: { flexDirection: 'column', alignItems: 'stretch', gap: 8 }, bulkActions: { flexDirection: 'row', gap: 5 }, bulkActionsCompact: { justifyContent: 'flex-end' },
+  participantList: { marginTop: 8 }, participantRow: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 9, borderTopWidth: 1, borderColor: colors.borderSubtle, paddingHorizontal: 16, paddingVertical: 10 }, participantRowCompact: { gap: 8, paddingHorizontal: 12 }, participantRowMenuOpen: { position: 'relative', zIndex: 50, elevation: 12 }, participantIdentity: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 9 }, participantIdentityCompact: { gap: 8 }, checkbox: { width: 24, height: 36, alignItems: 'center', justifyContent: 'center' }, avatar: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderRadius: radius.full, backgroundColor: '#3B82F6' }, avatarText: { ...typography.body, color: colors.surfacePrimary, fontWeight: '800' }, personInfo: { flex: 1, minWidth: 0, gap: 2 }, personName: { ...typography.bodySmall, color: colors.textHeading, fontWeight: '800' }, personMeta: { flexDirection: 'row', alignItems: 'center', gap: 4, flexWrap: 'wrap' }, roleText: { ...typography.caption, color: colors.textSecondary, flexShrink: 1 }, dot: { ...typography.caption, color: colors.textMuted }, statusPresent: { ...typography.caption, color: '#059669', fontWeight: '700' }, statusAbsent: { ...typography.caption, color: colors.error, fontWeight: '700' }, statusJustified: { ...typography.caption, color: '#D97706', fontWeight: '700' }, statusPending: { ...typography.caption, color: colors.textMuted, fontWeight: '700' }, email: { ...typography.caption, color: colors.textMuted }, participantActions: { flexDirection: 'row', alignItems: 'center', flexShrink: 0, gap: 5 }, participantActionsCompact: { gap: 5 }, mobileIconButton: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.sm, backgroundColor: colors.surfacePrimary }, mobileIconButtonActive: { borderColor: colors.brandBlue, backgroundColor: '#EFF6FF' }, participantMenuOverlay: { ...StyleSheet.absoluteFill, zIndex: 10 }, participantMenuWrap: { position: 'relative', zIndex: 30 }, participantMenu: { position: 'absolute', top: 40, right: 0, minWidth: 160, zIndex: 40, elevation: 8, borderWidth: 1, borderColor: colors.borderDefault, borderRadius: radius.sm, backgroundColor: colors.surfacePrimary, padding: 5, boxShadow: '0px 10px 24px rgba(15, 23, 42, 0.18)' }, participantMenuItem: { minHeight: 38, flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: radius.sm, paddingHorizontal: 9 }, participantMenuItemDanger: { borderTopWidth: 1, borderColor: colors.borderSubtle, marginTop: 3, paddingTop: 6 }, participantMenuText: { ...typography.caption, color: colors.textBody, fontWeight: '700' }, participantMenuDangerText: { ...typography.caption, color: colors.error, fontWeight: '700' }, observationPanel: { gap: 8, marginHorizontal: 12, marginBottom: 10, borderWidth: 1, borderColor: '#BFDBFE', borderRadius: radius.sm, backgroundColor: '#F8FBFF', padding: 10 }, observationHeading: { flexDirection: 'row', alignItems: 'center', gap: 6 }, observationHint: { ...typography.caption, flex: 1, color: colors.textMuted }, observationInput: { minHeight: 78, borderWidth: 1, borderColor: colors.borderDefault, borderRadius: radius.sm, padding: 9, color: colors.textBody, backgroundColor: colors.surfacePrimary, textAlignVertical: 'top' }, observationActions: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 7 }, observationCount: { ...typography.caption, marginRight: 'auto', color: colors.textMuted }, secondaryButton: { minHeight: 40, justifyContent: 'center', borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.sm, paddingHorizontal: 11 }, secondaryButtonText: { ...typography.caption, color: colors.textBody, fontWeight: '700' }, primaryButton: { minHeight: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderRadius: radius.sm, backgroundColor: colors.brandBlue, paddingHorizontal: 12 }, primaryButtonText: { ...typography.caption, color: colors.surfacePrimary, fontWeight: '800' },
   progressSection: { gap: 7, borderTopWidth: 1, borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary, padding: 16 }, progressHeader: { flexDirection: 'row', justifyContent: 'space-between' }, progressValue: { ...typography.caption, color: colors.brandBlue, fontWeight: '800' }, progressTrack: { height: 7, overflow: 'hidden', borderRadius: radius.full, backgroundColor: colors.surfaceMuted }, progressFill: { height: '100%', borderRadius: radius.full, backgroundColor: colors.brandBlue }, secondarySection: { gap: 12, borderTopWidth: 1, borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary, padding: 16 }, emptyState: { minHeight: 120, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 },
   loading: { minHeight: 160, alignItems: 'center', justifyContent: 'center' }, stateSection: { gap: 12, padding: 24 },
   titleOld: { ...typography.h1, color: colors.textHeading }, label: { ...typography.bodySmall, fontWeight: '600', color: colors.textHeading }, secondary: { ...typography.bodySmall, color: colors.textSecondary }, section: { gap: 12 }, toolbar: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 12 },
   input: { minHeight: 48, borderWidth: 1, borderColor: colors.borderDefault, borderRadius: radius.sm, padding: 12, fontSize: 16, color: colors.textBody, backgroundColor: colors.surfacePrimary },
-  action: { minHeight: 42, minWidth: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderWidth: 1, borderRadius: radius.sm, paddingHorizontal: 12, paddingVertical: 8, flexShrink: 1 }, actionIcon: { width: 42, minWidth: 42, paddingHorizontal: 0 }, action_primary: { borderColor: colors.brandBlue, backgroundColor: colors.brandBlue }, action_secondary: { borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary }, action_success: { borderColor: '#A7F3D0', backgroundColor: '#ECFDF5' }, action_danger: { borderColor: '#FECACA', backgroundColor: '#FEF2F2' }, action_icon: { borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary }, actionInactive: { borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary }, actionMark: { alignItems: 'center', justifyContent: 'center', gap: 1 }, actionLetter: { fontSize: 15, lineHeight: 18, fontWeight: '800' }, reasonChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 }, reasonChip: { maxWidth: '100%', borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.full, backgroundColor: colors.surfaceMuted, paddingHorizontal: 10, paddingVertical: 7 }, reasonChipText: { ...typography.caption, color: colors.textBody, fontWeight: '700' }, reasonInput: { minHeight: 90, textAlignVertical: 'top' }, actionText: { ...typography.bodySmall, color: colors.brandBlue, fontWeight: '700', flexShrink: 1 }, actionTextPrimary: { color: colors.surfacePrimary }, actionPressed: { opacity: 0.72 }, actionDisabled: { opacity: 0.5 },
+  action: { minHeight: 42, minWidth: 44, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderWidth: 1, borderRadius: radius.sm, paddingHorizontal: 12, paddingVertical: 8, flexShrink: 1 }, actionIcon: { width: 42, minWidth: 42, paddingHorizontal: 0 }, action_primary: { borderColor: colors.brandBlue, backgroundColor: colors.brandBlue }, action_secondary: { borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary }, action_success: { borderColor: '#A7F3D0', backgroundColor: '#ECFDF5' }, action_danger: { borderColor: '#FECACA', backgroundColor: '#FEF2F2' }, action_icon: { borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary }, actionInactive: { borderColor: colors.borderSubtle, backgroundColor: colors.surfacePrimary }, actionMark: { alignItems: 'center', justifyContent: 'center', gap: 1 }, actionLetter: { fontSize: 11, lineHeight: 12, fontWeight: '800' }, markButton: { width: 36, height: 36, minWidth: 36, minHeight: 36, paddingHorizontal: 0, paddingVertical: 0, borderWidth: 1.5, borderRadius: 8 }, reasonChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 }, reasonChip: { maxWidth: '100%', borderWidth: 1, borderColor: colors.borderSubtle, borderRadius: radius.full, backgroundColor: colors.surfaceMuted, paddingHorizontal: 10, paddingVertical: 7 }, reasonChipText: { ...typography.caption, color: colors.textBody, fontWeight: '700' }, reasonInput: { minHeight: 90, textAlignVertical: 'top' }, actionText: { ...typography.bodySmall, color: colors.brandBlue, fontWeight: '700', flexShrink: 1 }, actionTextPrimary: { color: colors.surfacePrimary }, actionPressed: { opacity: 0.72 }, actionDisabled: { opacity: 0.5 },
   cycle: { borderLeftWidth: 3, borderColor: colors.success, paddingLeft: 12, gap: 4 },
   error: { ...typography.bodySmall, color: colors.error },
   keyboardAvoiding: { flex: 1, width: '100%' }, overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center' },
@@ -504,18 +549,4 @@ const styles = StyleSheet.create({
   mobileOverlay: { justifyContent: 'flex-end', alignItems: 'stretch' },
   mobileDialog: { width: '100%', maxHeight: '88%', borderTopLeftRadius: 18, borderTopRightRadius: 18, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
   dialogContent: { padding: 20, gap: 20 }, radio: { minHeight: 48, flexDirection: 'row', gap: 12, alignItems: 'center' },
-});
-
-// Mantem o mesmo encaixe compacto do web no telefone: identidade e P/A/J
-// permanecem na mesma linha, com o nome podendo ser truncado.
-Object.assign(styles, {
-  participantRowCompact: { flexDirection: 'column', alignItems: 'stretch', gap: 8, paddingVertical: 12 },
-  participantIdentityCompact: { flexGrow: 0, flexShrink: 1, flexBasis: 'auto', width: '100%' },
-  participantActionsCompact: { width: '100%', flexGrow: 0, flexShrink: 0, justifyContent: 'flex-end', gap: 6, paddingLeft: 0, paddingTop: 0 },
-  actionIcon: { width: 42, minWidth: 42, paddingHorizontal: 0 },
-  mobileIconButton: { width: 42, height: 42 },
-  participantMenuOverlay: { ...StyleSheet.absoluteFill, zIndex: 10, elevation: 1 },
-  participantMenuWrap: { position: 'relative', zIndex: 100, elevation: 20 },
-  participantMenu: { position: 'absolute', top: 46, right: 0, minWidth: 160, zIndex: 110, elevation: 24, borderWidth: 1, borderColor: colors.borderDefault, borderRadius: radius.sm, backgroundColor: colors.surfacePrimary, padding: 5 },
-  searchRow: { minHeight: 42, backgroundColor: colors.surfacePrimary, borderColor: colors.borderSubtle },
 });

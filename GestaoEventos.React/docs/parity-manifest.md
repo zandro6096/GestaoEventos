@@ -33,6 +33,8 @@ Este arquivo e o ledger de release do app React. Uma rota ou fluxo so conta para
 
 Story 3.3: evidencia detalhada em `docs/evento-inicio-parity.md`; a deteccao de conflitos reais esta coberta pelo backend.
 
+Exceção de plataforma para revisão Apple 3.1.1 (2026-10-03): `/auth/cadastro` mantém cadastro público no Android/web; no iOS, somente permite ativação pessoal por convite validado de organização existente. Login iOS não oferece cadastro aberto; rota direta sem convite mostra orientação para convite. Testes: `test:store-review`, incluindo `registration-policy.test.cjs`.
+
 | React route/flow | Angular route/component | Angular service/source | Backend endpoint/class | Context scope | Permission checks | Analytics events | Tests | Status | Gaps |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `/admin/eventos/criar` e edição em acompanhamento | `libs/adm/eventos/form/evento-form.component`; `acompanhar-evento` com modal de edição | `EventoFormBase`; `EventoApiService`; `EventoTemplateService`; `GrupoService` | `GET /api/evento-templates`; `GET /api/grupos`; `GET /api/eventos/conflitos`; `POST /api/eventos`; `GET/PUT /api/eventos/{id}` | usuario -> estrutura -> grupos | `can(criar/gerenciar,eventos)`; contexto e offline revalidados antes da escrita | `visualization`; `simulation:evento:criar_step_*`; `simulation:evento:criar_submit`; `confirmation:evento:criar`; `entrance/simulation/confirmation` para edição | `smoke:criar-evento`; `check:acompanhamento`; type-check; lint | verified | Criação e edição usam contratos reais. A edição preserva recorrência e permite título, descrição, grupo, data/horário, endereço, consolidação, reabertura e presença agrupada. |

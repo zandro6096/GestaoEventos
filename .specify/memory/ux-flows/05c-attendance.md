@@ -66,6 +66,27 @@ Status muda: `PUBLICADO` → `EM_ANDAMENTO`
 **Rota**: `/admin/eventos/acompanhar/:id`
 **Componente**: `AcompanharEventoComponent` ⚠️ **Em desenvolvimento (placeholder)**
 
+### Feedback de início e presença na matriz
+
+- Na matriz de presença, cada opção é identificada por nome acessível: Presente,
+  Ausente ou Justificado; P/A/J podem continuar como abreviação visual em telas
+  compactas, com `title` e `aria-label` descritivos.
+- Ao selecionar um status para ocorrência agendada/reagendada, iniciar a ocorrência
+  automaticamente antes de aplicar a alteração local. Enquanto a API responde,
+  impedir novos toques para aquela ocorrência e informar o progresso.
+- Se o início falhar, reverter o status visual e explicar que nenhuma presença foi
+  alterada, orientando a conferir a conexão e tentar novamente.
+- O botão explícito Iniciar também deve mostrar “Iniciando...” e confirmar sucesso.
+
+### Cancelar ocorrência na matriz
+
+- A ação “Cancelar ocorrência” fica disponível para ocorrências agendadas,
+  reagendadas ou em andamento, inclusive no cartão mobile.
+- O motivo é obrigatório (mínimo de 5 caracteres; máximo de 500), com confirmação
+  em andamento enquanto a API responde.
+- Em sucesso, preservar a ocorrência no histórico e exibir seu motivo; em falha,
+  manter a ocorrência ativa e apresentar a mensagem de erro.
+
 ### Status de Presença Disponíveis
 
 | Status | Ícone | Observação obrigatória | Configurável pelo template? |
@@ -131,7 +152,10 @@ independente de `requerJustificativa`. (JUSTIFICADO implica explicação prévia
 - Usuário virtual pode ter o nome corrigido, pois ainda não representa uma conta real.
 - Usuário vinculado ao sistema não pode ter `Usuario.Nome` alterado por outro usuário; a edição salva apenas `nome_exibicao` como apelido no evento.
 - Usuário virtual também pode ter `data_nascimento` cadastrada/alterada pela chamada para alimentar o card de aniversariantes no dashboard.
-- Na UI pt-BR, `data_nascimento` deve ser exibida/editada como `dd/MM/yyyy` (ex.: `25/12/2026`) e enviada ao backend normalizada como `yyyy-MM-dd`.
+- Na UI pt-BR, datas de nascimento, entrada e início de acompanhamento devem usar seletor de calendário nativo e aparecer como `dd/MM/yyyy` (ex.: `25/12/2026`); enviar ao backend como ISO 8601 (`yyyy-MM-ddTHH:mm:ss`).
+- Endereço de participante é opcional e começa recolhido no mobile; após inclusão bem-sucedida, mostrar confirmação e limpar os campos pessoais para permitir novo cadastro.
+- Indicadores e acompanhamentos já registrados pertencem à pessoa na estrutura. Ao vincular uma pessoa existente a outro evento, não pedir para redefinir esses dados.
+- O modelo de evento pode definir se novos participantes começam selecionados em todos os eventos do mesmo grupo. A seleção continua editável no momento da inclusão.
 - Telefone de usuário virtual deve aparecer como **Celular** com máscara `(99) 99999-9999`.
 - Usuário vinculado ao sistema não pode ter `Usuario.DataNascimento` alterado por outro responsável nesta tela; a data é apenas exibida quando já existe no perfil.
 - Remover participante nunca apaga histórico passado já registrado.
@@ -161,13 +185,14 @@ Regras:
   - apoio à ação de acompanhamento de participantes.
 - O histórico de presença passado permanece preservado e continua disponível para análise de frequência/faltas no cockpit.
 
-### Cancelamento pela Lixeira (Fluxo Principal)
+### Iniciar e cancelar ocorrência no mobile
 
-Na tela de chamada (`/admin/eventos/acompanhar/:id`):
+Na tela de acompanhamento (`/admin/eventos/acompanhar/:id`):
 
-1. A lixeira abre **Cancelar Evento** (não exclusão permanente).
-2. Motivo é obrigatório para confirmar cancelamento da ocorrência.
-3. Exclusão permanente fica em ação secundária explícita dentro do modal de cancelamento.
+1. **Iniciar evento** envia a ação ao tocar e mostra o indicador de carregamento até a resposta da API.
+2. Se o início falhar, a mensagem de erro fica visível na tela.
+3. **Cancelar evento** aparece com texto na faixa de ações; o modal exige motivo com pelo menos 5 caracteres.
+4. O cancelamento preserva a ocorrência no histórico.
 
 ### Funcionalidades do Painel de Presença
 

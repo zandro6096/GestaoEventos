@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
@@ -39,7 +40,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         if (url.pathname === '/api/ocorrencias/91/status') data = { data: { id: 91, status: 'EmAndamento' } };
         await route.fulfill({ json: data });
       });
-      await page.goto('http://localhost:8083/eventos/iniciar');
+      await page.goto(`${SMOKE_BASE_URL}/eventos/iniciar`);
       if (width < 600) {
         await page.getByText('Mais', { exact: true }).click();
         await page.getByText('Menu', { exact: true }).waitFor();

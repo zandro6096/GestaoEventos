@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { track } from '../../../services/analytics/analytics.service';
 import { colors, spacing, typography } from '../../../shared/design/tokens';
@@ -14,10 +14,11 @@ import { biometricAvailability, isBiometricLoginEnabled } from '../services/biom
 import { useBiometricLoginMutation, useInviteDetails, useLoginMutation } from '../hooks/usePublicAuth';
 import { loginSchema, type LoginFormValues } from '../schemas/public-auth.schemas';
 import { getErrorMessage, getSingleParam } from './screen-utils';
+import { allowsPublicRegistration } from '../services/registration-policy';
 
 export function LoginScreen() {
   const params = useLocalSearchParams<{ convite?: string | string[] }>();
-  const inviteToken = getSingleParam(params.convite);
+  const inviteToken = getSingleParam(params.convite)?.trim() || null;
   const router = useRouter();
   const inviteQuery = useInviteDetails(inviteToken);
   const loginMutation = useLoginMutation();
@@ -92,10 +93,16 @@ export function LoginScreen() {
       subtitle="Entre com suas credenciais para continuar."
       footer={
         <View style={styles.footerRow}>
-          <Text style={styles.footerText}>Ainda não tem uma conta?</Text>
-          <Pressable accessibilityRole="link" onPress={() => router.push('/auth/cadastro')}>
-            <Text style={styles.linkText}>Registre-se</Text>
-          </Pressable>
+          {inviteToken || allowsPublicRegistration(Platform.OS) ? (
+            <>
+              <Text style={styles.footerText}>{inviteToken ? 'Recebeu um convite?' : 'Ainda não tem uma conta?'}</Text>
+              <Pressable accessibilityRole="link" onPress={() => router.push({ pathname: '/auth/cadastro', params: inviteToken ? { convite: inviteToken } : {} })}>
+                <Text style={styles.linkText}>{inviteToken ? 'Aceitar convite' : 'Registre-se'}</Text>
+              </Pressable>
+            </>
+          ) : (
+            <Text style={styles.footerText}>Para participar, peça ao administrador um convite para o seu e-mail.</Text>
+          )}
         </View>
       }
     >
@@ -127,6 +134,7 @@ export function LoginScreen() {
               keyboardType="email-address"
               autoComplete="username"
               placeholder="seu@email.com"
+              returnKeyType="next"
               error={errors.login?.message}
             />
           )}
@@ -143,6 +151,8 @@ export function LoginScreen() {
               onChangeText={onChange}
               autoComplete="current-password"
               placeholder="Sua senha"
+              returnKeyType="go"
+              onSubmitEditing={handleLoginPress}
               error={errors.senha?.message}
             />
           )}
@@ -180,11 +190,15 @@ const styles = StyleSheet.create({
   },
   footerRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
     gap: spacing.xs,
   },
   footerText: {
+    flexShrink: 1,
+    maxWidth: '100%',
+    textAlign: 'center',
     ...typography.bodySmall,
     color: colors.textSecondary,
   },

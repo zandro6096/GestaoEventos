@@ -1,3 +1,4 @@
+const SMOKE_BASE_URL = process.env.GESTAOEVENTOS_SMOKE_BASE_URL || 'http://localhost:8083';
 const assert = require('node:assert/strict');
 const { Buffer } = require('node:buffer');
 const fs = require('node:fs');
@@ -36,7 +37,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
           if (url.pathname === '/api/eventos/42/participantes/8' && request.method() === 'DELETE') {
             hasParticipant = false; participantWrites.push(request.postDataJSON());
           }
-          if (url.pathname === '/api/usuarios') data = { data: [{ id: 8, nome: 'Participante de teste' }] };
+          if (url.pathname === '/api/grupos-membros') data = { data: [{ usuario_id: 8 }] };
+          if (url.pathname === '/api/usuarios-estrutura') data = { data: [{ usuario_id: 8, nome_usuario: 'Participante de teste', email_usuario: null }] };
           if (url.pathname === '/api/eventos/42/ciclos') data = { data: [{ id: 4, nome: 'Ciclo atual', inicio_em: '2026-01-01', ativo: true }] };
           if (request.method() === 'PUT') { writes.push(request.postDataJSON()); status = request.postDataJSON().novo_status; data = { id: 91, status }; }
           if (url.pathname === '/api/ocorrencias/91/descancelar') { writes.push(request.postDataJSON()); status = 'Agendada'; }
@@ -45,7 +47,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
         const route = scenario === 'success' && width === 390
           ? '/admin/eventos/42/ocorrencias?data=2026-09-07'
           : '/eventos/acompanhar/42?data=2026-09-07';
-        await page.goto(`http://localhost:8083${route}`);
+        await page.goto(`${SMOKE_BASE_URL}${route}`);
         if (scenario === '404' || scenario === '403') {
           await page.getByText(scenario === '404' ? 'Evento nao encontrado.' : 'Sem permissao para este evento.', { exact: true }).waitFor();
           assert.equal(await page.getByRole('button', { name: 'Adicionar participante', exact: true }).count(), 0);
@@ -54,7 +56,11 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
           await page.screenshot({ path: `tests/artifacts/acompanhamento/${scenario}-${width}.png`, fullPage: true });
           if (scenario === 'success') {
-            await page.getByRole('button', { name: 'Remover Participante de teste', exact: true }).click();
+            // Editar/Remover ficam no menu "Mais acoes" da linha, no celular e no desktop.
+            const participantMenu = page.getByRole('button', { name: 'Mais acoes de Participante de teste', exact: true });
+            await participantMenu.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+            await participantMenu.click();
+            await page.getByText('Remover participante', { exact: true }).click();
             await page.getByLabel('Motivo', { exact: true }).fill('Mudanca de grupo');
             await page.getByRole('button', { name: 'Confirmar', exact: true }).click();
             await page.getByText('Nenhum participante nesta ocorrencia.', { exact: true }).waitFor();
@@ -62,21 +68,30 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
             assert.equal(participantWrites[0].escopo, 'somente_ocorrencia');
             assert.equal(participantWrites[0].tipo, 'usuario');
             await page.getByRole('button', { name: 'Adicionar participante', exact: true }).click();
-            await page.getByLabel('Nome da pessoa', { exact: true }).fill('Participante');
-            await page.getByRole('button', { name: 'Buscar pessoas', exact: true }).click();
+            await page.getByText('Pessoa existente', { exact: true }).click();
+            await page.getByLabel('Buscar pessoa', { exact: true }).fill('Participante');
             await page.getByText('Participante de teste', { exact: true }).click();
             await page.getByText('Esta e as proximas ocorrencias', { exact: true }).click();
-            await page.getByRole('button', { name: 'Confirmar', exact: true }).click();
-            await page.getByRole('button', { name: 'Remover Participante de teste', exact: true }).waitFor();
+            await page.getByText('Adicionar participante', { exact: true }).last().click();
+            // O painel fica aberto para adicionar mais pessoas; confirma o sucesso e fecha.
+            await page.getByText('Pessoa adicionada aos encontros selecionados.', { exact: true }).waitFor();
+            await page.getByText('Cancelar', { exact: true }).last().click();
+            {
+              const participantMenu = page.getByRole('button', { name: 'Mais acoes de Participante de teste', exact: true });
+              await participantMenu.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+              await participantMenu.click();
+              await page.getByText('Remover participante', { exact: true }).waitFor();
+            }
             assert.equal(participantWrites[1].usuario_id, 8);
             assert.equal(participantWrites[1].escopo, 'futuros');
           }
           if (scenario === 'cancelled') {
             assert.equal(await page.getByRole('button', { name: 'Adicionar participante', exact: true }).count(), 0);
             await page.getByRole('button', { name: 'Restaurar ocorrencia', exact: true }).click();
-          } else await page.getByRole('button', { name: 'Cancelar ocorrencia', exact: true }).click();
+          } else await page.getByRole('button', { name: 'Cancelar evento', exact: true }).click();
           assert.equal(await page.getByRole('button', { name: 'Confirmar', exact: true }).isDisabled(), true);
-          await page.getByLabel('Motivo', { exact: true }).fill('Mudanca de agenda');
+          // Restaurar (descancelar) também pede motivo, no campo "Motivo".
+          await page.getByLabel(scenario === 'cancelled' ? 'Motivo' : 'Motivo do cancelamento', { exact: true }).fill('Mudanca de agenda');
           await page.getByRole('button', { name: 'Confirmar', exact: true }).scrollIntoViewIfNeeded();
           await page.waitForTimeout(400); // Allow the native modal slide animation to settle before capturing.
           await page.screenshot({ path: `tests/artifacts/acompanhamento/dialog-${scenario}-${width}.png`, fullPage: true });
