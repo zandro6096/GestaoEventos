@@ -12,6 +12,7 @@ import { colors, radius, spacing, typography } from '../../../shared/design/toke
 import { layoutMetrics } from '../../../shared/theme';
 import { JornadaActionPanel, type JornadaActionTarget } from '../components/JornadaActionPanel';
 import { JornadaSectionTabs, type JornadaView } from '../components/JornadaSectionTabs';
+import { McpAnnouncementBanner } from '../../mcp/components/McpAnnouncementBanner';
 import { useJornada } from '../hooks/useJornada';
 import { usePendenciasDetalhe } from '../hooks/usePendenciasDetalhe';
 import type {
@@ -164,6 +165,7 @@ export function JornadaScreen() {
 
   return (
     <ScreenShell>
+      <McpAnnouncementBanner />
       {compact && activeView !== 'pendencias' && jornada.pendenciasResumo && jornada.pendenciasResumo.total > 0 ? (
         <PendenciasSection
           data={jornada.pendenciasResumo}
