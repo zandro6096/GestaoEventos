@@ -10,6 +10,8 @@ O app usa tres lanes explicitas:
 
 `EXPO_PUBLIC_API_URL` deve conter somente a origem/base URL, sem o sufixo `/api`, caminho, query ou fragmento. Preview e prod falham no preflight e no `app.config.js` quando a variavel falta, e nunca aceitam localhost. `EXPO_PUBLIC_ANALYTICS_ENABLED=false` desabilita o provider de analytics sem alterar o fluxo do produto; por padrao, analytics fica ativo.
 
+Para builds `prod`, o EAS tambem precisa receber duas variaveis fora do Git: `GOOGLE_SERVICES_JSON` (arquivo/configuracao Firebase Android da app `manager.events`) e `GOOGLE_SERVICE_INFO_PLIST` (arquivo/configuracao Firebase iOS da app `manager.events`). Prefira variaveis do tipo arquivo; o `app.config.js` tambem aceita o conteudo como secret. O build produtivo bloqueia cada plataforma quando sua configuracao estiver ausente.
+
 ## EAS
 
 Os perfis estao em `eas.json`: `development`, `preview` e `production`, com canais `dev`, `preview` e `prod`. Configure `EXPO_PUBLIC_API_URL` nos ambientes EAS correspondentes antes de executar `eas build`. A variavel nao e um segredo, mas nao deve ser substituida por placeholder no ambiente publicado.

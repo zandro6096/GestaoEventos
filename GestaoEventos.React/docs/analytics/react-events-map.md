@@ -6,6 +6,8 @@ O React usa `RouteAnalyticsTracker` no layout raiz para emitir uma visualizacao 
 
 Features devem usar `funnel.entrance`, `funnel.simulation` e `funnel.confirmation` em `services/analytics/funnel.ts`. A API delega para `track`, portanto o mesmo contrato de detalhe seguro e o mesmo provider web/native sao aplicados em todos os fluxos.
 
+No web, o adapter publica `ge_event` no `dataLayer` para o GTM. Em Android e iOS, os adapters publicam o mesmo `ge_event` usando Firebase Analytics nativo, que alimenta a propriedade GA4 vinculada ao projeto Firebase. A fila local só é fallback para falha de inicialização; o SDK Firebase mantém a entrega offline.
+
 | Area | Entrance | Simulation | Confirmation |
 | --- | --- | --- | --- |
 | Auth | login/cadastro | submit | sucesso de autenticacao |

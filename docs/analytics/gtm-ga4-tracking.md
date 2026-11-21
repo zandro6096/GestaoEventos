@@ -106,3 +106,9 @@ Crie dimensoes de escopo `Event`:
 
 - Mantenha GTM como canal principal para GA4.
 - Nao criar envio paralelo de GA4 fora do GTM para os mesmos eventos.
+
+## 10. Apps Android e iOS
+
+O app React Native envia o mesmo contrato `ge_event` diretamente pelo Firebase Analytics nativo. Essa rota nao usa GTM: o projeto Firebase deve estar vinculado à propriedade GA4 `Manager Events` e conter as apps `manager.events` (Android) e `manager.events` (iOS). Os arquivos `google-services.json` e `GoogleService-Info.plist` sao injetados nos builds por variaveis de ambiente do EAS e nunca devem entrar no Git.
+
+Depois de instalar uma build assinada, valide em `GA4 > Reports > Realtime` ou no DebugView do Firebase a presenca de `ge_event` com `custom_path`, `custom_action` e `custom_detail`.

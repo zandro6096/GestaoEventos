@@ -16,6 +16,8 @@ O app do Manager Person nao deve compartilhar package, bundle ID, credencial de 
 
 O EAS gerencia a chave de assinatura Android remotamente. Para submeter ao Google Play, cadastrar uma conta de servico no Play Console e disponibilizar o JSON fora do Git. O arquivo `google-services.json` do Firebase nao substitui essa conta de servico.
 
+O build produtivo tambem precisa da configuracao Firebase Android na variavel de ambiente secreta `GOOGLE_SERVICES_JSON`. O app envia analytics nativo para a propriedade GA4 vinculada ao projeto Firebase.
+
 ```bash
 eas build --platform android --profile production
 eas submit --platform android --latest
@@ -41,11 +43,17 @@ Estado da ficha iOS em 2026-09-09:
 
 Ainda dependem de dados reais antes do envio: URL da politica de privacidade, declaracao de direitos sobre conteudo de terceiros e credenciais de uma conta de revisao. A declaracao `ITSAppUsesNonExemptEncryption=false` ja esta configurada no app.
 
+Para o proximo build com analytics nativo, cadastrar a app iOS `manager.events` no mesmo projeto Firebase e disponibilizar `GoogleService-Info.plist` como variavel de ambiente secreta `GOOGLE_SERVICE_INFO_PLIST`. O `app.config.js` bloqueia o build iOS produtivo sem esse arquivo.
+
 O envio Android ainda exige um JSON de conta de servico do Google Play com permissao no app `manager.events`; o `google-services.json` do Firebase nao substitui esse arquivo.
 
-## Build Android em andamento
+No ambiente EAS de producao existe `GOOGLE_SERVICES_JSON`, mas ainda nao existe `GOOGLE_SERVICE_INFO_PLIST`. Por isso um novo build iOS com GA4 nativo nao pode ser concluido ate cadastrar a app iOS `manager.events` no Firebase e adicionar esse segredo.
 
-O build produtivo alinhado à ficha do Google Play foi criado no EAS com version code `8`. O job e `e385854e-2aa4-459a-be36-48c442318ded`; a URL de logs fica no projeto EAS. A submissao so deve ser executada depois que o job estiver `finished` e a ficha do Google Play estiver criada.
+## Build Android e submissao atuais
+
+O build produtivo com analytics nativo foi concluido no EAS com a versao `1.0.3` e version code `32`. O job e `106d6930-40ad-4ff9-a6e7-ee755acd2aed`. A submissao foi agendada para o track interno do Google Play no envio `23114f34-8c32-4859-99cf-d264efd98b8a`.
+
+O submit precisa resolver o ambiente `prod` (`EXPO_PUBLIC_ENV=prod`) para usar o pacote `manager.events`; sem isso o EAS tenta submeter o pacote de desenvolvimento `manager.eventsdev`.
 
 ## Build iOS enviada
 
